@@ -1,8 +1,4 @@
-import { Injectable } from '@nestjs/common';
-
-@Injectable()
-export class UsersService {}
-aimport { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -22,9 +18,10 @@ export class UsersService {
     return user;
   }
 
-  async create(data: { email: string; password?: string; role?: UserRole }) {
-    const passwordHash = data.password ? await bcrypt.hash(data.password, 10) : undefined;
+  async create(data: { email: string; password?: string; role?: 'student'|'admin' }) {
+    const passwordHash = data.password ? await bcrypt.hash(data.password, 10) : await bcrypt.hash(crypto.randomUUID(), 10);
     const user = this.users.create({
+      id: crypto.randomUUID(),
       email: data.email,
       passwordHash: passwordHash ?? '',
       role: data.role ?? 'student',
@@ -37,7 +34,7 @@ export class UsersService {
     if (data.email) user.email = data.email;
     if (data.password) user.passwordHash = await bcrypt.hash(data.password, 10);
     if (data.role) user.role = data.role;
-    return this.users.save(user);
+    return this.users.update(id, user);
   }
 
   async remove(id: string) {
