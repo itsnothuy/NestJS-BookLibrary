@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Pool } from 'mysql2/promise';
+import type { Pool } from 'mysql2/promise';
 import { MYSQL } from '../database/mysql.module';
 
 export type UserRow = {
@@ -17,22 +17,27 @@ export class UsersRepo {
 
   async findByEmail(email: string) {
     const [rows] = await this.pool.execute('SELECT * FROM user WHERE email=? LIMIT 1', [email]);
-    return Array.isArray(rows) ? rows[0] : null;
+    const arr = rows as any[];
+    return arr[0] ?? null;
   }
 
   async findById(id: string): Promise<UserRow | null> {
     const [rows] = await this.pool.execute('SELECT * FROM user WHERE id=? LIMIT 1', [id]);
-    return Array.isArray(rows) && rows.length > 0 ? rows[0] as UserRow : null;
+    const arr = rows as any[];
+    return arr[0] ?? null;
   }
 
   async findAll(): Promise<UserRow[]> {
-    const [rows] = await this.pool.execute('SELECT * FROM user ORDER BY createdAt DESC');
-    return Array.isArray(rows) ? rows as UserRow[] : [];
+    const [rows] = await this.pool.query('SELECT id, email, role, createdAt, updatedAt FROM user ORDER BY createdAt DESC');
+    return rows as any[];
   }
 
   async create(data: { id: string; email: string; passwordHash: string; role: 'student'|'admin' }): Promise<UserRow> {
-    const [result] = await this.pool.execute('INSERT INTO user SET ?', [data]);
-    return { ...data, id: result.insertId };
+    await this.pool.query(
+      'INSERT INTO user (id, email, passwordHash, role) VALUES (?, ?, ?, ?)',
+      [data.id, data.email, data.passwordHash, data.role],
+    );
+    return (await this.findById(data.id))!;
   }
 
   async update(id: string, patch: Partial<Pick<UserRow,'email'|'passwordHash'|'role'>>): Promise<UserRow> {
@@ -42,7 +47,7 @@ export class UsersRepo {
     const passwordHash = patch.passwordHash ?? user.passwordHash;
     const role = patch.role ?? user.role;
     await this.pool.query('UPDATE user SET email=?, passwordHash=?, role=? WHERE id=?', [email, passwordHash, role, id]);
-    return { ...user, email, passwordHash, role };
+    return (await this.findById(id))!;
   }
 
   async remove(id: string): Promise<void> {

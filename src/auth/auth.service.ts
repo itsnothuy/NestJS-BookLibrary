@@ -5,10 +5,6 @@ import * as crypto from 'crypto';
 import { JwtService } from '@nestjs/jwt';
 import { UsersRepo } from 'src/users/users.repo';
 
-type UserRecord = { id: string; email: string; passwordHash: string; role: 'student'|'admin' };
-// TEMP store (replace with DB next step)
-const users: UserRecord[] = [];
-
 @Injectable()
 export class AuthService {
     constructor(
@@ -20,7 +16,7 @@ export class AuthService {
         const exists = await this.usersRepo.findByEmail(email);
         if (exists) throw new ConflictException('Email exists');
         const passwordHash = await bcrypt.hash(password, 12);
-        await this.usersRepo.create(
+        const user = await this.usersRepo.create(
             { id: crypto.randomUUID(), email, passwordHash, role: 'student' }
         );
         return this.sign(user.id, user.email, user.role);

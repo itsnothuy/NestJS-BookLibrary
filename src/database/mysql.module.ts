@@ -1,6 +1,6 @@
 // src/database/mysql.module.ts
 import { Module } from '@nestjs/common';
-import { createPool, Pool } from 'mysql2/promise';
+import mysql, { Pool } from 'mysql2/promise';
 
 export const MYSQL = Symbol('MYSQL_POOL');
 
