@@ -13,31 +13,31 @@ This document visualizes the current backend stack using Mermaid diagrams: high-
 ```mermaid
 flowchart LR
   subgraph Client["API Consumer (HTTP)"]
-    U[Frontend / API Client]
+    U["Frontend / API Client"]
   end
 
   subgraph App["NestJS App (Express)"]
     direction LR
 
     subgraph C["Controllers"]
-      AC[AuthController]
-      UC[UsersController]
+      AC["AuthController"]
+      UC["UsersController"]
     end
 
     subgraph S["Services (Providers)"]
-      AS[AuthService]
-      US[UsersService]
+      AS["AuthService"]
+      US["UsersService"]
     end
 
     subgraph G["Auth & RBAC"]
-      JG[JwtAuthGuard]
-      RS[JwtStrategy]
-      RG[RolesGuard]
+      JG["JwtAuthGuard"]
+      RS["JwtStrategy"]
+      RG["RolesGuard"]
     end
 
     subgraph R["Data Access (no ORM)"]
-      UR[UsersRepo]
-      MP[MYSQL_POOL (mysql2/promise)]
+      UR["UsersRepo"]
+      MP["MYSQL_POOL (mysql2/promise)"]
     end
   end
 
@@ -185,13 +185,13 @@ sequenceDiagram
 ```mermaid
 flowchart LR
   subgraph Host
-    ENV[.env\nDB_HOST/USER/PASS/NAME\nJWT_SECRET/EXPIRES]
-    Proc[(node / nest start)]
+    ENV[".env<br/>DB_HOST/USER/PASS/NAME<br/>JWT_SECRET/EXPIRES"]
+    Proc["node / nest start"]
   end
 
   subgraph App["NestJS App"]
-    Mods[AppModule • AuthModule • UsersModule • MysqlModule]
-    Pool[MYSQL_POOL (mysql2/promise)]
+    Mods["AppModule, AuthModule, UsersModule, MysqlModule"]
+    Pool["MYSQL_POOL (mysql2/promise)"]
   end
 
   MariaDB[(MariaDB Server)]
@@ -201,8 +201,8 @@ flowchart LR
   App --> Pool --> MariaDB
 
   subgraph Migrations
-    Runner[ts-node src/database/migrate.ts]
-    Files[*.sql in src/database/migrations]
+    Runner["ts-node src/database/migrate.ts"]
+    Files["*.sql in src/database/migrations"]
   end
   Runner --> MariaDB
   Files --> Runner
