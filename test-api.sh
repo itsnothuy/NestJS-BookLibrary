@@ -1,0 +1,190 @@
+#!/bin/bash
+
+# Script to test the NestJS BookLibrary API
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Function to print colored output
+print_status() {
+    local status=$1
+    local message=$2
+    case $status in
+        "INFO")
+            echo -e "${BLUE}[INFO]${NC} $message"
+            ;;
+        "SUCCESS")
+            echo -e "${GREEN}[SUCCESS]${NC} $message"
+            ;;
+        "WARNING")
+            echo -e "${YELLOW}[WARNING]${NC} $message"
+            ;;
+        "ERROR")
+            echo -e "${RED}[ERROR]${NC} $message"
+            ;;
+    esac
+}
+
+# Function to check if a command exists
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+# Step 1: Check prerequisites
+print_status "INFO" "Step 1: Checking prerequisites..."
+
+if ! command_exists curl; then
+    print_status "ERROR" "curl is not installed"
+    exit 1
+fi
+
+if ! command_exists node; then
+    print_status "ERROR" "Node.js is not installed"
+    exit 1
+fi
+
+print_status "SUCCESS" "All prerequisites are available"
+
+# Step 0: Reset the Database
+print_status "INFO" "Step 0: Resetting the database..."
+
+# Stop and remove the MariaDB container
+print_status "INFO" "Stopping and removing the MariaDB container..."
+docker stop mariadb-dev >/dev/null 2>&1
+if docker rm mariadb-dev >/dev/null 2>&1; then
+    print_status "SUCCESS" "MariaDB container removed."
+else
+    print_status "WARNING" "MariaDB container was not running."
+fi
+
+# Remove the MariaDB data volume
+print_status "INFO" "Removing the MariaDB data volume..."
+if docker volume rm student-library-api_mariadb_data >/dev/null 2>&1; then
+    print_status "SUCCESS" "MariaDB data volume removed."
+else
+    print_status "WARNING" "MariaDB data volume not found."
+fi
+
+# Start fresh MariaDB container
+print_status "INFO" "Starting a fresh MariaDB container..."
+docker-compose up -d mariadb
+if [ $? -eq 0 ]; then
+    print_status "SUCCESS" "MariaDB container started."
+else
+    print_status "ERROR" "Failed to start MariaDB container."
+    exit 1
+fi
+
+# Wait for MariaDB to be ready and create user table
+print_status "INFO" "Waiting for MariaDB to be ready..."
+for i in {1..30}; do
+  if docker exec mariadb-dev mariadb -u nestuser -pnestpassword -e "SELECT 1" >/dev/null 2>&1; then
+    print_status "SUCCESS" "MariaDB is ready"
+    break
+  fi
+  sleep 2
+done
+
+# Create user table
+print_status "INFO" "Creating user table..."
+docker exec mariadb-dev mariadb -u nestuser -pnestpassword -e "USE nestjs_library; CREATE TABLE IF NOT EXISTS user (id VARCHAR(36) PRIMARY KEY, email VARCHAR(255) NOT NULL UNIQUE, passwordHash VARCHAR(255) NOT NULL, role ENUM('student', 'admin') NOT NULL, createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP);" >/dev/null 2>&1
+if [ $? -eq 0 ]; then
+    print_status "SUCCESS" "User table created/verified"
+else
+    print_status "ERROR" "Failed to create user table"
+    exit 1
+fi
+
+# Step 0.5: Check for processes using port 3000
+print_status "INFO" "Checking for processes using port 3000..."
+PORT_3000_PROCESSES=$(lsof -ti:3000)
+if [ -n "$PORT_3000_PROCESSES" ]; then
+    print_status "WARNING" "Processes found using port 3000: $PORT_3000_PROCESSES"
+else
+    print_status "SUCCESS" "No processes are using port 3000"
+fi
+
+# Kill processes using port 3000 if any
+if [ -n "$PORT_3000_PROCESSES" ]; then
+    print_status "INFO" "Terminating processes using port 3000..."
+    echo "$PORT_3000_PROCESSES" | xargs kill -9
+    print_status "SUCCESS" "Terminated processes using port 3000"
+fi
+
+# Step 2: Start the NestJS application
+print_status "INFO" "Step 2: Starting the NestJS application..."
+npm run start:dev &
+NEST_PID=$!
+
+# Wait for the application to start
+sleep 10
+
+# Step 3: Test MariaDB connection
+print_status "INFO" "Step 3: Testing MariaDB connection..."
+MARIADB_TEST=$(docker exec mariadb-dev mariadb -u nestuser -pnestpassword -e "SELECT 1 as test;" 2>/dev/null)
+
+if [[ $MARIADB_TEST == *"test"* ]]; then
+    print_status "SUCCESS" "MariaDB connection successful"
+else
+    print_status "ERROR" "Failed to connect to MariaDB"
+    echo "Debug: Checking MariaDB container status..."
+    docker ps | grep mariadb
+    exit 1
+fi
+
+# Step 3: Test API endpoints
+print_status "INFO" "Step 3: Testing API endpoints..."
+
+# Test 1: Health check
+print_status "INFO" "Testing health check endpoint..."
+HEALTH_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/health)
+if [ "$HEALTH_RESPONSE" -eq 200 ]; then
+    print_status "SUCCESS" "Health check passed"
+else
+    print_status "ERROR" "Health check failed with status code $HEALTH_RESPONSE"
+    kill $NEST_PID
+    exit 1
+fi
+
+# Additional Tests for Authentication and Database
+
+# Test 2: Signup Endpoint
+print_status "INFO" "Testing signup endpoint..."
+SIGNUP_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:3000/auth/signup \
+  -H "Content-Type: application/json" \
+  -d '{"email":"testuser@example.com","password":"TestPassword123"}')
+if [ "$SIGNUP_RESPONSE" -eq 201 ]; then
+    print_status "SUCCESS" "Signup test passed"
+else
+    print_status "ERROR" "Signup test failed with status code $SIGNUP_RESPONSE"
+fi
+
+# Test 3: Login Endpoint
+print_status "INFO" "Testing login endpoint..."
+LOGIN_RESPONSE=$(curl -s -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"testuser@example.com","password":"TestPassword123"}')
+ACCESS_TOKEN=$(echo "$LOGIN_RESPONSE" | jq -r .access_token)
+if [ "$ACCESS_TOKEN" != "null" ] && [ -n "$ACCESS_TOKEN" ]; then
+    print_status "SUCCESS" "Login test passed"
+else
+    print_status "ERROR" "Login test failed"
+fi
+
+# Test 4: Database Check
+print_status "INFO" "Testing database for user existence..."
+USER_EXISTS=$(docker exec mariadb-dev mariadb -u nestuser -pnestpassword -e "USE nestjs_library; SELECT email FROM user WHERE email='testuser@example.com';" 2>/dev/null | grep testuser@example.com)
+if [ -n "$USER_EXISTS" ]; then
+    print_status "SUCCESS" "User exists in the database"
+else
+    print_status "ERROR" "User does not exist in the database"
+fi
+
+# Step 4: Cleanup
+print_status "INFO" "Step 4: Cleaning up..."
+kill $NEST_PID
+print_status "SUCCESS" "Test completed!"

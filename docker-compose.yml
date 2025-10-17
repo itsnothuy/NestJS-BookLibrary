@@ -1,0 +1,95 @@
+version: "3.8"
+services:
+  web:
+    image: httpd24:latest
+    container_name: "httpd-dev"
+    # restart: always
+    hostname: httpd01
+    networks:
+      - my-network
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./php_codes:/htdocs/
+      - ./my-httpd.conf:/usr/local/apache2/conf/httpd.conf
+      - ./my-httpd-vhosts.conf:/usr/local/apache2/conf/extra/httpd-vhosts.conf
+      - ./my-httpd-ssl.conf:/usr/local/apache2/conf/extra/httpd-ssl.conf
+      - ./apache/logs:/usr/local/apache2/logs
+    command: ["httpd-foreground"]
+  mariadb:
+    image: mariadb:latest
+    container_name: "mariadb-dev"
+    # restart: always
+    hostname: mysql02
+    networks:
+      - my-network
+    ports:
+      - "3307:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "rootpassword"
+      MYSQL_DATABASE: "nestjs_library"
+      MYSQL_USER: "nestuser"
+      MYSQL_PASSWORD: "nestpassword"
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "ping", "-unestuser", "-pnestpassword"]
+      interval: 3s
+      timeout: 5s
+      retries: 10
+  php83:
+    image: php83fpm-phalcon56:latest
+    container_name: "php8-dev"
+    # restart: always
+    hostname: php03
+    networks:
+      - my-network
+    volumes:
+      - ./my-php8.ini:/usr/local/etc/php/php.ini
+      - ./php_codes:/htdocs/
+    ports:
+      - 9501:9501
+  php74:
+    image: php74fpm-phalcon42:latest
+    container_name: "php7-dev"
+    # restart: always
+    hostname: php04
+    networks:
+      - my-network
+    volumes:
+      - ./my-php8.ini:/usr/local/etc/php/php.ini
+      - ./php_codes:/htdocs/
+    ports:
+      - 9502:9501
+  mongodb1:
+    image: mongo:latest
+    container_name: "mongo1"
+    # restart: always
+    hostname: mongo1
+    networks:
+      - my-network
+    volumes:
+      - mongodb_data:/data/db
+    command: mongod --replSet my-mongo-set
+  redis:
+    image: redis:latest
+    container_name: "redis1"
+    # restart: always
+    hostname: redis1
+    networks:
+      - my-network
+    volumes:
+      - redis_data:/data
+      # - ./redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server --appendonly yes
+    # environment:
+    # - REDIS_PASSWORD=your_password_here
+networks:
+  my-network:
+    driver: bridge
+
+volumes:
+  mariadb_data:
+  mongodb_data:
+  redis_data:
