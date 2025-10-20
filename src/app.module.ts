@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HealthController } from './health.controller';
+import { BooksModule } from './books/books.module';
 
 
 @Module({
@@ -23,6 +24,7 @@ import { HealthController } from './health.controller';
       autoLoadEntities: true,
       synchronize: true, // Set to false in production
     }),
+    BooksModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService],
