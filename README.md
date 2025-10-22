@@ -37,7 +37,7 @@ flowchart LR
 
     subgraph R["Data Access (no ORM)"]
       UR["UsersRepo"]
-      MP["MYSQL_POOL (mysql2/promise)"]
+      MP["MYSQL (mysql2/promise)"]
     end
   end
 
@@ -68,7 +68,7 @@ flowchart TD
   AM --> UM[UsersModule]
 
   subgraph MysqlModule
-    MP[MYSQL_POOL Provider]
+    MP[MYSQL Provider]
   end
 
   subgraph AuthModule
@@ -191,7 +191,7 @@ flowchart LR
 
   subgraph App["NestJS App"]
     Mods["AppModule, AuthModule, UsersModule, MysqlModule"]
-    Pool["MYSQL_POOL (mysql2/promise)"]
+    Pool["MYSQL (mysql2/promise)"]
   end
 
   MariaDB[(MariaDB Server)]

@@ -115,6 +115,16 @@ if [ -n "$PORT_3000_PROCESSES" ]; then
     print_status "SUCCESS" "Terminated processes using port 3000"
 fi
 
+# Step 0.6: Run database migrations
+print_status "INFO" "Running database migrations..."
+npx ts-node src/database/migrate.ts
+if [ $? -eq 0 ]; then
+    print_status "SUCCESS" "Migrations applied successfully"
+else
+    print_status "ERROR" "Failed to apply migrations"
+    exit 1
+fi
+
 # Step 2: Start the NestJS application
 print_status "INFO" "Step 2: Starting the NestJS application..."
 npm run start:dev &
@@ -163,6 +173,15 @@ else
     print_status "ERROR" "Signup test failed with status code $SIGNUP_RESPONSE"
 fi
 
+# Test 2.5: Create admin user manually in database for Books API testing
+print_status "INFO" "Creating admin user for Books API testing..."
+docker exec mariadb-dev mariadb -u nestuser -pnestpassword -e "USE nestjs_library; INSERT IGNORE INTO user (id, email, passwordHash, role) VALUES (UUID(), 'admin@example.com', '\$2b\$12\$yVBLB8dc3wwzPZ4EtzXfu.V0kWIoZrH.fLmV7K4ST422xuQcudcP6', 'admin');" >/dev/null 2>&1
+if [ $? -eq 0 ]; then
+    print_status "SUCCESS" "Admin user created successfully"
+else
+    print_status "ERROR" "Failed to create admin user"
+fi
+
 # Test 3: Login Endpoint
 print_status "INFO" "Testing login endpoint..."
 LOGIN_RESPONSE=$(curl -s -X POST http://localhost:3000/auth/login \
@@ -175,6 +194,18 @@ else
     print_status "ERROR" "Login test failed"
 fi
 
+# Test 3.1: Login as admin for Books API testing
+print_status "INFO" "Testing admin login for Books API..."
+ADMIN_LOGIN_RESPONSE=$(curl -s -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@example.com","password":"password"}')
+ADMIN_ACCESS_TOKEN=$(echo "$ADMIN_LOGIN_RESPONSE" | jq -r .access_token)
+if [ "$ADMIN_ACCESS_TOKEN" != "null" ] && [ -n "$ADMIN_ACCESS_TOKEN" ]; then
+    print_status "SUCCESS" "Admin login test passed"
+else
+    print_status "ERROR" "Admin login test failed"
+fi
+
 # Test 4: Database Check
 print_status "INFO" "Testing database for user existence..."
 USER_EXISTS=$(docker exec mariadb-dev mariadb -u nestuser -pnestpassword -e "USE nestjs_library; SELECT email FROM user WHERE email='testuser@example.com';" 2>/dev/null | grep testuser@example.com)
@@ -184,7 +215,78 @@ else
     print_status "ERROR" "User does not exist in the database"
 fi
 
+# Step 3.5: Test Books API endpoints
+print_status "INFO" "Step 3.5: Testing Books API endpoints..."
+
+# Test 1: List Books (Public)
+print_status "INFO" "Testing list books endpoint..."
+LIST_RESPONSE=$(curl -s http://localhost:3000/books)
+if [ "$(echo "$LIST_RESPONSE" | jq 'length')" -ge 0 ]; then
+    print_status "SUCCESS" "List books test passed"
+else
+    print_status "ERROR" "List books test failed"
+fi
+
+# Test 2: Create Book (Admin)
+print_status "INFO" "Testing create book endpoint..."
+CREATE_RESPONSE=$(curl -s -X POST http://localhost:3000/books \
+  -H "Authorization: Bearer $ADMIN_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Clean Architecture","author":"Robert C. Martin","isbn":"9780134494166","publishedYear":2017}')
+BOOK_ID=$(echo "$CREATE_RESPONSE" | jq -r .id)
+if [ "$BOOK_ID" != "null" ] && [ -n "$BOOK_ID" ]; then
+    print_status "SUCCESS" "Create book test passed"
+else
+    print_status "ERROR" "Create book test failed"
+    echo "Debug: CREATE_RESPONSE = $CREATE_RESPONSE"
+fi
+
+# Test 3: Get Book by ID (Public)
+print_status "INFO" "Testing get book by ID endpoint..."
+GET_RESPONSE=$(curl -s http://localhost:3000/books/$BOOK_ID)
+if [ "$(echo "$GET_RESPONSE" | jq -r .id)" == "$BOOK_ID" ]; then
+    print_status "SUCCESS" "Get book by ID test passed"
+else
+    print_status "ERROR" "Get book by ID test failed"
+fi
+
+# Test 4: Update Book (Admin)
+print_status "INFO" "Testing update book endpoint..."
+UPDATE_RESPONSE=$(curl -s -X PATCH http://localhost:3000/books/$BOOK_ID \
+  -H "Authorization: Bearer $ADMIN_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"publishedYear":2018}')
+UPDATE_YEAR=$(echo "$UPDATE_RESPONSE" | jq -r .publishedYear)
+if [ "$UPDATE_YEAR" != "null" ] && [ "$UPDATE_YEAR" = "2018" ]; then
+    print_status "SUCCESS" "Update book test passed"
+else
+    print_status "ERROR" "Update book test failed"
+    echo "Debug: UPDATE_RESPONSE = $UPDATE_RESPONSE"
+    echo "Debug: UPDATE_YEAR = $UPDATE_YEAR"
+fi
+
+# Test 5: Delete Book (Admin)
+print_status "INFO" "Testing delete book endpoint..."
+DELETE_RESPONSE=$(curl -s -X DELETE http://localhost:3000/books/$BOOK_ID \
+  -H "Authorization: Bearer $ADMIN_ACCESS_TOKEN")
+if [ "$DELETE_RESPONSE" == "" ]; then
+    print_status "SUCCESS" "Delete book test passed"
+else
+    print_status "ERROR" "Delete book test failed"
+    echo "Debug: DELETE_RESPONSE = $DELETE_RESPONSE"
+fi
+
 # Step 4: Cleanup
 print_status "INFO" "Step 4: Cleaning up..."
 kill $NEST_PID
 print_status "SUCCESS" "Test completed!"
+
+# Kill the process using the port at the end of the script
+PORT=3000
+PID=$(lsof -t -i:$PORT)
+if [ -n "$PID" ]; then
+  echo "Killing process on port $PORT"
+  kill -9 $PID
+else
+  echo "No process running on port $PORT"
+fi

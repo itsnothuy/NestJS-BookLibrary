@@ -47,7 +47,7 @@ flowchart LR
     end
 
     subgraph DB["Data Access (no ORM)"]
-      POOL["MYSQL_POOL"]
+      POOL["MYSQL"]
     end
   end
 

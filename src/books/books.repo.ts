@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, PoolConnection, RowDataPacket, ResultSetHeader } from 'mysql2/promise';
+import { MYSQL } from 'src/database/mysql.module';
 
 export type BookRow = {
   id: string;
@@ -12,7 +13,7 @@ export type BookRow = {
 };
 
 export class BooksRepo {
-    constructor(@Inject('MYSQL_POOL') private readonly pool: Pool) {}
+    constructor(@Inject(MYSQL) private readonly pool: Pool) {}
 
     async create(data: { title: string; author: string; isbn: string; publishedYear?: number | null }): Promise<BookRow> {
         const sql =

@@ -2,7 +2,7 @@
 import { Module } from '@nestjs/common';
 import mysql, { Pool } from 'mysql2/promise';
 
-export const MYSQL = Symbol('MYSQL_POOL');
+export const MYSQL = Symbol('MYSQL');
 
 @Module({
   providers: [{

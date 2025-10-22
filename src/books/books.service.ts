@@ -41,16 +41,12 @@ export class BooksService {
 
   async update(
     id: string,
-    patch: Partial<{ title: string; author: string; isbn: string; publishedYear: number }>,
+    patch: Partial<Omit<BookRow, 'id' | 'createdAt' | 'updatedAt'>>,
   ): Promise<BookRow> {
-    const existing = await this.repo.findById(id);
-    if (!existing) throw new NotFoundException('Book not found');
-    if (patch.isbn && patch.isbn !== existing.isbn) {
-      const dup = await this.repo.findByIsbn(patch.isbn);
-      if (dup) throw new ConflictException('ISBN already exists');
-    }
+    const found = await this.repo.findById(id);
+    if (!found) throw new NotFoundException('Book not found');
     const updated = await this.repo.updateById(id, patch);
-    if (!updated) throw new NotFoundException('Book not found after update');
+    if (!updated) throw new NotFoundException('Failed to update book');
     return updated;
   }
 

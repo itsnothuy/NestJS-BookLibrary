@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { BooksController } from './books.controller';
 import { BooksRepo } from './books.repo';
-import { MysqlModule } from 'src/database/mysql.module'; // provides MYSQL_POOL
+import { MysqlModule } from 'src/database/mysql.module'; // provides MYSQL
 
 
 @Module({
