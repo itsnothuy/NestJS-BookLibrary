@@ -241,39 +241,84 @@ else
     echo "Debug: CREATE_RESPONSE = $CREATE_RESPONSE"
 fi
 
-# Test 3: Get Book by ID (Public)
-print_status "INFO" "Testing get book by ID endpoint..."
-GET_RESPONSE=$(curl -s http://localhost:3000/books/$BOOK_ID)
-if [ "$(echo "$GET_RESPONSE" | jq -r .id)" == "$BOOK_ID" ]; then
-    print_status "SUCCESS" "Get book by ID test passed"
+# Test 2.1: Test ValidationPipe - Invalid ISBN
+print_status "INFO" "Testing validation with invalid ISBN..."
+INVALID_ISBN_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:3000/books \
+  -H "Authorization: Bearer $ADMIN_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Test Book","author":"Test Author","isbn":"invalid-isbn","publishedYear":2020}')
+if [ "$INVALID_ISBN_RESPONSE" -eq 400 ]; then
+    print_status "SUCCESS" "ValidationPipe correctly rejected invalid ISBN"
 else
-    print_status "ERROR" "Get book by ID test failed"
+    print_status "ERROR" "ValidationPipe did not reject invalid ISBN (status: $INVALID_ISBN_RESPONSE)"
+fi
+
+# Test 2.2: Test ValidationPipe - Missing required fields
+print_status "INFO" "Testing validation with missing fields..."
+MISSING_FIELDS_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:3000/books \
+  -H "Authorization: Bearer $ADMIN_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Test Book"}')
+if [ "$MISSING_FIELDS_RESPONSE" -eq 400 ]; then
+    print_status "SUCCESS" "ValidationPipe correctly rejected missing fields"
+else
+    print_status "ERROR" "ValidationPipe did not reject missing fields (status: $MISSING_FIELDS_RESPONSE)"
+fi
+
+# Test 2.3: Test ValidationPipe - Invalid UUID param
+print_status "INFO" "Testing UUID validation..."
+INVALID_UUID_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/books/invalid-uuid)
+if [ "$INVALID_UUID_RESPONSE" -eq 400 ]; then
+    print_status "SUCCESS" "ParseUUIDPipe correctly rejected invalid UUID"
+else
+    print_status "ERROR" "ParseUUIDPipe did not reject invalid UUID (status: $INVALID_UUID_RESPONSE)"
+fi
+
+# Test 3: Get Book by ID (Public)
+if [ "$BOOK_ID" != "null" ] && [ -n "$BOOK_ID" ]; then
+    print_status "INFO" "Testing get book by ID endpoint..."
+    GET_RESPONSE=$(curl -s http://localhost:3000/books/$BOOK_ID)
+    if [ "$(echo "$GET_RESPONSE" | jq -r .id)" == "$BOOK_ID" ]; then
+        print_status "SUCCESS" "Get book by ID test passed"
+    else
+        print_status "ERROR" "Get book by ID test failed"
+    fi
+else
+    print_status "WARNING" "Skipping get book by ID test - no valid book ID"
 fi
 
 # Test 4: Update Book (Admin)
-print_status "INFO" "Testing update book endpoint..."
-UPDATE_RESPONSE=$(curl -s -X PATCH http://localhost:3000/books/$BOOK_ID \
-  -H "Authorization: Bearer $ADMIN_ACCESS_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"publishedYear":2018}')
-UPDATE_YEAR=$(echo "$UPDATE_RESPONSE" | jq -r .publishedYear)
-if [ "$UPDATE_YEAR" != "null" ] && [ "$UPDATE_YEAR" = "2018" ]; then
-    print_status "SUCCESS" "Update book test passed"
+if [ "$BOOK_ID" != "null" ] && [ -n "$BOOK_ID" ]; then
+    print_status "INFO" "Testing update book endpoint..."
+    UPDATE_RESPONSE=$(curl -s -X PATCH http://localhost:3000/books/$BOOK_ID \
+      -H "Authorization: Bearer $ADMIN_ACCESS_TOKEN" \
+      -H "Content-Type: application/json" \
+      -d '{"publishedYear":2018}')
+    UPDATE_YEAR=$(echo "$UPDATE_RESPONSE" | jq -r .publishedYear)
+    if [ "$UPDATE_YEAR" != "null" ] && [ "$UPDATE_YEAR" = "2018" ]; then
+        print_status "SUCCESS" "Update book test passed"
+    else
+        print_status "ERROR" "Update book test failed"
+        echo "Debug: UPDATE_RESPONSE = $UPDATE_RESPONSE"
+        echo "Debug: UPDATE_YEAR = $UPDATE_YEAR"
+    fi
 else
-    print_status "ERROR" "Update book test failed"
-    echo "Debug: UPDATE_RESPONSE = $UPDATE_RESPONSE"
-    echo "Debug: UPDATE_YEAR = $UPDATE_YEAR"
+    print_status "WARNING" "Skipping update book test - no valid book ID"
 fi
 
 # Test 5: Delete Book (Admin)
-print_status "INFO" "Testing delete book endpoint..."
-DELETE_RESPONSE=$(curl -s -X DELETE http://localhost:3000/books/$BOOK_ID \
-  -H "Authorization: Bearer $ADMIN_ACCESS_TOKEN")
-if [ "$DELETE_RESPONSE" == "" ]; then
-    print_status "SUCCESS" "Delete book test passed"
+if [ "$BOOK_ID" != "null" ] && [ -n "$BOOK_ID" ]; then
+    print_status "INFO" "Testing delete book endpoint..."
+    DELETE_RESPONSE=$(curl -s -X DELETE http://localhost:3000/books/$BOOK_ID \
+      -H "Authorization: Bearer $ADMIN_ACCESS_TOKEN")
+    if [ "$DELETE_RESPONSE" == "" ]; then
+        print_status "SUCCESS" "Delete book test passed"
+    else
+        print_status "ERROR" "Delete book test failed"
+        echo "Debug: DELETE_RESPONSE = $DELETE_RESPONSE"
+    fi
 else
-    print_status "ERROR" "Delete book test failed"
-    echo "Debug: DELETE_RESPONSE = $DELETE_RESPONSE"
+    print_status "WARNING" "Skipping delete book test - no valid book ID"
 fi
 
 # Step 4: Cleanup

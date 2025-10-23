@@ -17,10 +17,8 @@ export class BooksService {
     return found;
   }
   
-  async create(input: { title?: string; author?: string; isbn?: string; publishedYear?: number }): Promise<BookRow> {
-    if (!input?.title || !input?.author || !input?.isbn) {
-      throw new ConflictException('Missing required fields: title, author, isbn');
-    }
+  async create(input: CreateBookDto): Promise<BookRow> {
+    // ValidationPipe now handles validation, so we can remove manual checks
     const dup = await this.repo.findByIsbn(input.isbn);
     if (dup) throw new ConflictException('ISBN already exists');
     return this.repo.create({
@@ -39,10 +37,7 @@ export class BooksService {
     // return this.repo.findById(id);
   }
 
-  async update(
-    id: string,
-    patch: Partial<Omit<BookRow, 'id' | 'createdAt' | 'updatedAt'>>,
-  ): Promise<BookRow> {
+  async update(id: string, patch: UpdateBookDto): Promise<BookRow> {
     const found = await this.repo.findById(id);
     if (!found) throw new NotFoundException('Book not found');
     const updated = await this.repo.updateById(id, patch);
