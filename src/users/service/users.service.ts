@@ -1,6 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { UsersRepo } from './users.repo';
+import * as crypto from 'crypto';
+import { UsersRepo } from '../users.repo';
+import { CreateUserDto } from '../dto/create-user.dto';
+import { UpdateUserDto } from '../dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -15,7 +18,7 @@ constructor(private repo: UsersRepo) {}
     return user;
   }
 
-  async create(data: { email: string; password?: string; role?: 'student'|'admin' }) {
+  async create(data: CreateUserDto) {
     const passwordHash = data.password ? await bcrypt.hash(data.password, 10) : await bcrypt.hash(crypto.randomUUID(), 10);
     return this.repo.create({
       id: crypto.randomUUID(),
@@ -25,11 +28,11 @@ constructor(private repo: UsersRepo) {}
     });
   }
 
-  async update(id: string, b: { email?: string; password?: string; role?: 'student'|'admin' }) {
+  async update(id: string, data: UpdateUserDto) {
     const patch: any = {};
-    if (b.email) patch.email = b.email;
-    if (b.password) patch.passwordHash = await bcrypt.hash(b.password, 10);
-    if (b.role) patch.role = b.role;
+    if (data.email) patch.email = data.email;
+    if (data.password) patch.passwordHash = await bcrypt.hash(data.password, 10);
+    if (data.role) patch.role = data.role;
     return this.repo.update(id, patch);
   }
 

@@ -321,6 +321,84 @@ else
     print_status "WARNING" "Skipping delete book test - no valid book ID"
 fi
 
+# Step 3.6: Test Users API endpoints
+print_status "INFO" "Step 3.6: Testing Users API endpoints..."
+
+# Test 1: List Users (Admin)
+print_status "INFO" "Testing list users endpoint..."
+USERS_LIST_RESPONSE=$(curl -s http://localhost:3000/users \
+  -H "Authorization: Bearer $ADMIN_ACCESS_TOKEN")
+if [ "$(echo "$USERS_LIST_RESPONSE" | jq -r 'type')" == "array" ]; then
+    print_status "SUCCESS" "List users test passed"
+else
+    print_status "ERROR" "List users test failed"
+    echo "Debug: USERS_LIST_RESPONSE = $USERS_LIST_RESPONSE"
+fi
+
+# Test 2: Create User (Admin)
+print_status "INFO" "Testing create user endpoint..."
+CREATE_USER_RESPONSE=$(curl -s -X POST http://localhost:3000/users \
+  -H "Authorization: Bearer $ADMIN_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"newuser@example.com","password":"password123","role":"student"}')
+USER_ID=$(echo "$CREATE_USER_RESPONSE" | jq -r .id)
+if [ "$USER_ID" != "null" ] && [ -n "$USER_ID" ]; then
+    print_status "SUCCESS" "Create user test passed"
+else
+    print_status "ERROR" "Create user test failed"
+    echo "Debug: CREATE_USER_RESPONSE = $CREATE_USER_RESPONSE"
+fi
+
+# Test 3: Get User by ID (Admin)
+if [ "$USER_ID" != "null" ] && [ -n "$USER_ID" ]; then
+    print_status "INFO" "Testing get user by ID endpoint..."
+    GET_USER_RESPONSE=$(curl -s http://localhost:3000/users/$USER_ID \
+      -H "Authorization: Bearer $ADMIN_ACCESS_TOKEN")
+    if [ "$(echo "$GET_USER_RESPONSE" | jq -r .id)" == "$USER_ID" ]; then
+        print_status "SUCCESS" "Get user by ID test passed"
+    else
+        print_status "ERROR" "Get user by ID test failed"
+        echo "Debug: GET_USER_RESPONSE = $GET_USER_RESPONSE"
+    fi
+else
+    print_status "WARNING" "Skipping get user by ID test - no valid user ID"
+fi
+
+# Test 4: Update User (Admin)
+if [ "$USER_ID" != "null" ] && [ -n "$USER_ID" ]; then
+    print_status "INFO" "Testing update user endpoint..."
+    UPDATE_USER_RESPONSE=$(curl -s -X PATCH http://localhost:3000/users/$USER_ID \
+      -H "Authorization: Bearer $ADMIN_ACCESS_TOKEN" \
+      -H "Content-Type: application/json" \
+      -d '{"role":"admin"}')
+    UPDATE_ROLE=$(echo "$UPDATE_USER_RESPONSE" | jq -r .role)
+    if [ "$UPDATE_ROLE" = "admin" ]; then
+        print_status "SUCCESS" "Update user test passed"
+    else
+        print_status "ERROR" "Update user test failed"
+        echo "Debug: UPDATE_USER_RESPONSE = $UPDATE_USER_RESPONSE"
+        echo "Debug: UPDATE_ROLE = $UPDATE_ROLE"
+    fi
+else
+    print_status "WARNING" "Skipping update user test - no valid user ID"
+fi
+
+# Test 5: Delete User (Admin)
+if [ "$USER_ID" != "null" ] && [ -n "$USER_ID" ]; then
+    print_status "INFO" "Testing delete user endpoint..."
+    DELETE_USER_RESPONSE=$(curl -s -X DELETE http://localhost:3000/users/$USER_ID \
+      -H "Authorization: Bearer $ADMIN_ACCESS_TOKEN")
+    DELETE_STATUS=$(echo "$DELETE_USER_RESPONSE" | jq -r .deleted)
+    if [ "$DELETE_STATUS" = "true" ]; then
+        print_status "SUCCESS" "Delete user test passed"
+    else
+        print_status "ERROR" "Delete user test failed"
+        echo "Debug: DELETE_USER_RESPONSE = $DELETE_USER_RESPONSE"
+    fi
+else
+    print_status "WARNING" "Skipping delete user test - no valid user ID"
+fi
+
 # Step 4: Cleanup
 print_status "INFO" "Step 4: Cleaning up..."
 kill $NEST_PID

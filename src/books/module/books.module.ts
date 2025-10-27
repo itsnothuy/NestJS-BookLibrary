@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { BooksService } from './books.service';
-import { BooksController } from './books.controller';
-import { BooksRepo } from './books.repo';
+import { BooksService } from '../service/books.service';
+import { BooksController } from '../controller/books.controller';
+import { BooksRepo } from '../books.repo';
 import { MysqlModule } from 'src/database/mysql.module'; // provides MYSQL
 
 

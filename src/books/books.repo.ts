@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, PoolConnection, RowDataPacket, ResultSetHeader } from 'mysql2/promise';
+import { v4 as uuidv4 } from 'uuid';
 import { MYSQL } from 'src/database/mysql.module';
 
 export type BookRow = {
@@ -12,24 +13,21 @@ export type BookRow = {
   updatedAt: Date;
 };
 
+@Injectable()
 export class BooksRepo {
     constructor(@Inject(MYSQL) private readonly pool: Pool) {}
 
     async create(data: { title: string; author: string; isbn: string; publishedYear?: number | null }): Promise<BookRow> {
+        const id = uuidv4(); // Generate UUID v4
         const sql =
-            'INSERT INTO book (id, title, author, isbn, publishedYear) VALUES (UUID(), ?, ?, ?, ?)';
-        const params = [data.title, data.author, data.isbn, data.publishedYear ?? null];
-        const [result] = await this.pool.execute<ResultSetHeader>(sql, params);
-        const insertId = (result.insertId as unknown as string) ?? null;
-        const [rows] = await this.pool.execute<RowDataPacket[]>(
-            'SELECT * FROM book WHERE id = ?',
-            [insertId],
-        );
-        if (!rows || rows.length === 0) {
-            const [found] = await this.pool.query<RowDataPacket[]>('SELECT * FROM book WHERE isbn = ?', [data.isbn]);
-            return found[0] as BookRow;
+            'INSERT INTO book (id, title, author, isbn, publishedYear) VALUES (?, ?, ?, ?, ?)';
+        const params = [id, data.title, data.author, data.isbn, data.publishedYear ?? null];
+        await this.pool.execute<ResultSetHeader>(sql, params);
+        const created = await this.findById(id);
+        if (!created) {
+            throw new Error('Failed to create book');
         }
-        return rows[0] as BookRow;
+        return created;
     }
 
     async findAll(): Promise<BookRow[]> {

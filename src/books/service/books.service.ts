@@ -1,6 +1,6 @@
-import { CreateBookDto } from './dto/create-book.dto';
-import { UpdateBookDto } from './dto/update-book.dto';
-import { BookRow, BooksRepo } from './books.repo';
+import { CreateBookDto } from '../dto/create-book.dto';
+import { UpdateBookDto } from '../dto/update-book.dto';
+import { BookRow, BooksRepo } from '../books.repo';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 
 @Injectable()

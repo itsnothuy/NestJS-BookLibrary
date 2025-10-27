@@ -1,9 +1,9 @@
 import {
   Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, ParseUUIDPipe,
 } from '@nestjs/common';
-import { BooksService } from './books.service';
-import { CreateBookDto } from './dto/create-book.dto';
-import { UpdateBookDto } from './dto/update-book.dto';
+import { BooksService } from '../service/books.service';
+import { CreateBookDto } from '../dto/create-book.dto';
+import { UpdateBookDto } from '../dto/update-book.dto';
 
 // Adjust these import paths to match your project:
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
