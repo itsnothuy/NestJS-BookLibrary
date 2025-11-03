@@ -46,6 +46,7 @@
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.1",
+    "@tailwindcss/postcss": "^4.1.16",
     "@types/express": "^5.0.0",
     "@types/jest": "^30.0.0",
     "@types/ms": "^2.1.0",

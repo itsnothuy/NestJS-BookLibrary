@@ -23,7 +23,7 @@ export class BooksController {
 
   // PUBLIC (validate that :id is a UUID)
   @Get(':id')
-  get(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+  get(@Param('id', ParseUUIDPipe) id: string) {
     return this.books.get(id);
   }
 
@@ -40,7 +40,7 @@ export class BooksController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   update(
-    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateBookDto,
   ) {
     return this.books.update(id, dto);
@@ -50,7 +50,7 @@ export class BooksController {
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
-  remove(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+  remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.books.remove(id);
   }
 }

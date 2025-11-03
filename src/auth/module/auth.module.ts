@@ -1,11 +1,11 @@
 // auth.module.ts
 import { Module } from '@nestjs/common';
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
+import { AuthController } from '../controller/auth.controller';
+import { AuthService } from '../service/auth.service';
 import { MysqlModule } from 'src/database/mysql.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import { JwtStrategy } from './jwt.strategy';
+import { JwtStrategy } from '../jwt.strategy';
 import { UsersRepo } from 'src/users/users.repo';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 

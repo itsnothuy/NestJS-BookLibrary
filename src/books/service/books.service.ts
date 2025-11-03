@@ -1,53 +1,49 @@
 import { CreateBookDto } from '../dto/create-book.dto';
 import { UpdateBookDto } from '../dto/update-book.dto';
-import { BookRow, BooksRepo } from '../books.repo';
+import { BooksRepo } from '../books.repo';
+import { BookResponseDto } from '../dto/book-response.dto';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class BooksService {
   constructor(private readonly repo: BooksRepo) {}
   
-  list(): Promise<BookRow[]> {
-    return this.repo.findAll();
+  async list(): Promise<BookResponseDto[]> {
+    const books = await this.repo.findAll();
+    return books.map(book => BookResponseDto.fromEntity(book));
   }
 
-  async get(id: string): Promise<BookRow> {
-    const found = await this.repo.findById(id);
+  async get(uuid: string): Promise<BookResponseDto> {
+    const found = await this.repo.findByUuid(uuid);
     if (!found) throw new NotFoundException('Book not found');
-    return found;
+    return BookResponseDto.fromEntity(found);
   }
   
-  async create(input: CreateBookDto): Promise<BookRow> {
+  async create(input: CreateBookDto): Promise<BookResponseDto> {
     // ValidationPipe now handles validation, so we can remove manual checks
     const dup = await this.repo.findByIsbn(input.isbn);
     if (dup) throw new ConflictException('ISBN already exists');
-    return this.repo.create({
+    const created = await this.repo.create({
       title: input.title,
       author: input.author,
       isbn: input.isbn,
       publishedYear: input.publishedYear ?? null,
     });
+    return BookResponseDto.fromEntity(created);
   }
 
-  findAll() {
-    // return this.repo.findAll();
-  }
-
-  findOne(id: number) {
-    // return this.repo.findById(id);
-  }
-
-  async update(id: string, patch: UpdateBookDto): Promise<BookRow> {
-    const found = await this.repo.findById(id);
+  async update(uuid: string, patch: UpdateBookDto): Promise<BookResponseDto> {
+    const found = await this.repo.findByUuid(uuid);
     if (!found) throw new NotFoundException('Book not found');
-    const updated = await this.repo.updateById(id, patch);
+    const updated = await this.repo.updateByUuid(uuid, patch);
     if (!updated) throw new NotFoundException('Failed to update book');
-    return updated;
+    return BookResponseDto.fromEntity(updated);
   }
 
-  async remove(id: string): Promise<void> {
-    const existing = await this.repo.findById(id);
+  async remove(uuid: string): Promise<void> {
+    const existing = await this.repo.findByUuid(uuid);
     if (!existing) throw new NotFoundException('Book not found');
-    await this.repo.deleteById(id);
+    const deleted = await this.repo.deleteByUuid(uuid);
+    if (!deleted) throw new NotFoundException('Failed to delete book');
   }
 }

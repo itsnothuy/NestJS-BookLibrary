@@ -1,57 +1,68 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool } from 'mysql2/promise';
 import { MYSQL } from '../database/mysql.module';
-
-export type UserRow = {
-  id: string;
-  email: string;
-  passwordHash: string;
-  role: 'student'|'admin';
-  createdAt?: Date;
-  updatedAt?: Date;
-};
+import { UserRow } from './entities/user.entity';
 
 @Injectable()
 export class UsersRepo {
   constructor(@Inject(MYSQL) private pool: Pool) {}
 
-  async findByEmail(email: string) {
-    const [rows] = await this.pool.execute('SELECT * FROM user WHERE email=? LIMIT 1', [email]);
+  async findByEmail(email: string): Promise<UserRow | null> {
+    const [rows] = await this.pool.execute('SELECT * FROM users WHERE email=? LIMIT 1', [email]);
     const arr = rows as any[];
     return arr[0] ?? null;
   }
 
-  async findById(id: string): Promise<UserRow | null> {
-    const [rows] = await this.pool.execute('SELECT * FROM user WHERE id=? LIMIT 1', [id]);
+  async findByUuid(uuid: string): Promise<UserRow | null> {
+    const [rows] = await this.pool.execute('SELECT * FROM users WHERE uuid=? LIMIT 1', [uuid]);
+    const arr = rows as any[];
+    return arr[0] ?? null;
+  }
+
+  async findById(id: number): Promise<UserRow | null> {
+    const [rows] = await this.pool.execute('SELECT * FROM users WHERE id=? LIMIT 1', [id]);
     const arr = rows as any[];
     return arr[0] ?? null;
   }
 
   async findAll(): Promise<UserRow[]> {
-    const [rows] = await this.pool.query('SELECT id, email, role, createdAt, updatedAt FROM user ORDER BY createdAt DESC');
+    const [rows] = await this.pool.query('SELECT * FROM users ORDER BY createdAt DESC');
     return rows as any[];
   }
 
-  async create(data: { id: string; email: string; passwordHash: string; role: 'student'|'admin' }): Promise<UserRow> {
-    await this.pool.query(
-      'INSERT INTO user (id, email, passwordHash, role) VALUES (?, ?, ?, ?)',
-      [data.id, data.email, data.passwordHash, data.role],
+  async create(data: { email: string; passwordHash: string; role: 'student'|'admin' }): Promise<UserRow> {
+    const [result] = await this.pool.query(
+      'INSERT INTO users (email, passwordHash, role) VALUES (?, ?, ?)',
+      [data.email, data.passwordHash, data.role],
     );
-    return (await this.findById(data.id))!;
+    const insertId = (result as any).insertId;
+    return (await this.findById(insertId))!;
   }
 
-  async update(id: string, patch: Partial<Pick<UserRow,'email'|'passwordHash'|'role'>>): Promise<UserRow> {
-    const user = await this.findById(id);  
-    if (!user) throw new Error('User not found');
-    const email = patch.email ?? user.email;
-    const passwordHash = patch.passwordHash ?? user.passwordHash;
-    const role = patch.role ?? user.role;
-    await this.pool.query('UPDATE user SET email=?, passwordHash=?, role=? WHERE id=?', [email, passwordHash, role, id]);
-    return (await this.findById(id))!;
+  async updateByUuid(uuid: string, patch: Partial<Pick<UserRow,'email'|'passwordHash'|'role'>>): Promise<UserRow | null> {
+    const user = await this.findByUuid(uuid);  
+    if (!user) return null;
+    
+    const fields: string[] = [];
+    const params: any[] = [];
+    
+    if (patch.email !== undefined) { fields.push('email = ?'); params.push(patch.email); }
+    if (patch.passwordHash !== undefined) { fields.push('passwordHash = ?'); params.push(patch.passwordHash); }
+    if (patch.role !== undefined) { fields.push('role = ?'); params.push(patch.role); }
+    
+    if (fields.length === 0) {
+      return user;
+    }
+    
+    const sql = `UPDATE users SET ${fields.join(', ')} WHERE uuid = ?`;
+    params.push(uuid);
+    
+    await this.pool.query(sql, params);
+    return await this.findByUuid(uuid);
   }
 
-  async remove(id: string): Promise<void> {
-    await this.pool.query('DELETE FROM user WHERE id=?', [id]);
-    return;
+  async removeByUuid(uuid: string): Promise<boolean> {
+    const [result] = await this.pool.query('DELETE FROM users WHERE uuid=?', [uuid]);
+    return (result as any).affectedRows > 0;
   }
 }

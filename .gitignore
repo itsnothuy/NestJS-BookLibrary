@@ -3,6 +3,13 @@
 /node_modules
 /build
 
+# Frontend specific
+frontend/node_modules
+frontend/dist
+frontend/build
+frontend/.vite
+frontend/.cache
+
 # Logs
 logs
 *.log
@@ -41,6 +48,10 @@ lerna-debug.log*
 .env.test.local
 .env.production.local
 .env.local
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
 
 # temp directory
 .temp
@@ -54,3 +65,18 @@ pids
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Database
+*.sqlite
+*.db
+/data/
+
+# Security
+*.pem
+*.key
+*.crt
+
+# Package manager
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

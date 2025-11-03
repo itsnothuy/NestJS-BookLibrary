@@ -1,12 +1,11 @@
-export interface Book {
+export interface User {
   id: number; // Internal auto-increment ID (not exposed to client)
   uuid: string; // Public-facing UUID
-  title: string;
-  author: string;
-  isbn: string;
-  publishedYear: number | null;
+  email: string;
+  passwordHash: string;
+  role: 'student' | 'admin';
   createdAt: Date;
   updatedAt: Date;
 }
 
-export type BookRow = Book;
+export type UserRow = User;

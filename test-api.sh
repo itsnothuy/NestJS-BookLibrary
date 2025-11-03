@@ -90,12 +90,12 @@ for i in {1..30}; do
 done
 
 # Create user table
-print_status "INFO" "Creating user table..."
-docker exec mariadb-dev mariadb -u nestuser -pnestpassword -e "USE nestjs_library; CREATE TABLE IF NOT EXISTS user (id VARCHAR(36) PRIMARY KEY, email VARCHAR(255) NOT NULL UNIQUE, passwordHash VARCHAR(255) NOT NULL, role ENUM('student', 'admin') NOT NULL, createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP);" >/dev/null 2>&1
+print_status "INFO" "Creating users table..."
+docker exec mariadb-dev mariadb -u nestuser -pnestpassword -e "USE nestjs_library; CREATE TABLE IF NOT EXISTS users (id INT AUTO_INCREMENT PRIMARY KEY, uuid CHAR(36) NOT NULL UNIQUE DEFAULT (UUID()), email VARCHAR(255) NOT NULL UNIQUE, passwordHash VARCHAR(255) NOT NULL, role ENUM('student', 'admin') NOT NULL, createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, INDEX idx_users_uuid (uuid), INDEX idx_users_email (email));" >/dev/null 2>&1
 if [ $? -eq 0 ]; then
-    print_status "SUCCESS" "User table created/verified"
+    print_status "SUCCESS" "Users table created/verified"
 else
-    print_status "ERROR" "Failed to create user table"
+    print_status "ERROR" "Failed to create users table"
     exit 1
 fi
 
@@ -175,7 +175,7 @@ fi
 
 # Test 2.5: Create admin user manually in database for Books API testing
 print_status "INFO" "Creating admin user for Books API testing..."
-docker exec mariadb-dev mariadb -u nestuser -pnestpassword -e "USE nestjs_library; INSERT IGNORE INTO user (id, email, passwordHash, role) VALUES (UUID(), 'admin@example.com', '\$2b\$12\$yVBLB8dc3wwzPZ4EtzXfu.V0kWIoZrH.fLmV7K4ST422xuQcudcP6', 'admin');" >/dev/null 2>&1
+docker exec mariadb-dev mariadb -u nestuser -pnestpassword -e "USE nestjs_library; INSERT IGNORE INTO users (email, passwordHash, role) VALUES ('admin@example.com', '\$2b\$12\$yVBLB8dc3wwzPZ4EtzXfu.V0kWIoZrH.fLmV7K4ST422xuQcudcP6', 'admin');" >/dev/null 2>&1
 if [ $? -eq 0 ]; then
     print_status "SUCCESS" "Admin user created successfully"
 else
@@ -208,7 +208,7 @@ fi
 
 # Test 4: Database Check
 print_status "INFO" "Testing database for user existence..."
-USER_EXISTS=$(docker exec mariadb-dev mariadb -u nestuser -pnestpassword -e "USE nestjs_library; SELECT email FROM user WHERE email='testuser@example.com';" 2>/dev/null | grep testuser@example.com)
+USER_EXISTS=$(docker exec mariadb-dev mariadb -u nestuser -pnestpassword -e "USE nestjs_library; SELECT email FROM users WHERE email='testuser@example.com';" 2>/dev/null | grep testuser@example.com)
 if [ -n "$USER_EXISTS" ]; then
     print_status "SUCCESS" "User exists in the database"
 else

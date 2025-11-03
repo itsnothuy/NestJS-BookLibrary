@@ -16,7 +16,7 @@ async function bootstrap() {
   );
   
   app.enableCors({
-    origin: ['http://localhost:5173'],
+    origin: ['http://localhost:5173', 'http://localhost:5174'],
     credentials: false, // switch to true if you later move to cookies
     allowedHeaders: ['Content-Type', 'Authorization'],
     methods: ['GET','POST','PATCH','DELETE','OPTIONS'],

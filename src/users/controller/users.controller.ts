@@ -23,20 +23,20 @@ export class UsersController {
   }
   
   @Get(':id') 
-  findOne(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) { 
+  findOne(@Param('id', ParseUUIDPipe) id: string) { 
     return this.users.findOne(id); 
   }
   
   @Patch(':id') 
   update(
-    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string, 
+    @Param('id', ParseUUIDPipe) id: string, 
     @Body() dto: UpdateUserDto
   ) { 
     return this.users.update(id, dto); 
   }
   
   @Delete(':id') 
-  remove(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) { 
+  remove(@Param('id', ParseUUIDPipe) id: string) { 
     return this.users.remove(id); 
   }
 }
