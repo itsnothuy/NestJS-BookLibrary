@@ -10,6 +10,13 @@ interface User {
   role: 'student' | 'admin';
   createdAt: string;
   updatedAt: string;
+  avatarUrl?: string;
+  avatarFilename?: string;
+  avatarMimeType?: string;
+  avatarSizeBytes?: number;
+  avatarWidth?: number;
+  avatarHeight?: number;
+  avatarUploadedAt?: string;
 }
 
 interface UserFormData {
@@ -397,6 +404,7 @@ export default function SimpleUsersTable() {
         <table style={styles.table}>
           <thead>
             <tr>
+              <th style={styles.th}>Avatar</th>
               <th style={styles.th}>Email</th>
               <th style={styles.th}>Role</th>
               <th style={styles.th}>Created</th>
@@ -406,13 +414,46 @@ export default function SimpleUsersTable() {
           <tbody>
             {users.length === 0 ? (
               <tr>
-                <td colSpan={4} style={{ ...styles.td, textAlign: 'center', color: '#6b7280' }}>
+                <td colSpan={5} style={{ ...styles.td, textAlign: 'center', color: '#6b7280' }}>
                   No users found.
                 </td>
               </tr>
             ) : (
               users.map((user) => (
                 <tr key={user.id}>
+                  <td style={styles.td}>
+                    <div style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '50%',
+                      backgroundColor: user.avatarUrl ? 'transparent' : '#f3f4f6',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      border: '2px solid #e5e7eb',
+                      overflow: 'hidden'
+                    }}>
+                      {user.avatarUrl ? (
+                        <img
+                          src={`${API_BASE}${user.avatarUrl}`}
+                          alt={`${user.email} avatar`}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover'
+                          }}
+                        />
+                      ) : (
+                        <span style={{ 
+                          color: '#6b7280', 
+                          fontSize: '14px',
+                          fontWeight: 'bold'
+                        }}>
+                          {user.email?.charAt(0).toUpperCase() || '?'}
+                        </span>
+                      )}
+                    </div>
+                  </td>
                   <td style={styles.td}>{user.email}</td>
                   <td style={styles.td}>
                     <span style={getRoleBadgeStyle(user.role)}>

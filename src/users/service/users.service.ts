@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { Express } from 'express';
 import { UsersRepo } from '../users.repo';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
@@ -48,6 +49,26 @@ export class UsersService {
     if (!user) throw new NotFoundException('User not found');
     const deleted = await this.repo.removeByUuid(uuid);
     if (!deleted) throw new NotFoundException('Failed to delete user');
-    return { deleted: true };
+    return deleted;
+  }
+
+  async updateAvatar(uuid: string, file: Express.Multer.File): Promise<UserResponseDto> {
+    if (!file) {
+      throw new NotFoundException('No file uploaded');
+    }
+
+    const avatarUrl = `/users/avatar/${file.filename}`;
+    const patch = {
+      avatarFilename: file.filename,
+      avatarPath: file.path,
+      avatarUrl: avatarUrl,
+      avatarMimeType: file.mimetype,
+      avatarSizeBytes: file.size,
+      avatarUploadedAt: new Date(),
+    };
+
+    const updated = await this.repo.updateByUuid(uuid, patch);
+    if (!updated) throw new NotFoundException('User not found');
+    return UserResponseDto.fromEntity(updated);
   }
 }

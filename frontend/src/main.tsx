@@ -5,6 +5,7 @@ import { HeroUIProvider } from '@heroui/react';
 import { AuthProvider, useAuth } from './modules/auth/AuthContext';
 import Login from './modules/auth/Login';
 import Signup from './modules/auth/Signup';
+import Profile from './modules/auth/Profile';
 import Dashboard from './modules/app/Dashboard';
 import './index.css';
 
@@ -21,6 +22,14 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/dashboard"
               element={

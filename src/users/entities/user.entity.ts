@@ -6,6 +6,15 @@ export interface User {
   role: 'student' | 'admin';
   createdAt: Date;
   updatedAt: Date;
+  // Avatar fields
+  avatarFilename?: string;
+  avatarPath?: string;
+  avatarUrl?: string;
+  avatarMimeType?: string;
+  avatarSizeBytes?: number;
+  avatarWidth?: number;
+  avatarHeight?: number;
+  avatarUploadedAt?: Date;
 }
 
 export type UserRow = User;
