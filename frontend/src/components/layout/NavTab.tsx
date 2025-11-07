@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../modules/auth/AuthContext";
 
 
-export const API_BASE = import.meta.env.VITE_API_BASE;
+export const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000';
 
-export default function NavTab({ activeTab, setActiveTab }: { activeTab: string | null; setActiveTab: (tab: string) => void }) {
+export default function NavTab({ activeTab, setActiveTab }: { activeTab: string | null; setActiveTab: (tab: string | null) => void }) {
     const {token} = useAuth();
     const [user, setUser] = useState<any>(null);
 

@@ -11,7 +11,8 @@ import {
   UseInterceptors,
   UploadedFile,
   Request,
-  Res
+  Res,
+  Query
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Express, Response } from 'express';
@@ -24,6 +25,7 @@ import { UpdateUserDto } from '../dto/update-user.dto';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { Roles } from '../../common/roles.decorator';
 import { RolesGuard } from '../../common/roles.guard';
+import { PaginationQueryDto } from '../../common/dto/pagination.dto';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('admin')
@@ -32,7 +34,12 @@ export class UsersController {
   constructor(private users: UsersService) {}
   
   @Get() 
-  findAll() { 
+  findAll(@Query() query: PaginationQueryDto, @Query('role') role?: string) { 
+    // If any pagination parameters are provided, use pagination
+    if (query.page || query.limit || query.sortBy || query.sortOrder || query.search || role) {
+      return this.users.findAllPaginated(query, { role });
+    }
+    // Otherwise, return all users (backward compatibility)
     return this.users.findAll(); 
   }
   

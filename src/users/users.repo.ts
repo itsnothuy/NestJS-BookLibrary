@@ -2,9 +2,12 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { Pool } from 'mysql2/promise';
 import { MYSQL } from '../database/mysql.module';
 import { UserRow } from './entities/user.entity';
+import { PaginatedRepository } from '../common/interfaces/paginated-repository.interface';
+import { PaginationQueryDto } from '../common/dto/pagination.dto';
+import { PaginationResultDto } from '../common/dto/pagination-result.dto';
 
 @Injectable()
-export class UsersRepo {
+export class UsersRepo implements PaginatedRepository<UserRow> {
   constructor(@Inject(MYSQL) private pool: Pool) {}
 
   // Helper method to convert database row to UserRow object
@@ -51,6 +54,86 @@ export class UsersRepo {
   async findAll(): Promise<UserRow[]> {
     const [rows] = await this.pool.query('SELECT * FROM users ORDER BY createdAt DESC');
     return (rows as any[]).map(row => this.mapDbRowToUser(row)).filter(user => user !== null);
+  }
+
+  async findManyPaginated(
+    options: PaginationQueryDto,
+    filters: { role?: string; search?: string } = {}
+  ): Promise<PaginationResultDto<UserRow>> {
+    const page = options.page ?? 1;
+    const limit = options.limit ?? 10;
+    const sortBy = options.sortBy ?? 'createdAt';
+    const sortOrder = options.sortOrder ?? 'desc';
+    const search = options.search;
+    
+    const offset = (page - 1) * limit;
+
+    // Build dynamic WHERE clause
+    const conditions: string[] = [];
+    const params: any[] = [];
+
+    if (filters.role) {
+      conditions.push('role = ?');
+      params.push(filters.role);
+    }
+
+    if (search || filters.search) {
+      const searchTerm = search || filters.search;
+      conditions.push('(email LIKE ? OR role LIKE ?)');
+      params.push(`%${searchTerm}%`, `%${searchTerm}%`);
+    }
+
+    const whereClause = conditions.length > 0 
+      ? `WHERE ${conditions.join(' AND ')}` 
+      : '';
+
+    // Validate sortBy to prevent SQL injection
+    const allowedSortFields = ['id', 'email', 'role', 'createdAt', 'updatedAt'];
+    const safeSortBy = allowedSortFields.includes(sortBy) ? sortBy : 'createdAt';
+    const safeSortOrder = sortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
+    // Get total count
+    const countQuery = `SELECT COUNT(*) as total FROM users ${whereClause}`;
+    const [countResult] = await this.pool.query(countQuery, params);
+    const total = (countResult as any[])[0].total;
+
+    // Get paginated data
+    const dataQuery = `
+      SELECT * FROM users 
+      ${whereClause}
+      ORDER BY ${safeSortBy} ${safeSortOrder}
+      LIMIT ? OFFSET ?
+    `;
+    const [dataResult] = await this.pool.query(dataQuery, [...params, limit, offset]);
+
+    const users = (dataResult as any[])
+      .map(row => this.mapDbRowToUser(row))
+      .filter((user): user is UserRow => user !== null);
+    
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data: users,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
+      links: this.generatePaginationLinks('users', page, totalPages, limit)
+    };
+  }
+
+  private generatePaginationLinks(resource: string, page: number, totalPages: number, limit: number) {
+    const baseUrl = `/${resource}`;
+    return {
+      first: `${baseUrl}?page=1&limit=${limit}`,
+      previous: page > 1 ? `${baseUrl}?page=${page - 1}&limit=${limit}` : undefined,
+      next: page < totalPages ? `${baseUrl}?page=${page + 1}&limit=${limit}` : undefined,
+      last: `${baseUrl}?page=${totalPages}&limit=${limit}`,
+    };
   }
 
   async create(data: { email: string; passwordHash: string; role: 'student'|'admin' }): Promise<UserRow> {

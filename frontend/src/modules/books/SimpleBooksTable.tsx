@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthContext";
 
-const API_BASE = import.meta.env.VITE_API_BASE;
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000';
 
 // Types
 interface Book {
@@ -171,10 +171,21 @@ export default function SimpleBooksTable() {
       const response = await fetch(`${API_BASE}/books`);
       if (!response.ok) throw new Error("Failed to fetch books");
       const data = await response.json();
-      setBooks(data);
+      
+      // Ensure data is an array (for backward compatibility)
+      if (Array.isArray(data)) {
+        setBooks(data);
+      } else if (data && data.data && Array.isArray(data.data)) {
+        // Handle paginated response if accidentally returned
+        setBooks(data.data);
+      } else {
+        console.error("Unexpected data format:", data);
+        setBooks([]);
+      }
     } catch (error) {
       console.error("Error fetching books:", error);
       alert("Failed to fetch books. Please try again.");
+      setBooks([]); // Ensure books is always an array
     } finally {
       setLoading(false);
     }
@@ -370,14 +381,14 @@ export default function SimpleBooksTable() {
             </tr>
           </thead>
           <tbody>
-            {books.length === 0 ? (
+            {!books || books.length === 0 ? (
               <tr>
                 <td colSpan={5} style={{ ...styles.td, textAlign: 'center', color: '#6b7280' }}>
                   No books found. Add your first book!
                 </td>
               </tr>
             ) : (
-              books.map((book) => (
+              Array.isArray(books) && books.map((book) => (
                 <tr key={book.id}>
                   <td style={styles.td}>{book.title}</td>
                   <td style={styles.td}>{book.author}</td>

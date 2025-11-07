@@ -5,6 +5,8 @@ import { UsersRepo } from '../users.repo';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { UserResponseDto } from '../dto/user-response.dto';
+import { PaginationQueryDto } from '../../common/dto/pagination.dto';
+import { PaginationResultDto } from '../../common/dto/pagination-result.dto';
 
 @Injectable()
 export class UsersService {
@@ -13,6 +15,17 @@ export class UsersService {
   async findAll(): Promise<UserResponseDto[]> {
     const users = await this.repo.findAll();
     return users.map(user => UserResponseDto.fromEntity(user));
+  }
+
+  async findAllPaginated(
+    query: PaginationQueryDto, 
+    filters: { role?: string } = {}
+  ): Promise<PaginationResultDto<UserResponseDto>> {
+    const result = await this.repo.findManyPaginated(query, filters);
+    return {
+      ...result,
+      data: result.data.map(user => UserResponseDto.fromEntity(user))
+    };
   }
 
   async findOne(uuid: string): Promise<UserResponseDto> {

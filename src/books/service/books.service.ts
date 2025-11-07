@@ -3,6 +3,8 @@ import { UpdateBookDto } from '../dto/update-book.dto';
 import { BooksRepo } from '../books.repo';
 import { BookResponseDto } from '../dto/book-response.dto';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { PaginationQueryDto } from '../../common/dto/pagination.dto';
+import { PaginationResultDto } from '../../common/dto/pagination-result.dto';
 
 @Injectable()
 export class BooksService {
@@ -11,6 +13,17 @@ export class BooksService {
   async list(): Promise<BookResponseDto[]> {
     const books = await this.repo.findAll();
     return books.map(book => BookResponseDto.fromEntity(book));
+  }
+
+  async listPaginated(
+    query: PaginationQueryDto, 
+    filters: { author?: string; publishedYear?: number } = {}
+  ): Promise<PaginationResultDto<BookResponseDto>> {
+    const result = await this.repo.findManyPaginated(query, filters);
+    return {
+      ...result,
+      data: result.data.map(book => BookResponseDto.fromEntity(book))
+    };
   }
 
   async get(uuid: string): Promise<BookResponseDto> {

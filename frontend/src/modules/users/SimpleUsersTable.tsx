@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthContext";
 
-const API_BASE = import.meta.env.VITE_API_BASE;
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000';
 
 // Types
 interface User {
@@ -199,10 +199,21 @@ export default function SimpleUsersTable() {
       });
       if (!response.ok) throw new Error("Failed to fetch users");
       const data = await response.json();
-      setUsers(data);
+      
+      // Ensure data is an array (for backward compatibility)
+      if (Array.isArray(data)) {
+        setUsers(data);
+      } else if (data && data.data && Array.isArray(data.data)) {
+        // Handle paginated response if accidentally returned
+        setUsers(data.data);
+      } else {
+        console.error("Unexpected data format:", data);
+        setUsers([]);
+      }
     } catch (error) {
       console.error("Error fetching users:", error);
       alert("Failed to fetch users. Please try again.");
+      setUsers([]); // Ensure users is always an array
     } finally {
       setLoading(false);
     }
@@ -412,14 +423,14 @@ export default function SimpleUsersTable() {
             </tr>
           </thead>
           <tbody>
-            {users.length === 0 ? (
+            {!users || users.length === 0 ? (
               <tr>
                 <td colSpan={5} style={{ ...styles.td, textAlign: 'center', color: '#6b7280' }}>
                   No users found.
                 </td>
               </tr>
             ) : (
-              users.map((user) => (
+              Array.isArray(users) && users.map((user) => (
                 <tr key={user.id}>
                   <td style={styles.td}>
                     <div style={{

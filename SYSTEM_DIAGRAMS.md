@@ -215,6 +215,104 @@
        │                                         │                                         │
 ```
 
+### 2.5. Avatar & Profile System Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                        AVATAR & PROFILE SYSTEM                                 │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                 │
+│  ┌─────────────────────────────────────────────────────────────────────────┐   │
+│  │                         Frontend Layer                                  │   │
+│  │                                                                         │   │
+│  │  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐                 │   │
+│  │  │   Profile   │    │   Header    │    │    Users    │                 │   │
+│  │  │    Page     │    │  Component  │    │    Table    │                 │   │
+│  │  │             │    │             │    │             │                 │   │
+│  │  │ • File      │    │ • Avatar    │    │ • Avatar    │                 │   │
+│  │  │   Upload    │    │   Display   │    │   Column    │                 │   │
+│  │  │ • Preview   │    │ • Click to  │    │ • Fallback  │                 │   │
+│  │  │ • Form      │    │   Profile   │    │   Initials  │                 │   │
+│  │  │   Validation│    │ • Fallback  │    │ • Thumbnail │                 │   │
+│  │  │             │    │   Initials  │    │   Display   │                 │   │
+│  │  └─────────────┘    └─────────────┘    └─────────────┘                 │   │
+│  │         │                    │                   │                     │   │
+│  │         └────────────────────┼───────────────────┘                     │   │
+│  │                              │                                         │   │
+│  │  ┌─────────────────────────────────────────────────────────────────┐   │   │
+│  │  │              File Processing APIs                                │   │   │
+│  │  │  • FileReader.readAsDataURL() - Image Preview                  │   │   │
+│  │  │  • FormData.append() - Multipart Upload                        │   │   │
+│  │  │  • File.size & File.type - Client Validation                   │   │   │
+│  │  │  • fetch() with Authorization header                           │   │   │
+│  │  └─────────────────────────────────────────────────────────────────┘   │   │
+│  └─────────────────────────────────────────────────────────────────────────┘   │
+│                                      │                                         │
+│                            HTTPS Multipart/Form-Data                          │
+│                                      │                                         │
+│  ┌─────────────────────────────────────────────────────────────────────────┐   │
+│  │                          Backend Layer                                  │   │
+│  │                                                                         │   │
+│  │  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐                 │   │
+│  │  │    Auth     │    │    Users    │    │   Static    │                 │   │
+│  │  │ Controller  │    │ Controller  │    │   Assets    │                 │   │
+│  │  │             │    │             │    │             │                 │   │
+│  │  │ • PATCH     │    │ • POST      │    │ • GET       │                 │   │
+│  │  │   /profile  │    │   /avatar   │    │   /users/   │                 │   │
+│  │  │ • Profile   │    │ • Multer    │    │   avatar/   │                 │   │
+│  │  │   Update    │    │   Upload    │    │ • File      │                 │   │
+│  │  │ • Email     │    │ • File      │    │   Serving   │                 │   │
+│  │  │   Password  │    │   Storage   │    │ • CORS      │                 │   │
+│  │  │             │    │             │    │   Headers   │                 │   │
+│  │  └─────────────┘    └─────────────┘    └─────────────┘                 │   │
+│  │         │                    │                   │                     │   │
+│  │         └────────────────────┼───────────────────┘                     │   │
+│  │                              │                                         │   │
+│  │  ┌─────────────────────────────────────────────────────────────────┐   │   │
+│  │  │                    Multer Middleware                            │   │   │
+│  │  │  • diskStorage() - File System Storage                         │   │   │
+│  │  │  • fileFilter() - MIME Type Validation                         │   │   │
+│  │  │  • limits - Size Restrictions (5MB)                            │   │   │
+│  │  │  • filename() - UUID-based Naming                              │   │   │
+│  │  │  • destination() - Dynamic Directory Creation                  │   │   │
+│  │  └─────────────────────────────────────────────────────────────────┘   │   │
+│  └─────────────────────────────────────────────────────────────────────────┘   │
+│                                      │                                         │
+│                                 SQL Updates                                    │
+│                                      │                                         │
+│  ┌─────────────────────────────────────────────────────────────────────────┐   │
+│  │                         Database Layer                                  │   │
+│  │                                                                         │   │
+│  │  ┌─────────────────────────────────────────────────────────────────┐   │   │
+│  │  │                      users Table                                │   │   │
+│  │  │                                                                 │   │   │
+│  │  │  • avatar_filename    VARCHAR(255)  - Original name            │   │   │
+│  │  │  • avatar_path        VARCHAR(500)  - Server file path         │   │   │
+│  │  │  • avatar_url         VARCHAR(500)  - Public serving URL       │   │   │
+│  │  │  • avatar_mime_type   VARCHAR(100)  - Content-Type             │   │   │
+│  │  │  • avatar_size_bytes  INT           - File size for quotas     │   │   │
+│  │  │  • avatar_width       INT           - Image width (UI layout)  │   │   │
+│  │  │  • avatar_height      INT           - Image height (UI layout) │   │   │
+│  │  │  • avatar_uploaded_at DATETIME(6)   - Upload timestamp         │   │   │
+│  │  └─────────────────────────────────────────────────────────────────┘   │   │
+│  └─────────────────────────────────────────────────────────────────────────┘   │
+│                                      │                                         │
+│  ┌─────────────────────────────────────────────────────────────────────────┐   │
+│  │                         File System                                     │   │
+│  │                                                                         │   │
+│  │  uploads/avatars/                                                       │   │
+│  │  ├── avatar-user-uuid-1699123456789.jpg                                │   │
+│  │  ├── avatar-user-uuid-1699123456790.png                                │   │
+│  │  └── avatar-user-uuid-1699123456791.gif                                │   │
+│  │                                                                         │   │
+│  │  Production Alternative:                                                │   │
+│  │  • AWS S3 / Google Cloud Storage                                       │   │
+│  │  • CDN Integration (CloudFront, CloudFlare)                            │   │
+│  │  • Image Processing Pipeline (Sharp, Jimp)                             │   │
+│  └─────────────────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────────────┘
+```
+
 ### 3. CRUD Operation Flow - Create Book
 
 ```
@@ -442,4 +540,129 @@ Load Balanced (Future):
                     └─────────────┘
 ```
 
-This comprehensive diagram collection provides production-ready visualizations of the entire system architecture, from user interactions to database operations, security layers, and performance considerations.
+### 6. Avatar Upload Flow - Detailed Sequence
+
+```
+User: Profile Page → File Selection → Upload → Database Update → UI Refresh
+
+┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+│    User     │ │  Frontend   │ │   Multer    │ │   NestJS    │ │  Database   │ │ File System │
+│  Interface  │ │  (React)    │ │ Middleware  │ │  Backend    │ │  (MariaDB)  │ │  (uploads/) │
+└─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘
+       │               │               │               │               │               │
+       │ 1. Select     │               │               │               │               │
+       │    Image      │               │               │               │               │
+       │ ─────────────▶│               │               │               │               │
+       │               │ 2. Validate   │               │               │               │
+       │               │    File       │               │               │               │
+       │               │    (5MB, img) │               │               │               │
+       │               │ ──────────────│               │               │               │
+       │               │ 3. Generate   │               │               │               │
+       │               │    Preview    │               │               │               │
+       │               │    (FileReader│               │               │               │
+       │               │     .readAs   │               │               │               │
+       │               │     DataURL)  │               │               │               │
+       │ 4. Preview    │ ◀─────────────│               │               │               │
+       │    Displayed  │               │               │               │               │
+       │ ◀─────────────│               │               │               │               │
+       │               │               │               │               │               │
+       │ 5. Submit     │               │               │               │               │
+       │    Form       │               │               │               │               │
+       │ ─────────────▶│               │               │               │               │
+       │               │ 6. Create     │               │               │               │
+       │               │    FormData   │               │               │               │
+       │               │    append     │               │               │               │
+       │               │    ('avatar', │               │               │               │
+       │               │     file)     │               │               │               │
+       │               │ ──────────────│               │               │               │
+       │               │ 7. POST       │               │               │               │
+       │               │    /users/    │               │               │               │
+       │               │    avatar     │               │               │               │
+       │               │    (multipart)│               │               │               │
+       │               │ ─────────────────────────────▶│               │               │
+       │               │               │ 8. JWT Auth   │               │               │
+       │               │               │    Validation │               │               │
+       │               │               │ ◀─────────────│               │               │
+       │               │               │ 9. Process    │               │               │
+       │               │               │    Upload     │               │               │
+       │               │               │ ──────────────│               │               │
+       │               │               │ 10. File      │               │               │
+       │               │               │     Type      │               │               │
+       │               │               │     Check     │               │               │
+       │               │               │     (MIME)    │               │               │
+       │               │               │ ──────────────│               │               │
+       │               │               │ 11. Size      │               │               │
+       │               │               │     Limit     │               │               │
+       │               │               │     (5MB)     │               │               │
+       │               │               │ ──────────────│               │               │
+       │               │               │ 12. Generate  │               │               │
+       │               │               │     Filename  │               │               │
+       │               │               │     (UUID+    │               │               │
+       │               │               │     timestamp)│               │               │
+       │               │               │ ──────────────│               │               │
+       │               │               │ 13. Save File │               │               │
+       │               │               │ ─────────────────────────────────────────────▶│
+       │               │               │               │ 14. File      │               │
+       │               │               │               │     Saved     │               │
+       │               │               │               │ ◀─────────────────────────────│
+       │               │               │ 15. File      │               │               │
+       │               │               │     Metadata  │               │               │
+       │               │               │ ◀─────────────│               │               │
+       │               │               │ 16. Update    │               │               │
+       │               │               │     User      │               │               │
+       │               │               │     Avatar    │               │               │
+       │               │               │     Fields    │               │               │
+       │               │               │ ─────────────────────────────▶│               │
+       │               │               │               │ 17. UPDATE    │               │
+       │               │               │               │     users     │               │
+       │               │               │               │     SET       │               │
+       │               │               │               │     avatar_*  │               │
+       │               │               │               │ ──────────────│               │
+       │               │               │               │ 18. Success   │               │
+       │               │               │               │ ◀─────────────│               │
+       │               │ 19. Upload    │               │               │               │
+       │               │     Success   │               │               │               │
+       │               │ ◀─────────────────────────────│               │               │
+       │ 20. Success   │               │               │               │               │
+       │     Message   │               │               │               │               │
+       │ ◀─────────────│               │               │               │               │
+       │               │ 21. Refresh   │               │               │               │
+       │               │     User      │               │               │               │
+       │               │     Profile   │               │               │               │
+       │               │     (GET      │               │               │               │
+       │               │     /auth/me) │               │               │               │
+       │               │ ─────────────────────────────▶│               │               │
+       │               │               │               │ 22. SELECT    │               │
+       │               │               │               │     * FROM    │               │
+       │               │               │               │     users     │               │
+       │               │               │               │     WHERE     │               │
+       │               │               │               │     uuid=?    │               │
+       │               │               │               │ ─────────────▶│               │
+       │               │               │               │ 23. User      │               │
+       │               │               │               │     Data      │               │
+       │               │               │               │     with      │               │
+       │               │               │               │     Avatar    │               │
+       │               │               │               │ ◀─────────────│               │
+       │               │ 24. Updated   │               │               │               │
+       │               │     Profile   │               │               │               │
+       │               │     with      │               │               │               │
+       │               │     Avatar    │               │               │               │
+       │               │ ◀─────────────────────────────│               │               │
+       │ 25. UI        │               │               │               │               │
+       │     Update    │               │               │               │               │
+       │     (Avatar   │               │               │               │               │
+       │     Displayed │               │               │               │               │
+       │     in Header,│               │               │               │               │
+       │     Tables)   │               │               │               │               │
+       │ ◀─────────────│               │               │               │               │
+       │               │               │               │               │               │
+
+Error Handling:
+• File too large → Client validation prevents upload
+• Invalid file type → Multer rejects with error
+• Network failure → Frontend shows retry option
+• Server error → File cleanup and user notification
+• Database error → Rollback file save
+```
+
+This comprehensive diagram collection provides production-ready visualizations of the entire system architecture, from user interactions to database operations, security layers, performance considerations, and the complete avatar/profile management system.

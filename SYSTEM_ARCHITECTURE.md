@@ -5,12 +5,14 @@
 2. [Frontend-Backend Communication Flow](#frontend-backend-communication-flow)
 3. [Authentication & Authorization Flow](#authentication--authorization-flow)
 4. [CRUD Operations Deep Dive](#crud-operations-deep-dive)
-5. [Data Flow Diagrams](#data-flow-diagrams)
-6. [Security Architecture](#security-architecture)
-7. [State Management & UI Flow](#state-management--ui-flow)
-8. [API Communication Patterns](#api-communication-patterns)
-9. [Error Handling & Recovery](#error-handling--recovery)
-10. [Performance Considerations](#performance-considerations)
+5. [Avatar & Profile System Architecture](#avatar--profile-system-architecture)
+6. [File Upload & Storage Pattern](#file-upload--storage-pattern)
+7. [Data Flow Diagrams](#data-flow-diagrams)
+8. [Security Architecture](#security-architecture)
+9. [State Management & UI Flow](#state-management--ui-flow)
+10. [API Communication Patterns](#api-communication-patterns)
+11. [Error Handling & Recovery](#error-handling--recovery)
+12. [Performance Considerations](#performance-considerations)
 
 ---
 
@@ -628,6 +630,348 @@ const handleDelete = async () => {
   }
 };
 ```
+
+---
+
+## 🎭 Avatar & Profile System Architecture
+
+### 1. Database Schema Design
+
+#### Avatar Metadata Storage Strategy
+
+```sql
+-- Avatar fields added to existing users table
+ALTER TABLE users 
+ADD COLUMN avatar_filename VARCHAR(255) NULL,    -- Original filename for reference
+ADD COLUMN avatar_path VARCHAR(500) NULL,        -- Server file path for operations
+ADD COLUMN avatar_url VARCHAR(500) NULL,         -- Public URL for serving
+ADD COLUMN avatar_mime_type VARCHAR(100) NULL,   -- Content-Type validation
+ADD COLUMN avatar_size_bytes INT NULL,           -- File size for quotas
+ADD COLUMN avatar_width INT NULL,                -- Image dimensions for UI
+ADD COLUMN avatar_height INT NULL,               -- Image dimensions for UI
+ADD COLUMN avatar_uploaded_at DATETIME(6) NULL;  -- Upload timestamp
+```
+
+#### Design Rationale
+
+1. **Separation of Concerns**:
+   - `avatar_path`: Internal server operations (file management, backups)
+   - `avatar_url`: Public-facing client access (CDN-ready)
+   - Enables seamless migration to cloud storage without client changes
+
+2. **Metadata Completeness**:
+   - File dimensions prevent UI layout shifts during image loading
+   - MIME type enables proper Content-Type headers and security validation
+   - Size tracking for storage analytics and quota management
+   - Timestamp for cache invalidation and audit trails
+
+3. **Future Scalability**:
+   - Support for multiple image variants (thumbnails, compressed versions)
+   - Storage quota management per user role
+   - Image processing pipeline integration (cropping, resizing)
+
+### 2. NestJS File Upload Processing
+
+#### Multer Middleware Integration
+
+```typescript
+@Post('avatar')
+@UseInterceptors(FileInterceptor('avatar', {
+  storage: diskStorage({
+    destination: (req, file, cb) => {
+      const uploadPath = join(process.cwd(), 'uploads', 'avatars');
+      if (!existsSync(uploadPath)) {
+        mkdirSync(uploadPath, { recursive: true });
+      }
+      cb(null, uploadPath);
+    },
+    filename: (req, file, cb) => {
+      const user = (req as any).user;
+      const ext = extname(file.originalname);
+      const filename = `avatar-${user.uuid}-${Date.now()}${ext}`;
+      cb(null, filename);
+    },
+  }),
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed!'), false);
+    }
+  },
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+}))
+async uploadAvatar(
+  @UploadedFile() file: Express.Multer.File,
+  @Request() req: any
+) {
+  return this.users.updateAvatar(req.user.uuid, file);
+}
+```
+
+#### Security and Performance Considerations
+
+1. **Multi-Layer Validation**:
+   - JWT authentication ensures user authorization
+   - MIME type filtering prevents malicious file uploads
+   - File size limits protect against DoS attacks
+   - Filename sanitization prevents directory traversal
+
+2. **Storage Strategy**:
+   - **diskStorage** chosen over **memoryStorage** for scalability
+   - Automatic directory creation for deployment flexibility
+   - UUID-based naming prevents enumeration attacks
+   - Timestamp inclusion prevents filename collisions
+
+3. **Error Handling**:
+   ```typescript
+   // Graceful error handling in file processing
+   try {
+     const result = await this.users.updateAvatar(user.uuid, file);
+     return result;
+   } catch (error) {
+     // Clean up uploaded file on processing failure
+     if (file.path && existsSync(file.path)) {
+       unlinkSync(file.path);
+     }
+     throw error;
+   }
+   ```
+
+### 3. Static File Serving Architecture
+
+#### NestJS Static Assets Configuration
+
+```typescript
+// main.ts - Application bootstrap
+app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+  prefix: '/users/avatar/',
+});
+```
+
+#### Production-Ready Enhancements
+
+```typescript
+// Environment-specific static serving
+if (process.env.NODE_ENV === 'production') {
+  // Use CDN or nginx for static files in production
+  app.useStaticAssets('/var/www/uploads', {
+    prefix: '/static/',
+    maxAge: '1y',        // Browser caching
+    etag: true,          // ETag headers for caching
+    immutable: true,     // Immutable cache headers
+  });
+} else {
+  // Development file serving
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+    prefix: '/users/avatar/',
+    maxAge: 0,           // No caching in development
+  });
+}
+```
+
+---
+
+## 📁 File Upload & Storage Pattern
+
+### 1. Frontend File Processing
+
+#### FileReader API Integration
+
+```typescript
+const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (file) {
+    // Client-side validation (first line of defense)
+    if (file.size > 5 * 1024 * 1024) {
+      setError('File size must be less than 5MB');
+      return;
+    }
+    if (!file.type.startsWith('image/')) {
+      setError('Please select an image file');
+      return;
+    }
+    
+    // Set file for upload
+    setAvatarFile(file);
+    
+    // Generate preview using FileReader API
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setAvatarPreview(e.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+    setError(null);
+  }
+};
+```
+
+#### Design Patterns and Benefits
+
+1. **Progressive Enhancement**:
+   - Immediate client-side validation provides instant feedback
+   - FileReader generates base64 preview without server round-trip
+   - Graceful degradation if JavaScript fails
+
+2. **User Experience Optimization**:
+   - Real-time file validation prevents submission errors
+   - Instant image preview confirms correct file selection
+   - Loading states and error boundaries handle edge cases
+
+3. **Security Layering**:
+   - Client validation as first filter (UX improvement)
+   - Server validation as enforcement layer (security requirement)
+   - Both size and type checking at multiple points
+
+### 2. FormData Upload Implementation
+
+#### Multipart Form Submission
+
+```typescript
+// Avatar upload with FormData
+if (avatarFile) {
+  const formData = new FormData();
+  formData.append('avatar', avatarFile);
+
+  const avatarRes = await fetch(`${API_BASE}/users/avatar`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`
+      // Note: NO Content-Type header - browser sets multipart boundary
+    },
+    body: formData
+  });
+
+  if (!avatarRes.ok) {
+    const errorData = await avatarRes.json().catch(() => ({}));
+    throw new Error(errorData.message || 'Failed to upload avatar');
+  }
+}
+```
+
+#### Critical Implementation Details
+
+1. **Content-Type Header Omission**:
+   - Browser automatically sets `multipart/form-data` with proper boundary
+   - Manual Content-Type setting would break multipart encoding
+   - FormData API handles binary data encoding automatically
+
+2. **Error Handling Strategy**:
+   - Network errors handled separately from HTTP errors
+   - JSON parsing with fallback for non-JSON error responses
+   - Graceful degradation when server is unreachable
+
+3. **Authentication Integration**:
+   - JWT token in Authorization header for secure uploads
+   - Token validation happens before file processing
+   - User context available throughout upload pipeline
+
+### 3. Complete Avatar Flow Sequence
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend
+    participant NestJS
+    participant Multer
+    participant Database
+    participant FileSystem
+
+    User->>Frontend: Select avatar file
+    Frontend->>Frontend: Validate file (size, type)
+    Frontend->>Frontend: Generate preview with FileReader
+    User->>Frontend: Submit profile form
+    
+    Frontend->>NestJS: POST /users/avatar (FormData)
+    NestJS->>NestJS: Authenticate JWT token
+    NestJS->>Multer: Process multipart upload
+    
+    Multer->>Multer: Validate file type/size
+    Multer->>FileSystem: Save to uploads/avatars/
+    Multer->>NestJS: Return file metadata
+    
+    NestJS->>Database: UPDATE users SET avatar_* = ?
+    Database->>NestJS: Confirm metadata saved
+    NestJS->>Frontend: Return success + avatar URL
+    
+    Frontend->>Frontend: Update UI state
+    Frontend->>NestJS: GET /auth/me (refresh user)
+    NestJS->>Database: SELECT * FROM users WHERE uuid = ?
+    Database->>NestJS: Return updated user profile
+    NestJS->>Frontend: Complete profile with avatar
+    
+    Frontend->>User: Display updated avatar everywhere
+```
+
+### 4. Avatar Display Architecture
+
+#### Reusable Avatar Component Pattern
+
+```typescript
+// Consistent avatar display across components
+const AvatarDisplay = ({ user, size = 40, onClick }) => (
+  <div
+    onClick={onClick}
+    style={{
+      width: `${size}px`,
+      height: `${size}px`,
+      borderRadius: "50%",
+      backgroundColor: user?.avatarUrl ? "transparent" : "#e5e7eb",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      cursor: onClick ? "pointer" : "default",
+      border: "2px solid #e5e7eb",
+      overflow: "hidden",
+      transition: "border-color 0.2s"
+    }}
+    title={onClick ? "Click to edit profile" : undefined}
+  >
+    {user?.avatarUrl ? (
+      <img
+        src={`${API_BASE}${user.avatarUrl}`}
+        alt={`${user.email} avatar`}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover"
+        }}
+        onError={(e) => {
+          // Fallback to initials if image fails to load
+          e.currentTarget.style.display = 'none';
+        }}
+      />
+    ) : (
+      <span style={{ 
+        color: "#6b7280", 
+        fontSize: `${size * 0.35}px`,
+        fontWeight: "bold"
+      }}>
+        {user?.email?.charAt(0).toUpperCase() || '?'}
+      </span>
+    )}
+  </div>
+);
+```
+
+#### UI/UX Design Principles
+
+1. **Fallback Strategy**:
+   - User initials when no avatar exists
+   - Error handling for broken image URLs
+   - Consistent placeholder styling
+
+2. **Accessibility**:
+   - Proper alt text for screen readers
+   - Keyboard navigation support
+   - Color contrast compliance
+
+3. **Performance**:
+   - Lazy loading for avatar grids
+   - Image caching through proper HTTP headers
+   - Responsive sizing based on container
 
 ---
 

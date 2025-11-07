@@ -5,7 +5,7 @@ import SimpleUsersTable from '../users/SimpleUsersTable';
 import NavTab from '../../components/layout/NavTab';
 import Header from '../../components/layout/Header';
 
-export const API_BASE = import.meta.env.VITE_API_BASE;
+export const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000';
 
 export default function Dashboard() {
   const { token } = useAuth();
