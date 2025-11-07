@@ -1,4 +1,3 @@
-// auth.module.ts
 import { Module } from '@nestjs/common';
 import { AuthController } from '../controller/auth.controller';
 import { AuthService } from '../service/auth.service';
@@ -7,6 +6,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from '../jwt.strategy';
 import { UsersRepo } from 'src/users/users.repo';
+import { UsersService } from 'src/users/service/users.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
@@ -20,6 +20,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, UsersRepo],
+  providers: [AuthService, JwtStrategy, UsersRepo, UsersService],
 })
 export class AuthModule {}

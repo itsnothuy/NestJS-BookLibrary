@@ -17,4 +17,4 @@ export const breadcrumbConfig: BreadcrumbConfig[] = [
   { path: '/admin', label: 'Administration', parent: '/dashboard' },
   { path: '/admin/users', label: 'User Management', parent: '/admin' },
   { path: '/admin/books', label: 'Book Management', parent: '/admin' },
-];
+]

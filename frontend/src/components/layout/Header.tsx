@@ -6,6 +6,7 @@ const API_BASE = import.meta.env.VITE_API_BASE;
 
 export default function Header() {
     const [user, setUser] = useState<any>(null);
+    const [avatarError, setAvatarError] = useState(false);
     const { token, logout } = useAuth();
     const navigate = useNavigate();
 
@@ -19,6 +20,7 @@ export default function Header() {
                     if (res.ok) {
                         const profile = await res.json();
                         setUser(profile);
+                        setAvatarError(false); // Reset avatar error state
                     }
                 } catch (error) {
                     console.error('Failed to fetch profile:', error);
@@ -76,7 +78,7 @@ export default function Header() {
                 }}
                 title="Click to edit profile"
             >
-                {user?.avatarUrl ? (
+                {user?.avatarUrl && !avatarError ? (
                     <img
                         src={`${API_BASE}${user.avatarUrl}`}
                         alt="User avatar"
@@ -85,20 +87,9 @@ export default function Header() {
                             height: "100%",
                             objectFit: "cover"
                         }}
-                        onError={(e) => {
-                            // Fallback to initials if image fails to load
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                            if (target.parentElement) {
-                                const fallback = document.createElement('span');
-                                fallback.style.cssText = `
-                                    color: #6b7280; 
-                                    font-size: 14px;
-                                    font-weight: bold;
-                                `;
-                                fallback.textContent = user?.email?.charAt(0).toUpperCase() || '?';
-                                target.parentElement.appendChild(fallback);
-                            }
+                        onError={() => {
+                            console.log('Avatar failed to load:', `${API_BASE}${user.avatarUrl}`);
+                            setAvatarError(true);
                         }}
                     />
                 ) : (

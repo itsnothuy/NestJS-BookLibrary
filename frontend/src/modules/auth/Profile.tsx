@@ -13,6 +13,7 @@ export default function Profile() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [avatarError, setAvatarError] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -32,6 +33,9 @@ export default function Profile() {
             setEmail(profile.email);
             if (profile.avatarUrl) {
               setAvatarPreview(`${API_BASE}${profile.avatarUrl}`);
+              setAvatarError(false);
+            } else {
+              setAvatarPreview(null);
             }
           }
         } catch (error) {
@@ -59,6 +63,7 @@ export default function Profile() {
       const reader = new FileReader();
       reader.onload = (e) => {
         setAvatarPreview(e.target?.result as string);
+        setAvatarError(false); // Reset error state for new preview
       };
       reader.readAsDataURL(file);
       setError(null);
@@ -129,6 +134,9 @@ export default function Profile() {
         setEmail(profile.email);
         if (profile.avatarUrl) {
           setAvatarPreview(`${API_BASE}${profile.avatarUrl}`);
+          setAvatarError(false);
+        } else {
+          setAvatarPreview(null);
         }
       }
     } catch (err: any) {
@@ -173,7 +181,7 @@ export default function Profile() {
             Profile Picture
           </label>
           <div style={{ marginBottom: '10px' }}>
-            {avatarPreview ? (
+            {avatarPreview && !avatarError ? (
               <img
                 src={avatarPreview}
                 alt="Avatar preview"
@@ -183,6 +191,10 @@ export default function Profile() {
                   borderRadius: '50%',
                   objectFit: 'cover',
                   border: '2px solid #e5e7eb'
+                }}
+                onError={() => {
+                  console.log('Avatar preview failed to load:', avatarPreview);
+                  setAvatarError(true);
                 }}
               />
             ) : (
@@ -200,7 +212,7 @@ export default function Profile() {
                   color: '#6b7280'
                 }}
               >
-                No Image
+                {avatarError ? user?.email?.charAt(0).toUpperCase() || '?' : 'No Image'}
               </div>
             )}
           </div>

@@ -266,23 +266,6 @@ export default function PaginatedBooksTable() {
           />
         </div>
 
-    
-        {/* Page Size Selector
-        <select
-          value={pagination.state.limit}
-          onChange={(e) => pagination.changePageSize(Number(e.target.value))}
-          style={{
-            padding: '8px 12px',
-            border: '1px solid #d1d5db',
-            borderRadius: '6px',
-            fontSize: '14px'
-          }}
-        >
-          <option value={5}>5 per page</option>
-          <option value={10}>10 per page</option>
-          <option value={25}>25 per page</option>
-          <option value={50}>50 per page</option>
-        </select> */}
 
         {/* Clear Filters */}
         {(authorFilter || yearFilter || pagination.state.search) && (
