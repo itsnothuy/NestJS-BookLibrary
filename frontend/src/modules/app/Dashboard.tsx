@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../auth/AuthContext';
-import SimpleBooksTable from '../books/SimpleBooksTable';
-import SimpleUsersTable from '../users/SimpleUsersTable';
+import PaginatedBooksTable from '../../components/books/PaginatedBooksTable';
+import PaginatedUsersTable from '../../components/users/PaginatedUsersTable';
 import NavTab from '../../components/layout/NavTab';
 import Header from '../../components/layout/Header';
+import Breadcrumbs from '../../components/navigation/Breadcrumbs';
 
 export const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000';
 
@@ -37,10 +38,12 @@ export default function Dashboard() {
       <Header />
       {/* Navigation Tabs */}
       <NavTab activeTab={activeTab} setActiveTab={(tab: string | null) => setActiveTab(tab)} />
+      {/* Breadcrumbs */}
+      <Breadcrumbs />
       {/* Main Content */}
       <main style={{ padding: "2rem" }}>
-        {activeTab === 'books' && <SimpleBooksTable />}
-        {activeTab === 'users' && user?.role === 'admin' && <SimpleUsersTable />}
+        {activeTab === 'books' && <PaginatedBooksTable />}
+        {activeTab === 'users' && user?.role === 'admin' && <PaginatedUsersTable />}
       </main>
     </div>
   );
