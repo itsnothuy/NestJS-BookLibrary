@@ -89,27 +89,6 @@ export default function PaginatedBooksTable() {
     yearFilter
   ]);
 
-  const getStatusBadge = (book: Book) => {
-    const isNew = new Date(book.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    
-    if (isNew) {
-      return (
-        <span style={{
-          padding: '2px 6px',
-          borderRadius: '8px',
-          fontSize: '10px',
-          fontWeight: '600',
-          backgroundColor: '#dcfce7',
-          color: '#16a34a',
-          border: '1px solid #bbf7d0'
-        }}>
-          NEW
-        </span>
-      );
-    }
-    return null;
-  };
-
   const columns = [
     {
       key: 'title',
@@ -120,7 +99,6 @@ export default function PaginatedBooksTable() {
           <div style={{ fontWeight: '600', marginBottom: '2px' }}>
             {book.title}
           </div>
-          {getStatusBadge(book)}
         </div>
       )
     },
@@ -288,37 +266,8 @@ export default function PaginatedBooksTable() {
           />
         </div>
 
-        {/* Author Filter */}
-        <input
-          type="text"
-          placeholder="Filter by author"
-          value={authorFilter}
-          onChange={(e) => setAuthorFilter(e.target.value)}
-          style={{
-            padding: '8px 12px',
-            border: '1px solid #d1d5db',
-            borderRadius: '6px',
-            fontSize: '14px',
-            minWidth: '150px'
-          }}
-        />
-
-        {/* Year Filter */}
-        <input
-          type="number"
-          placeholder="Year"
-          value={yearFilter}
-          onChange={(e) => setYearFilter(e.target.value)}
-          style={{
-            padding: '8px 12px',
-            border: '1px solid #d1d5db',
-            borderRadius: '6px',
-            fontSize: '14px',
-            width: '100px'
-          }}
-        />
-
-        {/* Page Size Selector */}
+    
+        {/* Page Size Selector
         <select
           value={pagination.state.limit}
           onChange={(e) => pagination.changePageSize(Number(e.target.value))}
@@ -333,7 +282,7 @@ export default function PaginatedBooksTable() {
           <option value={10}>10 per page</option>
           <option value={25}>25 per page</option>
           <option value={50}>50 per page</option>
-        </select>
+        </select> */}
 
         {/* Clear Filters */}
         {(authorFilter || yearFilter || pagination.state.search) && (

@@ -140,7 +140,7 @@ export default function PaginatedUsersTable() {
     if (user.avatarUrl) {
       return (
         <img
-          src={user.avatarUrl}
+          src={`${API_BASE}${user.avatarUrl}`}
           alt={`${user.email}'s avatar`}
           style={{
             width: size,
@@ -148,6 +148,30 @@ export default function PaginatedUsersTable() {
             borderRadius: '50%',
             objectFit: 'cover',
             border: '2px solid #e5e7eb'
+          }}
+          onError={(e) => {
+            // Fallback to initials if image fails to load
+            const target = e.target as HTMLImageElement;
+            target.style.display = 'none';
+            if (target.parentElement) {
+              const fallback = document.createElement('div');
+              const initials = user.email.split('@')[0].substring(0, 2).toUpperCase();
+              fallback.style.cssText = `
+                width: ${size}px;
+                height: ${size}px;
+                border-radius: 50%;
+                background-color: #3b82f6;
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: ${Math.floor(size / 2.5)}px;
+                font-weight: 600;
+                border: 2px solid #e5e7eb;
+              `;
+              fallback.textContent = initials;
+              target.parentElement.appendChild(fallback);
+            }
           }}
         />
       );
@@ -328,40 +352,6 @@ export default function PaginatedUsersTable() {
             }}
           />
         </div>
-
-        {/* Role Filter */}
-        <select
-          value={roleFilter}
-          onChange={(e) => setRoleFilter(e.target.value)}
-          style={{
-            padding: '8px 12px',
-            border: '1px solid #d1d5db',
-            borderRadius: '6px',
-            fontSize: '14px',
-            minWidth: '120px'
-          }}
-        >
-          <option value="">All Roles</option>
-          <option value="admin">Admin</option>
-          <option value="student">Student</option>
-        </select>
-
-        {/* Page Size Selector */}
-        <select
-          value={pagination.state.limit}
-          onChange={(e) => pagination.changePageSize(Number(e.target.value))}
-          style={{
-            padding: '8px 12px',
-            border: '1px solid #d1d5db',
-            borderRadius: '6px',
-            fontSize: '14px'
-          }}
-        >
-          <option value={5}>5 per page</option>
-          <option value={10}>10 per page</option>
-          <option value={25}>25 per page</option>
-          <option value={50}>50 per page</option>
-        </select>
       </div>
 
       <PaginatedTable

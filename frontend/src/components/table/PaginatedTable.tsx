@@ -56,18 +56,17 @@ export default function PaginatedTable<T>({
     backgroundColor: 'white',
     borderRadius: '8px',
     overflow: 'hidden',
-    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
     position: 'relative' as const
   };
 
   const thStyle = {
-    padding: '12px 16px',
+    backgroundColor: '#f9fafb',
+    padding: '12px',
     textAlign: 'left' as const,
-    backgroundColor: '#f8fafc',
-    borderBottom: '1px solid #e2e8f0',
-    fontSize: '14px',
     fontWeight: '600',
     color: '#374151',
+    borderBottom: '1px solid #e5e7eb',
     userSelect: 'none' as const
   };
 
@@ -78,9 +77,8 @@ export default function PaginatedTable<T>({
   };
 
   const tdStyle = {
-    padding: '12px 16px',
-    borderBottom: '1px solid #f1f5f9',
-    fontSize: '14px',
+    padding: '12px',
+    borderBottom: '1px solid #e5e7eb',
     color: '#374151',
     verticalAlign: 'top' as const
   };
@@ -90,10 +88,10 @@ export default function PaginatedTable<T>({
       {/* Add CSS for hover effects */}
       <style>{`
         .sortable-header:hover {
-          background-color: #f1f5f9 !important;
+          background-color: #f3f4f6 !important;
         }
         .table-row:hover {
-          background-color: #f8fafc !important;
+          background-color: #f9fafb !important;
         }
         @keyframes spin {
           from { transform: rotate(0deg); }
@@ -171,8 +169,8 @@ export default function PaginatedTable<T>({
                 style={{
                   ...tdStyle,
                   textAlign: 'center',
-                  padding: '48px 16px',
-                  color: '#9ca3af',
+                  padding: '40px',
+                  color: '#6b7280',
                   fontStyle: 'italic'
                 }}
               >

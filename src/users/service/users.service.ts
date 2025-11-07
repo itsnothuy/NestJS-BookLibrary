@@ -70,7 +70,7 @@ export class UsersService {
       throw new NotFoundException('No file uploaded');
     }
 
-    const avatarUrl = `/users/avatar/${file.filename}`;
+    const avatarUrl = `/avatar/${file.filename}`;
     const patch = {
       avatarFilename: file.filename,
       avatarPath: file.path,

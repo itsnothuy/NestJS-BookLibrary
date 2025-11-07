@@ -11,12 +11,10 @@ import {
   UseInterceptors,
   UploadedFile,
   Request,
-  Res,
-  Query,
-  SetMetadata
+  Query
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import type { Express, Response } from 'express';
+import type { Express } from 'express';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { existsSync, mkdirSync } from 'fs';
@@ -99,16 +97,5 @@ export class UsersController {
     @Request() req: any
   ) {
     return this.users.updateAvatar((req as any).user.uuid, file);
-  }
-
-  @Get('avatar/:filename')
-  @SetMetadata('skipAuth', true)
-  async getAvatar(@Param('filename') filename: string, @Res() res: Response) {
-    const path = join(process.cwd(), 'uploads', 'avatars', filename);
-    if (existsSync(path)) {
-      return res.sendFile(path);
-    } else {
-      return res.status(404).json({ message: 'Avatar not found' });
-    }
   }
 }

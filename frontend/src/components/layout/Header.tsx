@@ -85,6 +85,21 @@ export default function Header() {
                             height: "100%",
                             objectFit: "cover"
                         }}
+                        onError={(e) => {
+                            // Fallback to initials if image fails to load
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            if (target.parentElement) {
+                                const fallback = document.createElement('span');
+                                fallback.style.cssText = `
+                                    color: #6b7280; 
+                                    font-size: 14px;
+                                    font-weight: bold;
+                                `;
+                                fallback.textContent = user?.email?.charAt(0).toUpperCase() || '?';
+                                target.parentElement.appendChild(fallback);
+                            }
+                        }}
                     />
                 ) : (
                     <span style={{ 
