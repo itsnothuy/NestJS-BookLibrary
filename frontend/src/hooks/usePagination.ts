@@ -46,7 +46,7 @@ export function usePagination(initialLimit = 10) {
   };
 
   const changePageSize = (limit: number) => {
-    updatePagination({ limit, page: 1 }); // Reset to first page
+    updatePagination({ limit, page: 1 });
   };
 
   const updateSort = (sortBy: string, sortOrder?: 'asc' | 'desc') => {
@@ -55,7 +55,7 @@ export function usePagination(initialLimit = 10) {
   };
 
   const updateSearch = (search: string) => {
-    updatePagination({ search, page: 1 }); // Reset to first page
+    updatePagination({ search, page: 1 }); 
   };
 
   const reset = () => {

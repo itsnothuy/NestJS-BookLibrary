@@ -12,7 +12,8 @@ import {
   UploadedFile,
   Request,
   Res,
-  Query
+  Query,
+  SetMetadata
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Express, Response } from 'express';
@@ -35,11 +36,9 @@ export class UsersController {
   
   @Get() 
   findAll(@Query() query: PaginationQueryDto, @Query('role') role?: string) { 
-    // If any pagination parameters are provided, use pagination
     if (query.page || query.limit || query.sortBy || query.sortOrder || query.search || role) {
       return this.users.findAllPaginated(query, { role });
     }
-    // Otherwise, return all users (backward compatibility)
     return this.users.findAll(); 
   }
   
@@ -66,7 +65,6 @@ export class UsersController {
     return this.users.remove(id); 
   }
 
-  // Avatar upload endpoint for any user to upload their own avatar
   @UseGuards(JwtAuthGuard) // Remove admin role requirement for own avatar
   @Post('avatar')
   @UseInterceptors(FileInterceptor('avatar', {
@@ -103,8 +101,8 @@ export class UsersController {
     return this.users.updateAvatar((req as any).user.uuid, file);
   }
 
-  // Serve avatar files
   @Get('avatar/:filename')
+  @SetMetadata('skipAuth', true)
   async getAvatar(@Param('filename') filename: string, @Res() res: Response) {
     const path = join(process.cwd(), 'uploads', 'avatars', filename);
     if (existsSync(path)) {

@@ -7,11 +7,6 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   
-  // Serve static files from uploads directory
-  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
-    prefix: '/users/avatar/',
-  });
-  
   // Enable global validation pipe
   app.useGlobalPipes(
     new ValidationPipe({

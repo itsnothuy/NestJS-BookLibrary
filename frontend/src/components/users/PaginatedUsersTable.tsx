@@ -320,7 +320,7 @@ export default function PaginatedUsersTable() {
             value={pagination.state.search}
             onChange={(e) => pagination.updateSearch(e.target.value)}
             style={{
-              width: '100%',
+              width: '80%',
               padding: '8px 12px',
               border: '1px solid #d1d5db',
               borderRadius: '6px',

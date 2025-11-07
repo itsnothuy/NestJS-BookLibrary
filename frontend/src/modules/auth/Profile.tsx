@@ -72,14 +72,12 @@ export default function Profile() {
     setBusy(true);
 
     try {
-      // Validate password confirmation
       if (password && password !== confirmPassword) {
         setError('Passwords do not match');
         setBusy(false);
         return;
       }
 
-      // Update profile info (email/password)
       if (email !== user?.email || password) {
         const profileData: any = {};
         if (email !== user?.email) profileData.email = email;
@@ -100,7 +98,6 @@ export default function Profile() {
         }
       }
 
-      // Upload avatar if selected
       if (avatarFile) {
         const formData = new FormData();
         formData.append('avatar', avatarFile);
@@ -118,13 +115,11 @@ export default function Profile() {
           throw new Error(errorData.message || 'Failed to upload avatar');
         }
       }
-
       setSuccess('Profile updated successfully!');
       setPassword('');
       setConfirmPassword('');
       setAvatarFile(null);
       
-      // Refresh user data
       const res = await fetch(`${API_BASE}/auth/me`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -167,7 +162,7 @@ export default function Profile() {
             fontSize: '14px'
           }}
         >
-          Back to Dashboard
+          Back
         </button>
       </div>
 
@@ -220,7 +215,7 @@ export default function Profile() {
           </small>
         </div>
 
-        {/* Email Field */}
+        {/* Email */}
         <div style={{ marginBottom: '15px' }}>
           <label>Email<br/>
             <input 
@@ -234,7 +229,7 @@ export default function Profile() {
           </label>
         </div>
         
-        {/* Password Field */}
+        {/* Password */}
         <div style={{ marginBottom: '15px' }}>
           <label>New Password (leave blank to keep current)<br/>
             <input 
@@ -247,7 +242,7 @@ export default function Profile() {
           </label>
         </div>
 
-        {/* Confirm Password Field */}
+        {/* Confirm Password */}
         {password && (
           <div style={{ marginBottom: '20px' }}>
             <label>Confirm New Password<br/>
@@ -263,7 +258,7 @@ export default function Profile() {
           </div>
         )}
 
-        {/* Role Display */}
+        {/* Role */}
         <div style={{ marginBottom: '20px' }}>
           <label>Role<br/>
             <input 
