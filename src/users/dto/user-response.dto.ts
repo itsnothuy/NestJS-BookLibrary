@@ -6,9 +6,8 @@ export class UserResponseDto {
   role: 'student' | 'admin';
   createdAt: Date;
   updatedAt: Date;
-  // Avatar fields
-  avatarUrl?: string;
-  avatarFilename?: string;
+  // Avatar fields - BLOB storage
+  avatarUrl?: string; // URL to BLOB avatar endpoint
   avatarMimeType?: string;
   avatarSizeBytes?: number;
   avatarWidth?: number;
@@ -16,14 +15,16 @@ export class UserResponseDto {
   avatarUploadedAt?: Date;
 
   static fromEntity(user: UserRow): UserResponseDto {
+    // For BLOB storage, avatar URL points to /avatar/:uuid endpoint
+    const avatarUrl = user.avatarData ? `/avatar/${user.uuid}` : undefined;
+    
     return {
       id: user.uuid, // Expose UUID as 'id' to client
       email: user.email,
       role: user.role,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
-      avatarUrl: user.avatarUrl,
-      avatarFilename: user.avatarFilename,
+      avatarUrl: avatarUrl, // BLOB avatar URL
       avatarMimeType: user.avatarMimeType,
       avatarSizeBytes: user.avatarSizeBytes,
       avatarWidth: user.avatarWidth,

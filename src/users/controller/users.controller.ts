@@ -15,9 +15,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Express } from 'express';
-import { diskStorage } from 'multer';
-import { extname, join } from 'path';
-import { existsSync, mkdirSync } from 'fs';
+import { memoryStorage } from 'multer';
 import { UsersService } from '../service/users.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
@@ -66,21 +64,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard) // Remove admin role requirement for own avatar
   @Post('avatar')
   @UseInterceptors(FileInterceptor('avatar', {
-    storage: diskStorage({
-      destination: (req, file, cb) => {
-        const uploadPath = join(process.cwd(), 'uploads', 'avatars');
-        if (!existsSync(uploadPath)) {
-          mkdirSync(uploadPath, { recursive: true });
-        }
-        cb(null, uploadPath);
-      },
-      filename: (req, file, cb) => {
-        const user = (req as any).user;
-        const ext = extname(file.originalname);
-        const filename = `avatar-${user.uuid}-${Date.now()}${ext}`;
-        cb(null, filename);
-      },
-    }),
+    storage: memoryStorage(), // Use memory storage for BLOB storage
     fileFilter: (req, file, cb) => {
       if (file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
         cb(null, true);
@@ -98,4 +82,5 @@ export class UsersController {
   ) {
     return this.users.updateAvatar((req as any).user.uuid, file);
   }
+
 }

@@ -70,11 +70,9 @@ export class UsersService {
       throw new NotFoundException('No file uploaded');
     }
 
-    const avatarUrl = `/avatar/${file.filename}`;
+    // For BLOB storage, we store the file buffer directly in the database
     const patch = {
-      avatarFilename: file.filename,
-      avatarPath: file.path,
-      avatarUrl: avatarUrl,
+      avatarData: file.buffer, // Store image data as BLOB
       avatarMimeType: file.mimetype,
       avatarSizeBytes: file.size,
       avatarUploadedAt: new Date(),

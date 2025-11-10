@@ -11,8 +11,7 @@ interface User {
   role: 'admin' | 'student';
   createdAt: string;
   updatedAt: string;
-  avatarUrl: string | null;
-  avatarFilename: string | null;
+  avatarUrl: string | null; // BLOB avatar URL
   avatarMimeType: string | null;
   avatarSizeBytes: number | null;
   avatarWidth: number | null;

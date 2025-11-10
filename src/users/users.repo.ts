@@ -22,9 +22,7 @@ export class UsersRepo implements PaginatedRepository<UserRow> {
       role: row.role,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
-      avatarFilename: row.avatar_filename,
-      avatarPath: row.avatar_path,
-      avatarUrl: row.avatar_url,
+      avatarData: row.avatar_data, // BLOB data from database
       avatarMimeType: row.avatar_mime_type,
       avatarSizeBytes: row.avatar_size_bytes,
       avatarWidth: row.avatar_width,
@@ -87,17 +85,14 @@ export class UsersRepo implements PaginatedRepository<UserRow> {
       ? `WHERE ${conditions.join(' AND ')}` 
       : '';
 
-    // Validate sortBy to prevent SQL injection
     const allowedSortFields = ['id', 'email', 'role', 'createdAt', 'updatedAt'];
     const safeSortBy = allowedSortFields.includes(sortBy) ? sortBy : 'createdAt';
     const safeSortOrder = sortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
 
-    // Get total count
     const countQuery = `SELECT COUNT(*) as total FROM users ${whereClause}`;
     const [countResult] = await this.pool.query(countQuery, params);
     const total = (countResult as any[])[0].total;
 
-    // Get paginated data
     const dataQuery = `
       SELECT * FROM users 
       ${whereClause}
@@ -145,7 +140,7 @@ export class UsersRepo implements PaginatedRepository<UserRow> {
     return (await this.findById(insertId))!;
   }
 
-  async updateByUuid(uuid: string, patch: Partial<Pick<UserRow,'email'|'passwordHash'|'role'|'avatarFilename'|'avatarPath'|'avatarUrl'|'avatarMimeType'|'avatarSizeBytes'|'avatarWidth'|'avatarHeight'|'avatarUploadedAt'>>): Promise<UserRow | null> {
+  async updateByUuid(uuid: string, patch: Partial<Pick<UserRow,'email'|'passwordHash'|'role'|'avatarData'|'avatarMimeType'|'avatarSizeBytes'|'avatarWidth'|'avatarHeight'|'avatarUploadedAt'>>): Promise<UserRow | null> {
     const user = await this.findByUuid(uuid);  
     if (!user) return null;
     
@@ -155,9 +150,7 @@ export class UsersRepo implements PaginatedRepository<UserRow> {
     if (patch.email !== undefined) { fields.push('email = ?'); params.push(patch.email); }
     if (patch.passwordHash !== undefined) { fields.push('passwordHash = ?'); params.push(patch.passwordHash); }
     if (patch.role !== undefined) { fields.push('role = ?'); params.push(patch.role); }
-    if (patch.avatarFilename !== undefined) { fields.push('avatar_filename = ?'); params.push(patch.avatarFilename); }
-    if (patch.avatarPath !== undefined) { fields.push('avatar_path = ?'); params.push(patch.avatarPath); }
-    if (patch.avatarUrl !== undefined) { fields.push('avatar_url = ?'); params.push(patch.avatarUrl); }
+    if (patch.avatarData !== undefined) { fields.push('avatar_data = ?'); params.push(patch.avatarData); } // BLOB data
     if (patch.avatarMimeType !== undefined) { fields.push('avatar_mime_type = ?'); params.push(patch.avatarMimeType); }
     if (patch.avatarSizeBytes !== undefined) { fields.push('avatar_size_bytes = ?'); params.push(patch.avatarSizeBytes); }
     if (patch.avatarWidth !== undefined) { fields.push('avatar_width = ?'); params.push(patch.avatarWidth); }
