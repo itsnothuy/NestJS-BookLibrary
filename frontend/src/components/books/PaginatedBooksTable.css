@@ -1,0 +1,276 @@
+/* PaginatedBooksTable Component Styles */
+
+.paginated-books-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.paginated-books-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.paginated-books-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #1f2937;
+  margin: 0;
+}
+
+.paginated-books-button {
+  padding: 10px 20px;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.paginated-books-button:hover {
+  background-color: #2563eb;
+}
+
+.paginated-books-button-danger {
+  padding: 8px 16px;
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-left: 5px;
+}
+
+.paginated-books-button-danger:hover {
+  background-color: #b91c1c;
+}
+
+.paginated-books-button-secondary {
+  padding: 8px 16px;
+  background-color: #6b7280;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-left: 5px;
+}
+
+.paginated-books-button-secondary:hover {
+  background-color: #4b5563;
+}
+
+.paginated-books-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.paginated-books-th {
+  background-color: #f9fafb;
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.paginated-books-td {
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #374151;
+}
+
+.paginated-books-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.paginated-books-modal-content {
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow: auto;
+}
+
+.paginated-books-form-group {
+  margin-bottom: 20px;
+}
+
+.paginated-books-label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.paginated-books-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.paginated-books-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px #3b82f6;
+}
+
+.paginated-books-modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.paginated-books-loading {
+  text-align: center;
+  padding: 40px;
+  color: #6b7280;
+}
+
+.paginated-books-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.paginated-books-error {
+  padding: 24px;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #dc2626;
+}
+
+.paginated-books-error h3 {
+  margin: 0 0 8px 0;
+}
+
+.paginated-books-error p {
+  margin: 0;
+}
+
+.paginated-books-retry-button {
+  margin-top: 12px;
+  padding: 8px 16px;
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.paginated-books-retry-button:hover {
+  background-color: #b91c1c;
+}
+
+.paginated-books-search-controls {
+  margin-bottom: 24px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.paginated-books-search-input-container {
+  flex: 1;
+  min-width: 300px;
+  max-width: 400px;
+}
+
+.paginated-books-search-input {
+  width: 80%;
+  padding: 8px 12px;
+  margin: 0px 0px 0px 30px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.paginated-books-search-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px #3b82f6;
+}
+
+.paginated-books-clear-filters {
+  padding: 8px 12px;
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.paginated-books-clear-filters:hover {
+  background-color: #e5e7eb;
+}
+
+.paginated-books-title-cell {
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.paginated-books-author-cell {
+  font-weight: 500;
+  color: #374151;
+}
+
+.paginated-books-isbn-cell {
+  background-color: #f3f4f6;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: monospace;
+}
+
+.paginated-books-year-cell {
+  text-align: center;
+  color: #6b7280;
+}
+
+.paginated-books-date-cell {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.paginated-books-role-display {
+  margin-right: 1rem;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.paginated-books-admin-message {
+  color: #6b7280;
+  font-size: 14px;
+  font-style: italic;
+}
+
+.paginated-books-modal h2 {
+  margin-top: 0;
+  color: #1f2937;
+}

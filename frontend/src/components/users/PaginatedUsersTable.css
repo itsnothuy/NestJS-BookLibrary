@@ -1,0 +1,269 @@
+/* PaginatedUsersTable Component Styles */
+
+.paginated-users-container {
+  padding: 24px;
+}
+
+.paginated-users-header {
+  margin-bottom: 24px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.paginated-users-title {
+  margin: 0;
+  color: #1f2937;
+}
+
+.paginated-users-controls {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.paginated-users-search-container {
+  flex: 1;
+  min-width: 300px;
+  max-width: 400px;
+}
+
+.paginated-users-search-input {
+  width: 80%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.paginated-users-search-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px #3b82f6;
+}
+
+.paginated-users-button {
+  padding: 10px 20px;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.paginated-users-button:hover {
+  background-color: #2563eb;
+}
+
+.paginated-users-button-danger {
+  padding: 8px 16px;
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-left: 5px;
+}
+
+.paginated-users-button-danger:hover {
+  background-color: #b91c1c;
+}
+
+.paginated-users-button-secondary {
+  padding: 8px 16px;
+  background-color: #6b7280;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-left: 5px;
+}
+
+.paginated-users-button-secondary:hover {
+  background-color: #4b5563;
+}
+
+.paginated-users-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.paginated-users-modal-content {
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow: auto;
+}
+
+.paginated-users-form-group {
+  margin-bottom: 20px;
+}
+
+.paginated-users-label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.paginated-users-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.paginated-users-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px #3b82f6;
+}
+
+.paginated-users-select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+  background-color: white;
+}
+
+.paginated-users-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px #3b82f6;
+}
+
+.paginated-users-modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.paginated-users-error {
+  padding: 24px;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #dc2626;
+}
+
+.paginated-users-error h3 {
+  margin: 0 0 8px 0;
+}
+
+.paginated-users-error p {
+  margin: 0;
+}
+
+.paginated-users-retry-button {
+  margin-top: 12px;
+  padding: 8px 16px;
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.paginated-users-retry-button:hover {
+  background-color: #b91c1c;
+}
+
+.paginated-users-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.paginated-users-email-cell {
+  font-weight: 500;
+}
+
+.paginated-users-date-cell {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.paginated-users-role-display {
+  margin-right: 1rem;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.paginated-users-admin-message {
+  color: #6b7280;
+  font-size: 14px;
+  font-style: italic;
+}
+
+/* Role Badge Styles */
+.paginated-users-role-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.paginated-users-role-admin {
+  background-color: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.paginated-users-role-student {
+  background-color: #dbeafe;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}
+
+.paginated-users-role-default {
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+/* Avatar Styles */
+.paginated-users-avatar-img {
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e5e7eb;
+}
+
+.paginated-users-avatar-fallback {
+  border-radius: 50%;
+  background-color: #3b82f6;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  border: 2px solid #e5e7eb;
+}
+
+.paginated-users-modal h2 {
+  margin-top: 0;
+  color: #1f2937;
+}

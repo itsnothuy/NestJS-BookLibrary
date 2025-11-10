@@ -2,133 +2,9 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../modules/auth/AuthContext';
 import { usePagination } from '../../hooks/usePagination';
 import PaginatedTable from '../table/PaginatedTable';
+import './PaginatedBooksTable.css';
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000';
-
-const styles = {
-  container: {
-    maxWidth: '1200px',
-    margin: '0 auto',
-    padding: '20px',
-    fontFamily: 'system-ui, -apple-system, sans-serif',
-  },
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '30px',
-  },
-  title: {
-    fontSize: '2rem',
-    fontWeight: 'bold',
-    color: '#1f2937',
-    margin: 0,
-  },
-  button: {
-    padding: '10px 20px',
-    backgroundColor: '#3b82f6',
-    color: 'white',
-    border: 'none',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    fontWeight: '500',
-  },
-  buttonDanger: {
-    padding: '8px 16px',
-    backgroundColor: '#dc2626',
-    color: 'white',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontSize: '12px',
-    marginLeft: '5px',
-  },
-  buttonSecondary: {
-    padding: '8px 16px',
-    backgroundColor: '#6b7280',
-    color: 'white',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontSize: '12px',
-    marginLeft: '5px',
-  },
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse' as const,
-    backgroundColor: 'white',
-    borderRadius: '8px',
-    overflow: 'hidden',
-    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-  },
-  th: {
-    backgroundColor: '#f9fafb',
-    padding: '12px',
-    textAlign: 'left' as const,
-    fontWeight: '600',
-    color: '#374151',
-    borderBottom: '1px solid #e5e7eb',
-  },
-  td: {
-    padding: '12px',
-    borderBottom: '1px solid #e5e7eb',
-    color: '#374151',
-  },
-  modal: {
-    position: 'fixed' as const,
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1000,
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    padding: '30px',
-    borderRadius: '8px',
-    maxWidth: '500px',
-    width: '90%',
-    maxHeight: '90vh',
-    overflow: 'auto',
-  },
-  formGroup: {
-    marginBottom: '20px',
-  },
-  label: {
-    display: 'block',
-    marginBottom: '5px',
-    fontWeight: '500',
-    color: '#374151',
-  },
-  input: {
-    width: '100%',
-    padding: '8px 12px',
-    border: '1px solid #d1d5db',
-    borderRadius: '4px',
-    fontSize: '14px',
-    boxSizing: 'border-box' as const,
-  },
-  modalButtons: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    gap: '10px',
-    marginTop: '20px',
-  },
-  loading: {
-    textAlign: 'center' as const,
-    padding: '40px',
-    color: '#6b7280',
-  },
-  actions: {
-    display: 'flex',
-    gap: '5px',
-  },
-};
 
 interface Book {
   id: string;
@@ -402,7 +278,7 @@ export default function PaginatedBooksTable() {
       sortable: true,
       render: (book: Book) => (
         <div>
-          <div style={{ fontWeight: '600', marginBottom: '2px' }}>
+          <div className="paginated-books-title-cell">
             {book.title}
           </div>
         </div>
@@ -414,7 +290,7 @@ export default function PaginatedBooksTable() {
       sortable: true,
       width: '200px',
       render: (book: Book) => (
-        <div style={{ fontWeight: '500', color: '#374151' }}>
+        <div className="paginated-books-author-cell">
           {book.author}
         </div>
       )
@@ -424,13 +300,7 @@ export default function PaginatedBooksTable() {
       label: 'ISBN',
       width: '140px',
       render: (book: Book) => (
-        <code style={{
-          backgroundColor: '#f3f4f6',
-          padding: '2px 6px',
-          borderRadius: '4px',
-          fontSize: '12px',
-          fontFamily: 'monospace'
-        }}>
+        <code className="paginated-books-isbn-cell">
           {book.isbn}
         </code>
       )
@@ -441,7 +311,7 @@ export default function PaginatedBooksTable() {
       sortable: true,
       width: '80px',
       render: (book: Book) => (
-        <div style={{ textAlign: 'center', color: '#6b7280' }}>
+        <div className="paginated-books-year-cell">
           {book.publishedYear || '—'}
         </div>
       )
@@ -452,7 +322,7 @@ export default function PaginatedBooksTable() {
       sortable: true,
       width: '120px',
       render: (book: Book) => (
-        <div style={{ fontSize: '14px', color: '#6b7280' }}>
+        <div className="paginated-books-date-cell">
           {new Date(book.createdAt).toLocaleDateString('en-US', {
             month: 'short',
             day: 'numeric',
@@ -466,16 +336,16 @@ export default function PaginatedBooksTable() {
       label: 'Actions',
       width: '160px',
       render: (book: Book) => (
-        <div style={styles.actions}>
+        <div className="paginated-books-actions">
           <button
-            style={styles.buttonSecondary}
+            className="paginated-books-button-secondary"
             onClick={() => openViewModal(book)}
           >
             View
           </button>
           {userRole === 'admin' && (
             <button
-              style={styles.buttonSecondary}
+              className="paginated-books-button-secondary"
               onClick={() => openEditModal(book)}
             >
               Edit
@@ -483,7 +353,7 @@ export default function PaginatedBooksTable() {
           )}
           {userRole === 'admin' && (
             <button
-              style={styles.buttonDanger}
+              className="paginated-books-button-danger"
               onClick={() => openDeleteModal(book)}
             >
               Delete
@@ -496,26 +366,12 @@ export default function PaginatedBooksTable() {
 
   if (error) {
     return (
-      <div style={{
-        padding: '24px',
-        backgroundColor: '#fef2f2',
-        border: '1px solid #fecaca',
-        borderRadius: '8px',
-        color: '#dc2626'
-      }}>
-        <h3 style={{ margin: '0 0 8px 0' }}>Error loading books</h3>
-        <p style={{ margin: 0 }}>{error}</p>
+      <div className="paginated-books-error">
+        <h3>Error loading books</h3>
+        <p>{error}</p>
         <button
           onClick={fetchBooks}
-          style={{
-            marginTop: '12px',
-            padding: '8px 16px',
-            backgroundColor: '#dc2626',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}
+          className="paginated-books-retry-button"
         >
           Retry
         </button>
@@ -524,18 +380,18 @@ export default function PaginatedBooksTable() {
   }
 
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <h1 style={styles.title}>Books Library</h1>
+    <div className="paginated-books-container">
+      <div className="paginated-books-header">
+        <h1 className="paginated-books-title">Books Library</h1>
         <div>
           {userRole && (
-            <span style={{ marginRight: '1rem', color: '#6b7280', fontSize: '14px' }}>
+            <span className="paginated-books-role-display">
               Role: <strong>{userRole}</strong>
             </span>
           )}
           {userRole === 'admin' ? (
             <button
-              style={styles.button}
+              className="paginated-books-button"
               onClick={() => {
                 resetForm();
                 setShowAddModal(true);
@@ -544,36 +400,23 @@ export default function PaginatedBooksTable() {
               + Add New Book
             </button>
           ) : (
-            <span style={{ color: '#6b7280', fontSize: '14px', fontStyle: 'italic' }}>
+            <span className="paginated-books-admin-message">
               Admin access required to manage books
             </span>
           )}
         </div>
       </div>
 
-      <div style={{ 
-        marginBottom: '24px',
-        display: 'flex',
-        gap: '16px',
-        alignItems: 'center',
-        flexWrap: 'wrap'
-      }}>
+      <div className="paginated-books-search-controls">
         
         {/* Search Input */}
-        <div style={{ flex: '1', minWidth: '300px', maxWidth: '400px' }}>
+        <div className="paginated-books-search-input-container">
           <input
             type="text"
             placeholder="Search books by title, author, or ISBN..."
             value={pagination.state.search}
             onChange={(e) => pagination.updateSearch(e.target.value)}
-            style={{
-              width: '80%',
-              padding: '8px 12px',
-              margin: '0px 0px 0px 30px',
-              border: '1px solid #d1d5db',
-              borderRadius: '6px',
-              fontSize: '14px'
-            }}
+            className="paginated-books-search-input"
           />
         </div>
 
@@ -586,15 +429,7 @@ export default function PaginatedBooksTable() {
               setYearFilter('');
               pagination.updateSearch('');
             }}
-            style={{
-              padding: '8px 12px',
-              backgroundColor: '#f3f4f6',
-              color: '#374151',
-              border: '1px solid #d1d5db',
-              borderRadius: '6px',
-              fontSize: '14px',
-              cursor: 'pointer'
-            }}
+            className="paginated-books-clear-filters"
           >
             Clear Filters
           </button>
@@ -624,13 +459,13 @@ export default function PaginatedBooksTable() {
 
       {/* Add Book Modal */}
       {showAddModal && (
-        <div style={styles.modal}>
-          <div style={styles.modalContent}>
+        <div className="paginated-books-modal">
+          <div className="paginated-books-modal-content">
             <h2>Add New Book</h2>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Title</label>
+            <div className="paginated-books-form-group">
+              <label className="paginated-books-label">Title</label>
               <input
-                style={styles.input}
+                className="paginated-books-input"
                 type="text"
                 value={formData.title}
                 onChange={(e) =>
@@ -639,10 +474,10 @@ export default function PaginatedBooksTable() {
                 placeholder="Enter book title"
               />
             </div>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Author</label>
+            <div className="paginated-books-form-group">
+              <label className="paginated-books-label">Author</label>
               <input
-                style={styles.input}
+                className="paginated-books-input"
                 type="text"
                 value={formData.author}
                 onChange={(e) =>
@@ -651,10 +486,10 @@ export default function PaginatedBooksTable() {
                 placeholder="Enter author name"
               />
             </div>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>ISBN</label>
+            <div className="paginated-books-form-group">
+              <label className="paginated-books-label">ISBN</label>
               <input
-                style={styles.input}
+                className="paginated-books-input"
                 type="text"
                 value={formData.isbn}
                 onChange={(e) =>
@@ -663,10 +498,10 @@ export default function PaginatedBooksTable() {
                 placeholder="Enter ISBN (13 digits)"
               />
             </div>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Publisher</label>
+            <div className="paginated-books-form-group">
+              <label className="paginated-books-label">Publisher</label>
               <input
-                style={styles.input}
+                className="paginated-books-input"
                 type="text"
                 value={formData.publisher}
                 onChange={(e) =>
@@ -675,10 +510,10 @@ export default function PaginatedBooksTable() {
                 placeholder="Enter publisher name"
               />
             </div>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Published Year</label>
+            <div className="paginated-books-form-group">
+              <label className="paginated-books-label">Published Year</label>
               <input
-                style={styles.input}
+                className="paginated-books-input"
                 type="number"
                 value={formData.publishedYear?.toString() || ""}
                 onChange={(e) =>
@@ -690,10 +525,10 @@ export default function PaginatedBooksTable() {
                 placeholder="Enter published year"
               />
             </div>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Total Copies</label>
+            <div className="paginated-books-form-group">
+              <label className="paginated-books-label">Total Copies</label>
               <input
-                style={styles.input}
+                className="paginated-books-input"
                 type="number"
                 value={formData.totalCopies?.toString() || ""}
                 onChange={(e) =>
@@ -705,10 +540,10 @@ export default function PaginatedBooksTable() {
                 placeholder="Enter total copies"
               />
             </div>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Location</label>
+            <div className="paginated-books-form-group">
+              <label className="paginated-books-label">Location</label>
               <input
-                style={styles.input}
+                className="paginated-books-input"
                 type="text"
                 value={formData.location}
                 onChange={(e) =>
@@ -717,14 +552,14 @@ export default function PaginatedBooksTable() {
                 placeholder="Enter shelf location"
               />
             </div>
-            <div style={styles.modalButtons}>
+            <div className="paginated-books-modal-buttons">
               <button
-                style={styles.buttonSecondary}
+                className="paginated-books-button-secondary"
                 onClick={() => setShowAddModal(false)}
               >
                 Cancel
               </button>
-              <button style={styles.button} onClick={handleCreate}>
+              <button className="paginated-books-button" onClick={handleCreate}>
                 Add Book
               </button>
             </div>
@@ -734,13 +569,13 @@ export default function PaginatedBooksTable() {
 
       {/* Edit Book Modal */}
       {showEditModal && (
-        <div style={styles.modal}>
-          <div style={styles.modalContent}>
+        <div className="paginated-books-modal">
+          <div className="paginated-books-modal-content">
             <h2>Edit Book</h2>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Title</label>
+            <div className="paginated-books-form-group">
+              <label className="paginated-books-label">Title</label>
               <input
-                style={styles.input}
+                className="paginated-books-input"
                 type="text"
                 value={formData.title}
                 onChange={(e) =>
@@ -748,10 +583,10 @@ export default function PaginatedBooksTable() {
                 }
               />
             </div>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Author</label>
+            <div className="paginated-books-form-group">
+              <label className="paginated-books-label">Author</label>
               <input
-                style={styles.input}
+                className="paginated-books-input"
                 type="text"
                 value={formData.author}
                 onChange={(e) =>
@@ -759,10 +594,10 @@ export default function PaginatedBooksTable() {
                 }
               />
             </div>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>ISBN</label>
+            <div className="paginated-books-form-group">
+              <label className="paginated-books-label">ISBN</label>
               <input
-                style={styles.input}
+                className="paginated-books-input"
                 type="text"
                 value={formData.isbn}
                 onChange={(e) =>
@@ -770,10 +605,10 @@ export default function PaginatedBooksTable() {
                 }
               />
             </div>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Publisher</label>
+            <div className="paginated-books-form-group">
+              <label className="paginated-books-label">Publisher</label>
               <input
-                style={styles.input}
+                className="paginated-books-input"
                 type="text"
                 value={formData.publisher}
                 onChange={(e) =>
@@ -781,10 +616,10 @@ export default function PaginatedBooksTable() {
                 }
               />
             </div>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Published Year</label>
+            <div className="paginated-books-form-group">
+              <label className="paginated-books-label">Published Year</label>
               <input
-                style={styles.input}
+                className="paginated-books-input"
                 type="number"
                 value={formData.publishedYear?.toString() || ""}
                 onChange={(e) =>
@@ -795,10 +630,10 @@ export default function PaginatedBooksTable() {
                 }
               />
             </div>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Total Copies</label>
+            <div className="paginated-books-form-group">
+              <label className="paginated-books-label">Total Copies</label>
               <input
-                style={styles.input}
+                className="paginated-books-input"
                 type="number"
                 value={formData.totalCopies?.toString() || ""}
                 onChange={(e) =>
@@ -809,10 +644,10 @@ export default function PaginatedBooksTable() {
                 }
               />
             </div>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Location</label>
+            <div className="paginated-books-form-group">
+              <label className="paginated-books-label">Location</label>
               <input
-                style={styles.input}
+                className="paginated-books-input"
                 type="text"
                 value={formData.location}
                 onChange={(e) =>
@@ -820,14 +655,14 @@ export default function PaginatedBooksTable() {
                 }
               />
             </div>
-            <div style={styles.modalButtons}>
+            <div className="paginated-books-modal-buttons">
               <button
-                style={styles.buttonSecondary}
+                className="paginated-books-button-secondary"
                 onClick={() => setShowEditModal(false)}
               >
                 Cancel
               </button>
-              <button style={styles.button} onClick={handleUpdate}>
+              <button className="paginated-books-button" onClick={handleUpdate}>
                 Update Book
               </button>
             </div>
@@ -837,30 +672,30 @@ export default function PaginatedBooksTable() {
 
       {/* View Book Modal */}
       {showViewModal && selectedBook && (
-        <div style={styles.modal}>
-          <div style={styles.modalContent}>
+        <div className="paginated-books-modal">
+          <div className="paginated-books-modal-content">
             <h2>Book Details</h2>
-            <div style={styles.formGroup}>
+            <div className="paginated-books-form-group">
               <strong>Title:</strong> {selectedBook.title}
             </div>
-            <div style={styles.formGroup}>
+            <div className="paginated-books-form-group">
               <strong>Author:</strong> {selectedBook.author}
             </div>
-            <div style={styles.formGroup}>
+            <div className="paginated-books-form-group">
               <strong>ISBN:</strong> {selectedBook.isbn}
             </div>
-            <div style={styles.formGroup}>
+            <div className="paginated-books-form-group">
               <strong>Published Year:</strong> {selectedBook.publishedYear || "Unknown"}
             </div>
-            <div style={styles.formGroup}>
+            <div className="paginated-books-form-group">
               <strong>Created:</strong> {new Date(selectedBook.createdAt).toLocaleDateString()}
             </div>
-            <div style={styles.formGroup}>
+            <div className="paginated-books-form-group">
               <strong>Updated:</strong> {new Date(selectedBook.updatedAt).toLocaleDateString()}
             </div>
-            <div style={styles.modalButtons}>
+            <div className="paginated-books-modal-buttons">
               <button
-                style={styles.button}
+                className="paginated-books-button"
                 onClick={() => setShowViewModal(false)}
               >
                 Close
@@ -872,21 +707,21 @@ export default function PaginatedBooksTable() {
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && selectedBook && (
-        <div style={styles.modal}>
-          <div style={styles.modalContent}>
+        <div className="paginated-books-modal">
+          <div className="paginated-books-modal-content">
             <h2>Delete Book</h2>
             <p>
               Are you sure you want to delete "<strong>{selectedBook.title}</strong>"?
               This action cannot be undone.
             </p>
-            <div style={styles.modalButtons}>
+            <div className="paginated-books-modal-buttons">
               <button
-                style={styles.buttonSecondary}
+                className="paginated-books-button-secondary"
                 onClick={() => setShowDeleteModal(false)}
               >
                 Cancel
               </button>
-              <button style={styles.buttonDanger} onClick={handleDelete}>
+              <button className="paginated-books-button-danger" onClick={handleDelete}>
                 Delete
               </button>
             </div>

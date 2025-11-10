@@ -2,112 +2,9 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../modules/auth/AuthContext';
 import { usePagination } from '../../hooks/usePagination';
 import PaginatedTable from '../table/PaginatedTable';
+import './PaginatedUsersTable.css';
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000';
-
-const styles = {
-  container: {
-    maxWidth: '1200px',
-    margin: '0 auto',
-    padding: '20px',
-    fontFamily: 'system-ui, -apple-system, sans-serif',
-  },
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '30px',
-  },
-  title: {
-    fontSize: '2rem',
-    fontWeight: 'bold',
-    color: '#1f2937',
-    margin: 0,
-  },
-  button: {
-    padding: '10px 20px',
-    backgroundColor: '#3b82f6',
-    color: 'white',
-    border: 'none',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    fontWeight: '500',
-  },
-  buttonDanger: {
-    padding: '8px 16px',
-    backgroundColor: '#dc2626',
-    color: 'white',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontSize: '12px',
-    marginLeft: '5px',
-  },
-  buttonSecondary: {
-    padding: '8px 16px',
-    backgroundColor: '#6b7280',
-    color: 'white',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontSize: '12px',
-    marginLeft: '5px',
-  },
-  modal: {
-    position: 'fixed' as const,
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1000,
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    padding: '30px',
-    borderRadius: '8px',
-    maxWidth: '500px',
-    width: '90%',
-    maxHeight: '90vh',
-    overflow: 'auto',
-  },
-  formGroup: {
-    marginBottom: '20px',
-  },
-  label: {
-    display: 'block',
-    marginBottom: '5px',
-    fontWeight: '500',
-    color: '#374151',
-  },
-  input: {
-    width: '100%',
-    padding: '8px 12px',
-    border: '1px solid #d1d5db',
-    borderRadius: '4px',
-    fontSize: '14px',
-    boxSizing: 'border-box' as const,
-  },
-  select: {
-    width: '100%',
-    padding: '8px 12px',
-    border: '1px solid #d1d5db',
-    borderRadius: '4px',
-    fontSize: '14px',
-    boxSizing: 'border-box' as const,
-    backgroundColor: 'white',
-  },
-  modalButtons: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    gap: '10px',
-    marginTop: '20px',
-  },
-};
 
 interface User {
   id: string;
@@ -372,38 +269,14 @@ export default function PaginatedUsersTable() {
     setShowDeleteModal(true);
   };
 
-  const getRoleBadgeStyle = (role: string) => {
-    const baseStyle = {
-      padding: '4px 8px',
-      borderRadius: '12px',
-      fontSize: '12px',
-      fontWeight: '600',
-      textTransform: 'uppercase' as const,
-      letterSpacing: '0.025em'
-    };
-
+  const getRoleBadgeClass = (role: string) => {
     switch (role) {
       case 'admin':
-        return {
-          ...baseStyle,
-          backgroundColor: '#fee2e2',
-          color: '#dc2626',
-          border: '1px solid #fecaca'
-        };
+        return 'paginated-users-role-badge paginated-users-role-admin';
       case 'student':
-        return {
-          ...baseStyle,
-          backgroundColor: '#dbeafe',
-          color: '#2563eb',
-          border: '1px solid #bfdbfe'
-        };
+        return 'paginated-users-role-badge paginated-users-role-student';
       default:
-        return {
-          ...baseStyle,
-          backgroundColor: '#f3f4f6',
-          color: '#374151',
-          border: '1px solid #d1d5db'
-        };
+        return 'paginated-users-role-badge paginated-users-role-default';
     }
   };
 
@@ -413,13 +286,8 @@ export default function PaginatedUsersTable() {
         <img
           src={`${API_BASE}${user.avatarUrl}`}
           alt={`${user.email}'s avatar`}
-          style={{
-            width: size,
-            height: size,
-            borderRadius: '50%',
-            objectFit: 'cover',
-            border: '2px solid #e5e7eb'
-          }}
+          className="paginated-users-avatar-img"
+          style={{ width: size, height: size }}
           onError={(e) => {
             // Fallback to initials if image fails to load
             const target = e.target as HTMLImageElement;
@@ -427,18 +295,11 @@ export default function PaginatedUsersTable() {
             if (target.parentElement) {
               const fallback = document.createElement('div');
               const initials = user.email.split('@')[0].substring(0, 2).toUpperCase();
-              fallback.style.cssText = `
+              fallback.className = 'paginated-users-avatar-fallback';
+              fallback.style.cssText += `
                 width: ${size}px;
                 height: ${size}px;
-                border-radius: 50%;
-                background-color: #3b82f6;
-                color: white;
-                display: flex;
-                align-items: center;
-                justify-content: center;
                 font-size: ${Math.floor(size / 2.5)}px;
-                font-weight: 600;
-                border: 2px solid #e5e7eb;
               `;
               fallback.textContent = initials;
               target.parentElement.appendChild(fallback);
@@ -452,18 +313,11 @@ export default function PaginatedUsersTable() {
     const initials = user.email.split('@')[0].substring(0, 2).toUpperCase();
     return (
       <div
+        className="paginated-users-avatar-fallback"
         style={{
           width: size,
           height: size,
-          borderRadius: '50%',
-          backgroundColor: '#3b82f6',
-          color: 'white',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
           fontSize: Math.floor(size / 2.5),
-          fontWeight: '600',
-          border: '2px solid #e5e7eb'
         }}
       >
         {initials}
@@ -483,7 +337,7 @@ export default function PaginatedUsersTable() {
       label: 'Email',
       sortable: true,
       render: (user: User) => (
-        <div style={{ fontWeight: '500' }}>
+        <div className="paginated-users-email-cell">
           {user.email}
         </div>
       )
@@ -494,7 +348,7 @@ export default function PaginatedUsersTable() {
       sortable: true,
       width: '120px',
       render: (user: User) => (
-        <span style={getRoleBadgeStyle(user.role)}>
+        <span className={getRoleBadgeClass(user.role)}>
           {user.role}
         </span>
       )
@@ -505,7 +359,7 @@ export default function PaginatedUsersTable() {
       sortable: true,
       width: '140px',
       render: (user: User) => (
-        <div style={{ fontSize: '14px', color: '#6b7280' }}>
+        <div className="paginated-users-date-cell">
           {new Date(user.createdAt).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'short',
@@ -519,9 +373,9 @@ export default function PaginatedUsersTable() {
       label: 'Actions',
       width: '180px',
       render: (user: User) => (
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div className="paginated-users-actions">
           <button
-            style={styles.buttonSecondary}
+            className="paginated-users-button-secondary"
             onClick={() => openViewModal(user)}
           >
             View
@@ -529,13 +383,13 @@ export default function PaginatedUsersTable() {
           {userRole === 'admin' && (
             <>
               <button
-                style={styles.buttonSecondary}
+                className="paginated-users-button-secondary"
                 onClick={() => openEditModal(user)}
               >
                 Edit
               </button>
               <button
-                style={styles.buttonDanger}
+                className="paginated-users-button-danger"
                 onClick={() => openDeleteModal(user)}
               >
                 Delete
@@ -549,26 +403,12 @@ export default function PaginatedUsersTable() {
 
   if (error) {
     return (
-      <div style={{
-        padding: '24px',
-        backgroundColor: '#fef2f2',
-        border: '1px solid #fecaca',
-        borderRadius: '8px',
-        color: '#dc2626'
-      }}>
-        <h3 style={{ margin: '0 0 8px 0' }}>Error loading users</h3>
-        <p style={{ margin: 0 }}>{error}</p>
+      <div className="paginated-users-error">
+        <h3>Error loading users</h3>
+        <p>{error}</p>
         <button
           onClick={fetchUsers}
-          style={{
-            marginTop: '12px',
-            padding: '8px 16px',
-            backgroundColor: '#dc2626',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}
+          className="paginated-users-retry-button"
         >
           Retry
         </button>
@@ -577,26 +417,20 @@ export default function PaginatedUsersTable() {
   }
 
   return (
-    <div style={{ padding: '24px' }}>
-      <div style={{ 
-        marginBottom: '24px',
-        display: 'flex',
-        gap: '16px',
-        alignItems: 'center',
-        flexWrap: 'wrap'
-      }}>
-        <h2 style={{ margin: 0, color: '#1f2937' }}>User Management</h2>
+    <div className="paginated-users-container">
+      <div className="paginated-users-header">
+        <h2 className="paginated-users-title">User Management</h2>
         
         {/* User Role Display and Add Button */}
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <div className="paginated-users-controls">
           {userRole && (
-            <span style={{ marginRight: '1rem', color: '#6b7280', fontSize: '14px' }}>
+            <span className="paginated-users-role-display">
               Role: <strong>{userRole}</strong>
             </span>
           )}
           {userRole === 'admin' ? (
             <button
-              style={styles.button}
+              className="paginated-users-button"
               onClick={() => {
                 resetForm();
                 setShowAddModal(true);
@@ -605,26 +439,20 @@ export default function PaginatedUsersTable() {
               + Add New User
             </button>
           ) : (
-            <span style={{ color: '#6b7280', fontSize: '14px', fontStyle: 'italic' }}>
+            <span className="paginated-users-admin-message">
               Admin access required to manage users
             </span>
           )}
         </div>
         
         {/* Search Input */}
-        <div style={{ flex: '1', minWidth: '300px', maxWidth: '400px' }}>
+        <div className="paginated-users-search-container">
           <input
             type="text"
             placeholder="Search users..."
             value={pagination.state.search}
             onChange={(e) => pagination.updateSearch(e.target.value)}
-            style={{
-              width: '80%',
-              padding: '8px 12px',
-              border: '1px solid #d1d5db',
-              borderRadius: '6px',
-              fontSize: '14px'
-            }}
+            className="paginated-users-search-input"
           />
         </div>
       </div>
@@ -652,13 +480,13 @@ export default function PaginatedUsersTable() {
 
       {/* Add User Modal */}
       {showAddModal && (
-        <div style={styles.modal}>
-          <div style={styles.modalContent}>
+        <div className="paginated-users-modal">
+          <div className="paginated-users-modal-content">
             <h2>Add New User</h2>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Email</label>
+            <div className="paginated-users-form-group">
+              <label className="paginated-users-label">Email</label>
               <input
-                style={styles.input}
+                className="paginated-users-input"
                 type="email"
                 value={formData.email}
                 onChange={(e) =>
@@ -667,10 +495,10 @@ export default function PaginatedUsersTable() {
                 placeholder="Enter email address"
               />
             </div>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Password</label>
+            <div className="paginated-users-form-group">
+              <label className="paginated-users-label">Password</label>
               <input
-                style={styles.input}
+                className="paginated-users-input"
                 type="password"
                 value={formData.password}
                 onChange={(e) =>
@@ -679,10 +507,10 @@ export default function PaginatedUsersTable() {
                 placeholder="Enter password"
               />
             </div>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Role</label>
+            <div className="paginated-users-form-group">
+              <label className="paginated-users-label">Role</label>
               <select
-                style={styles.select}
+                className="paginated-users-select"
                 value={formData.role}
                 onChange={(e) =>
                   setFormData({ ...formData, role: e.target.value as 'student' | 'admin' })
@@ -692,14 +520,14 @@ export default function PaginatedUsersTable() {
                 <option value="admin">Admin</option>
               </select>
             </div>
-            <div style={styles.modalButtons}>
+            <div className="paginated-users-modal-buttons">
               <button
-                style={styles.buttonSecondary}
+                className="paginated-users-button-secondary"
                 onClick={() => setShowAddModal(false)}
               >
                 Cancel
               </button>
-              <button style={styles.button} onClick={handleCreate}>
+              <button className="paginated-users-button" onClick={handleCreate}>
                 Add User
               </button>
             </div>
@@ -709,13 +537,13 @@ export default function PaginatedUsersTable() {
 
       {/* Edit User Modal */}
       {showEditModal && (
-        <div style={styles.modal}>
-          <div style={styles.modalContent}>
+        <div className="paginated-users-modal">
+          <div className="paginated-users-modal-content">
             <h2>Edit User</h2>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Email</label>
+            <div className="paginated-users-form-group">
+              <label className="paginated-users-label">Email</label>
               <input
-                style={styles.input}
+                className="paginated-users-input"
                 type="email"
                 value={formData.email}
                 onChange={(e) =>
@@ -723,10 +551,10 @@ export default function PaginatedUsersTable() {
                 }
               />
             </div>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Password (leave empty to keep current)</label>
+            <div className="paginated-users-form-group">
+              <label className="paginated-users-label">Password (leave empty to keep current)</label>
               <input
-                style={styles.input}
+                className="paginated-users-input"
                 type="password"
                 value={formData.password}
                 onChange={(e) =>
@@ -735,10 +563,10 @@ export default function PaginatedUsersTable() {
                 placeholder="Enter new password (optional)"
               />
             </div>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Role</label>
+            <div className="paginated-users-form-group">
+              <label className="paginated-users-label">Role</label>
               <select
-                style={styles.select}
+                className="paginated-users-select"
                 value={formData.role}
                 onChange={(e) =>
                   setFormData({ ...formData, role: e.target.value as 'student' | 'admin' })
@@ -748,14 +576,14 @@ export default function PaginatedUsersTable() {
                 <option value="admin">Admin</option>
               </select>
             </div>
-            <div style={styles.modalButtons}>
+            <div className="paginated-users-modal-buttons">
               <button
-                style={styles.buttonSecondary}
+                className="paginated-users-button-secondary"
                 onClick={() => setShowEditModal(false)}
               >
                 Cancel
               </button>
-              <button style={styles.button} onClick={handleUpdate}>
+              <button className="paginated-users-button" onClick={handleUpdate}>
                 Update User
               </button>
             </div>
@@ -765,27 +593,27 @@ export default function PaginatedUsersTable() {
 
       {/* View User Modal */}
       {showViewModal && selectedUser && (
-        <div style={styles.modal}>
-          <div style={styles.modalContent}>
+        <div className="paginated-users-modal">
+          <div className="paginated-users-modal-content">
             <h2>User Details</h2>
-            <div style={styles.formGroup}>
+            <div className="paginated-users-form-group">
               <strong>Email:</strong> {selectedUser.email}
             </div>
-            <div style={styles.formGroup}>
+            <div className="paginated-users-form-group">
               <strong>Role:</strong> 
-              <span style={getRoleBadgeStyle(selectedUser.role)}>
+              <span className={getRoleBadgeClass(selectedUser.role)}>
                 {selectedUser.role}
               </span>
             </div>
-            <div style={styles.formGroup}>
+            <div className="paginated-users-form-group">
               <strong>Created:</strong> {new Date(selectedUser.createdAt).toLocaleDateString()}
             </div>
-            <div style={styles.formGroup}>
+            <div className="paginated-users-form-group">
               <strong>Updated:</strong> {new Date(selectedUser.updatedAt).toLocaleDateString()}
             </div>
-            <div style={styles.modalButtons}>
+            <div className="paginated-users-modal-buttons">
               <button
-                style={styles.button}
+                className="paginated-users-button"
                 onClick={() => setShowViewModal(false)}
               >
                 Close
@@ -797,21 +625,21 @@ export default function PaginatedUsersTable() {
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && selectedUser && (
-        <div style={styles.modal}>
-          <div style={styles.modalContent}>
+        <div className="paginated-users-modal">
+          <div className="paginated-users-modal-content">
             <h2>Delete User</h2>
             <p>
               Are you sure you want to delete user "<strong>{selectedUser.email}</strong>"?
               This action cannot be undone.
             </p>
-            <div style={styles.modalButtons}>
+            <div className="paginated-users-modal-buttons">
               <button
-                style={styles.buttonSecondary}
+                className="paginated-users-button-secondary"
                 onClick={() => setShowDeleteModal(false)}
               >
                 Cancel
               </button>
-              <button style={styles.buttonDanger} onClick={handleDelete}>
+              <button className="paginated-users-button-danger" onClick={handleDelete}>
                 Delete
               </button>
             </div>
