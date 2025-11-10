@@ -153,7 +153,7 @@ export default function PaginatedUsersTable() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [roleFilter, setRoleFilter] = useState<string>('');
+  // Removed unused roleFilter for now
   const [userRole, setUserRole] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [formData, setFormData] = useState<UserFormData>({
@@ -179,8 +179,7 @@ export default function PaginatedUsersTable() {
         limit: pagination.state.limit.toString(),
         sortBy: pagination.state.sortBy,
         sortOrder: pagination.state.sortOrder,
-        ...(pagination.state.search && { search: pagination.state.search }),
-        ...(roleFilter && { role: roleFilter })
+        ...(pagination.state.search && { search: pagination.state.search })
       });
 
       const response = await fetch(`${API_BASE}/users?${queryParams}`, {
@@ -235,7 +234,6 @@ export default function PaginatedUsersTable() {
     pagination.state.sortBy, 
     pagination.state.sortOrder,
     pagination.state.search,
-    roleFilter,
     token
   ]);
 

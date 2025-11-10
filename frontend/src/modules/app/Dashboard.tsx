@@ -4,8 +4,6 @@ import PaginatedBooksTable from '../../components/books/PaginatedBooksTable';
 import PaginatedUsersTable from '../../components/users/PaginatedUsersTable';
 import NavTab from '../../components/layout/NavTab';
 import Header from '../../components/layout/Header';
-import Breadcrumbs from '../../components/navigation/Breadcrumbs';
-import SimpleBooksTable from '../books/SimpleBooksTable';
 
 export const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000';
 

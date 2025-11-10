@@ -31,12 +31,6 @@ export const columns = [
   { name: "ACTIONS", uid: "actions" },
 ];
 
-// Column type
-interface Column {
-  name: string;
-  uid: string;
-}
-
 // Icons components
 export const EyeIcon = (props: any) => {
   return (
