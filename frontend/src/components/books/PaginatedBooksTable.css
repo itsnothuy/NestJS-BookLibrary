@@ -8,17 +8,32 @@
 }
 
 .paginated-books-header {
+  margin-bottom: 24px;
   display: flex;
+  gap: 16px;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
+  flex-wrap: wrap;
 }
 
 .paginated-books-title {
+  margin: 0;
+  color: #1f2937;
   font-size: 2rem;
   font-weight: bold;
-  color: #1f2937;
-  margin: 0;
+}
+
+.paginated-books-controls {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.paginated-books-search-container {
+  flex: 1;
+  min-width: 300px;
+  max-width: 400px;
 }
 
 .paginated-books-button {
@@ -187,24 +202,9 @@
   background-color: #b91c1c;
 }
 
-.paginated-books-search-controls {
-  margin-bottom: 24px;
-  display: flex;
-  gap: 16px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.paginated-books-search-input-container {
-  flex: 1;
-  min-width: 300px;
-  max-width: 400px;
-}
-
 .paginated-books-search-input {
-  width: 80%;
+  width: 95%;
   padding: 8px 12px;
-  margin: 0px 0px 0px 30px;
   border: 1px solid #d1d5db;
   border-radius: 6px;
   font-size: 14px;

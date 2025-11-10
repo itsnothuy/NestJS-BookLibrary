@@ -382,8 +382,10 @@ export default function PaginatedBooksTable() {
   return (
     <div className="paginated-books-container">
       <div className="paginated-books-header">
-        <h1 className="paginated-books-title">Books Library</h1>
-        <div>
+        <h2 className="paginated-books-title">Books Library</h2>
+        
+        {/* Book Role Display and Add Button */}
+        <div className="paginated-books-controls">
           {userRole && (
             <span className="paginated-books-role-display">
               Role: <strong>{userRole}</strong>
@@ -405,12 +407,9 @@ export default function PaginatedBooksTable() {
             </span>
           )}
         </div>
-      </div>
-
-      <div className="paginated-books-search-controls">
         
         {/* Search Input */}
-        <div className="paginated-books-search-input-container">
+        <div className="paginated-books-search-container">
           <input
             type="text"
             placeholder="Search books by title, author, or ISBN..."

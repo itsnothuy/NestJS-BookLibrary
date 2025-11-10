@@ -19,11 +19,9 @@ export class BooksController {
   // PUBLIC
   @Get()
   list(@Query() query: PaginationQueryDto, @Query('author') author?: string, @Query('publishedYear') publishedYear?: number) {
-    // If any pagination parameters are provided, use pagination
     if (query.page || query.limit || query.sortBy || query.sortOrder || query.search || author || publishedYear) {
       return this.books.listPaginated(query, { author, publishedYear });
     }
-    // Otherwise, return all books (backward compatibility)
     return this.books.list();
   }
 

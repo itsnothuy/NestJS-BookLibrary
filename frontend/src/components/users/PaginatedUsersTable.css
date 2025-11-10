@@ -1,13 +1,17 @@
 /* PaginatedUsersTable Component Styles */
 
 .paginated-users-container {
-  padding: 24px;
+  margin: 0 auto;
+  max-width: 1200px;
+  padding: 20px;
+  font-family: system-ui, -apple-system, sans-serif;
 }
 
 .paginated-users-header {
   margin-bottom: 24px;
   display: flex;
   gap: 16px;
+  justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
 }
@@ -15,6 +19,8 @@
 .paginated-users-title {
   margin: 0;
   color: #1f2937;
+  font-size: 2rem;
+  font-weight: bold;
 }
 
 .paginated-users-controls {
@@ -31,7 +37,7 @@
 }
 
 .paginated-users-search-input {
-  width: 80%;
+  width: 95%;
   padding: 8px 12px;
   border: 1px solid #d1d5db;
   border-radius: 6px;
