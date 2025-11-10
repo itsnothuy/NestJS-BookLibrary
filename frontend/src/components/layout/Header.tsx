@@ -29,6 +29,26 @@ export default function Header() {
         }
     }, [token]);
 
+    // Add effect to listen for profile refresh events
+    useEffect(() => {
+        const handleProfileRefresh = () => {
+            if (token) {
+                fetch(`${API_BASE}/auth/me`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                }).then(res => res.json()).then(profile => {
+                    setUser(profile);
+                    setAvatarError(false);
+                }).catch(error => {
+                    console.error('Failed to refresh profile:', error);
+                });
+            }
+        };
+
+        // Listen for custom profile refresh event
+        window.addEventListener('profile-updated', handleProfileRefresh);
+        return () => window.removeEventListener('profile-updated', handleProfileRefresh);
+    }, [token]);
+
     const handleAvatarClick = () => {
         navigate('/profile');
     };

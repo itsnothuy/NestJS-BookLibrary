@@ -15,8 +15,16 @@ export class UserResponseDto {
   avatarUploadedAt?: Date;
 
   static fromEntity(user: UserRow): UserResponseDto {
-    // For BLOB storage, avatar URL points to /avatar/:uuid endpoint
-    const avatarUrl = user.avatarData ? `/avatar/${user.uuid}` : undefined;
+    // For BLOB storage, avatar URL points to /avatar/:uuid endpoint with cache-busting
+    let avatarUrl: string | undefined = undefined;
+    if (user.avatarData) {
+      const baseUrl = `/avatar/${user.uuid}`;
+      // Add cache-busting parameter to prevent browser caching old images
+      const cacheParam = user.avatarUploadedAt 
+        ? `?t=${new Date(user.avatarUploadedAt).getTime()}`
+        : '';
+      avatarUrl = `${baseUrl}${cacheParam}`;
+    }
     
     return {
       id: user.uuid, // Expose UUID as 'id' to client
@@ -24,7 +32,7 @@ export class UserResponseDto {
       role: user.role,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
-      avatarUrl: avatarUrl, // BLOB avatar URL
+      avatarUrl: avatarUrl, // BLOB avatar URL with cache-busting
       avatarMimeType: user.avatarMimeType,
       avatarSizeBytes: user.avatarSizeBytes,
       avatarWidth: user.avatarWidth,

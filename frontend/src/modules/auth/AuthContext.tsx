@@ -6,6 +6,7 @@ type AuthCtx = {
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string, role?: 'student' | 'admin') => Promise<void>;
   logout: () => void;
+  refreshProfile: () => void; // Add profile refresh trigger
 };
 
 const AuthContext = createContext<AuthCtx | null>(null);
@@ -14,6 +15,7 @@ const API_BASE = import.meta.env.VITE_API_BASE;
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('jwt') || null);
+  const [profileRefreshKey, setProfileRefreshKey] = useState(0);
 
   useEffect(() => {
     if (token) localStorage.setItem('jwt', token);
@@ -43,14 +45,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = () => setToken(null);
+  
+  const refreshProfile = () => {
+    setProfileRefreshKey(prev => prev + 1);
+  };
 
   const value = useMemo<AuthCtx>(() => ({
     token,
     isAuthenticated: !!token,
     login,
     signup,
-    logout
-  }), [token]);
+    logout,
+    refreshProfile
+  }), [token, profileRefreshKey]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

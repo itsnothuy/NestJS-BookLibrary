@@ -138,6 +138,9 @@ export default function Profile() {
         } else {
           setAvatarPreview(null);
         }
+        
+        // Dispatch event to notify other components about profile update
+        window.dispatchEvent(new CustomEvent('profile-updated'));
       }
     } catch (err: any) {
       setError(err.message || 'Failed to update profile');
