@@ -10,7 +10,6 @@ import { PaginationResultDto } from '../common/dto/pagination-result.dto';
 export class UsersRepo implements PaginatedRepository<UserRow> {
   constructor(@Inject(MYSQL) private pool: Pool) {}
 
-  // Helper method to convert database row to UserRow object
   private mapDbRowToUser(row: any): UserRow | null {
     if (!row) return null;
     
@@ -22,11 +21,11 @@ export class UsersRepo implements PaginatedRepository<UserRow> {
       role: row.role,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
-      avatarData: row.avatar_data, // BLOB data from database
+      avatarFilename: row.avatar_filename,
+      avatarPath: row.avatar_path,
+      avatarUrl: row.avatar_url,
       avatarMimeType: row.avatar_mime_type,
       avatarSizeBytes: row.avatar_size_bytes,
-      avatarWidth: row.avatar_width,
-      avatarHeight: row.avatar_height,
       avatarUploadedAt: row.avatar_uploaded_at,
     };
   }
@@ -140,7 +139,7 @@ export class UsersRepo implements PaginatedRepository<UserRow> {
     return (await this.findById(insertId))!;
   }
 
-  async updateByUuid(uuid: string, patch: Partial<Pick<UserRow,'email'|'passwordHash'|'role'|'avatarData'|'avatarMimeType'|'avatarSizeBytes'|'avatarWidth'|'avatarHeight'|'avatarUploadedAt'>>): Promise<UserRow | null> {
+  async updateByUuid(uuid: string, patch: Partial<Pick<UserRow,'email'|'passwordHash'|'role'|'avatarFilename'|'avatarPath'|'avatarUrl'|'avatarMimeType'|'avatarSizeBytes'|'avatarUploadedAt'>>): Promise<UserRow | null> {
     const user = await this.findByUuid(uuid);  
     if (!user) return null;
     
@@ -150,11 +149,11 @@ export class UsersRepo implements PaginatedRepository<UserRow> {
     if (patch.email !== undefined) { fields.push('email = ?'); params.push(patch.email); }
     if (patch.passwordHash !== undefined) { fields.push('passwordHash = ?'); params.push(patch.passwordHash); }
     if (patch.role !== undefined) { fields.push('role = ?'); params.push(patch.role); }
-    if (patch.avatarData !== undefined) { fields.push('avatar_data = ?'); params.push(patch.avatarData); } // BLOB data
+    if (patch.avatarFilename !== undefined) { fields.push('avatar_filename = ?'); params.push(patch.avatarFilename); }
+    if (patch.avatarPath !== undefined) { fields.push('avatar_path = ?'); params.push(patch.avatarPath); }
+    if (patch.avatarUrl !== undefined) { fields.push('avatar_url = ?'); params.push(patch.avatarUrl); }
     if (patch.avatarMimeType !== undefined) { fields.push('avatar_mime_type = ?'); params.push(patch.avatarMimeType); }
     if (patch.avatarSizeBytes !== undefined) { fields.push('avatar_size_bytes = ?'); params.push(patch.avatarSizeBytes); }
-    if (patch.avatarWidth !== undefined) { fields.push('avatar_width = ?'); params.push(patch.avatarWidth); }
-    if (patch.avatarHeight !== undefined) { fields.push('avatar_height = ?'); params.push(patch.avatarHeight); }
     if (patch.avatarUploadedAt !== undefined) { fields.push('avatar_uploaded_at = ?'); params.push(patch.avatarUploadedAt); }
     
     if (fields.length === 0) {

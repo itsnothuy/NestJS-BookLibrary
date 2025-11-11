@@ -486,7 +486,6 @@ export default function PaginatedBooksTable() {
                 placeholder="Enter ISBN (13 digits)"
               />
             </div>
-            
             <div className="paginated-books-form-group">
               <label className="paginated-books-label">Published Year</label>
               <input
@@ -600,12 +599,6 @@ export default function PaginatedBooksTable() {
             </div>
             <div className="paginated-books-form-group">
               <strong>Published Year:</strong> {selectedBook.publishedYear || "Unknown"}
-            </div>
-            <div className="paginated-books-form-group">
-              <strong>Created:</strong> {new Date(selectedBook.createdAt).toLocaleDateString()}
-            </div>
-            <div className="paginated-books-form-group">
-              <strong>Updated:</strong> {new Date(selectedBook.updatedAt).toLocaleDateString()}
             </div>
             <div className="paginated-books-modal-buttons">
               <button

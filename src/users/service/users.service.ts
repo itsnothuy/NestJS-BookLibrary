@@ -70,9 +70,11 @@ export class UsersService {
       throw new NotFoundException('No file uploaded');
     }
 
-    // For BLOB storage, we store the file buffer directly in the database
+    // For filesystem storage, we store the file path and metadata
     const patch = {
-      avatarData: file.buffer, // Store image data as BLOB
+      avatarFilename: file.originalname, // Original filename 
+      avatarPath: file.path, // Full server file path (e.g., "uploads/avatars/avatar-123456789.jpg")
+      avatarUrl: `/users/avatar/${file.filename}`, // Public URL path for serving
       avatarMimeType: file.mimetype,
       avatarSizeBytes: file.size,
       avatarUploadedAt: new Date(),

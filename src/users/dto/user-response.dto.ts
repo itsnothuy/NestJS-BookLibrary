@@ -6,25 +6,15 @@ export class UserResponseDto {
   role: 'student' | 'admin';
   createdAt: Date;
   updatedAt: Date;
-  // Avatar fields - BLOB storage
-  avatarUrl?: string; // URL to BLOB avatar endpoint
+  // Avatar fields - Filesystem storage
+  avatarUrl?: string; // URL to filesystem avatar
   avatarMimeType?: string;
   avatarSizeBytes?: number;
-  avatarWidth?: number;
-  avatarHeight?: number;
   avatarUploadedAt?: Date;
 
   static fromEntity(user: UserRow): UserResponseDto {
-    // For BLOB storage, avatar URL points to /avatar/:uuid endpoint with cache-busting
-    let avatarUrl: string | undefined = undefined;
-    if (user.avatarData) {
-      const baseUrl = `/avatar/${user.uuid}`;
-      // Add cache-busting parameter to prevent browser caching old images
-      const cacheParam = user.avatarUploadedAt 
-        ? `?t=${new Date(user.avatarUploadedAt).getTime()}`
-        : '';
-      avatarUrl = `${baseUrl}${cacheParam}`;
-    }
+    // For filesystem storage, use the stored avatarUrl directly
+    let avatarUrl: string | undefined = user.avatarUrl || undefined;
     
     return {
       id: user.uuid, // Expose UUID as 'id' to client
@@ -32,11 +22,9 @@ export class UserResponseDto {
       role: user.role,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
-      avatarUrl: avatarUrl, // BLOB avatar URL with cache-busting
+      avatarUrl: avatarUrl, // Direct filesystem URL
       avatarMimeType: user.avatarMimeType,
       avatarSizeBytes: user.avatarSizeBytes,
-      avatarWidth: user.avatarWidth,
-      avatarHeight: user.avatarHeight,
       avatarUploadedAt: user.avatarUploadedAt,
     };
   }

@@ -601,12 +601,6 @@ export default function PaginatedUsersTable() {
                 {selectedUser.role}
               </span>
             </div>
-            <div className="paginated-users-form-group">
-              <strong>Created:</strong> {new Date(selectedUser.createdAt).toLocaleDateString()}
-            </div>
-            <div className="paginated-users-form-group">
-              <strong>Updated:</strong> {new Date(selectedUser.updatedAt).toLocaleDateString()}
-            </div>
             <div className="paginated-users-modal-buttons">
               <button
                 className="paginated-users-button"

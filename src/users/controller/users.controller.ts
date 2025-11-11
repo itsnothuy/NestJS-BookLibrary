@@ -15,7 +15,9 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Express } from 'express';
-import { memoryStorage } from 'multer';
+import { diskStorage } from 'multer';
+import * as path from 'path';
+import * as fs from 'fs';
 import { UsersService } from '../service/users.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
@@ -64,7 +66,23 @@ export class UsersController {
   @UseGuards(JwtAuthGuard) // Remove admin role requirement for own avatar
   @Post('avatar')
   @UseInterceptors(FileInterceptor('avatar', {
-    storage: memoryStorage(), // Use memory storage for BLOB storage
+    storage: diskStorage({
+      destination: (req, file, cb) => {
+        const uploadPath = './uploads/avatars';
+        // Create directory if it doesn't exist
+        if (!fs.existsSync(uploadPath)) {
+          fs.mkdirSync(uploadPath, { recursive: true });
+        }
+        cb(null, uploadPath);
+      },
+      filename: (req, file, cb) => {
+        // Generate unique filename with timestamp and random number
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const fileExtension = path.extname(file.originalname);
+        const fileName = `avatar-${uniqueSuffix}${fileExtension}`;
+        cb(null, fileName);
+      }
+    }),
     fileFilter: (req, file, cb) => {
       if (file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
         cb(null, true);

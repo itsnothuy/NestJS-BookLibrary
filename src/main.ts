@@ -16,6 +16,11 @@ async function bootstrap() {
       transformOptions: { enableImplicitConversion: true }, // "2017" -> 2017
     }),
   );
+
+  // Serve static avatar files
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+    prefix: '/users/', // This makes files available at /users/avatar/filename.jpg
+  });
   
   app.enableCors({
     origin: ['http://localhost:5173', 'http://localhost:5174'],
