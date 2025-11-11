@@ -215,7 +215,7 @@
        │                                         │                                         │
 ```
 
-### 2.5. Avatar & Profile System Architecture
+### 2.5. Avatar & Profile System Architecture (BLOB Storage)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
@@ -254,31 +254,29 @@
 │  │                          Backend Layer                                  │   │
 │  │                                                                         │   │
 │  │  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐                 │   │
-│  │  │    Auth     │    │    Users    │    │   Static    │                 │   │
-│  │  │ Controller  │    │ Controller  │    │   Assets    │                 │   │
+│  │  │    Users    │    │   Avatar    │    │   Database  │                 │   │
+│  │  │ Controller  │    │ Controller  │    │ Repository  │                 │   │
 │  │  │             │    │             │    │             │                 │   │
-│  │  │ • PATCH     │    │ • POST      │    │ • GET       │                 │   │
-│  │  │   /profile  │    │   /avatar   │    │   /users/   │                 │   │
-│  │  │ • Profile   │    │ • Multer    │    │   avatar/   │                 │   │
-│  │  │   Update    │    │   Upload    │    │ • File      │                 │   │
-│  │  │ • Email     │    │ • File      │    │   Serving   │                 │   │
-│  │  │   Password  │    │   Storage   │    │ • CORS      │                 │   │
-│  │  │             │    │             │    │   Headers   │                 │   │
+│  │  │ • POST      │    │ • GET       │    │ • BLOB      │                 │   │
+│  │  │   /avatar   │    │   /:uuid    │    │   Storage   │                 │   │
+│  │  │ • Multer    │    │ • Direct    │    │ • Update    │                 │   │
+│  │  │   Upload    │    │   BLOB      │    │   Methods   │                 │   │
+│  │  │ • Memory    │    │   Serving   │    │ • Query     │                 │   │
+│  │  │   Buffer    │    │ • Headers   │    │   Builder   │                 │   │
 │  │  └─────────────┘    └─────────────┘    └─────────────┘                 │   │
 │  │         │                    │                   │                     │   │
 │  │         └────────────────────┼───────────────────┘                     │   │
 │  │                              │                                         │   │
 │  │  ┌─────────────────────────────────────────────────────────────────┐   │   │
 │  │  │                    Multer Middleware                            │   │   │
-│  │  │  • diskStorage() - File System Storage                         │   │   │
+│  │  │  • memoryStorage() - In-Memory Buffer Storage                  │   │   │
 │  │  │  • fileFilter() - MIME Type Validation                         │   │   │
 │  │  │  • limits - Size Restrictions (5MB)                            │   │   │
-│  │  │  • filename() - UUID-based Naming                              │   │   │
-│  │  │  • destination() - Dynamic Directory Creation                  │   │   │
+│  │  │  • Single file upload with field name validation              │   │   │
 │  │  └─────────────────────────────────────────────────────────────────┘   │   │
 │  └─────────────────────────────────────────────────────────────────────────┘   │
 │                                      │                                         │
-│                                 SQL Updates                                    │
+│                                 BLOB Updates                                   │
 │                                      │                                         │
 │  ┌─────────────────────────────────────────────────────────────────────────┐   │
 │  │                         Database Layer                                  │   │
@@ -286,29 +284,36 @@
 │  │  ┌─────────────────────────────────────────────────────────────────┐   │   │
 │  │  │                      users Table                                │   │   │
 │  │  │                                                                 │   │   │
-│  │  │  • avatar_filename    VARCHAR(255)  - Original name            │   │   │
-│  │  │  • avatar_path        VARCHAR(500)  - Server file path         │   │   │
-│  │  │  • avatar_url         VARCHAR(500)  - Public serving URL       │   │   │
+│  │  │  • avatar_data        LONGBLOB      - Image binary data        │   │   │
 │  │  │  • avatar_mime_type   VARCHAR(100)  - Content-Type             │   │   │
-│  │  │  • avatar_size_bytes  INT           - File size for quotas     │   │   │
-│  │  │  • avatar_width       INT           - Image width (UI layout)  │   │   │
-│  │  │  • avatar_height      INT           - Image height (UI layout) │   │   │
+│  │  │  • avatar_size_bytes  INT           - File size                │   │   │
 │  │  │  • avatar_uploaded_at DATETIME(6)   - Upload timestamp         │   │   │
+│  │  │                                                                 │   │   │
+│  │  │  Benefits:                                                      │   │   │
+│  │  │  • No file system management needed                            │   │   │
+│  │  │  • Atomic transactions ensure consistency                      │   │   │
+│  │  │  • Simplified backup/restore process                           │   │   │
+│  │  │  • No orphaned files or directory cleanup                      │   │   │
 │  │  └─────────────────────────────────────────────────────────────────┘   │   │
 │  └─────────────────────────────────────────────────────────────────────────┘   │
 │                                      │                                         │
 │  ┌─────────────────────────────────────────────────────────────────────────┐   │
-│  │                         File System                                     │   │
+│  │                      BLOB Serving Flow                                  │   │
 │  │                                                                         │   │
-│  │  uploads/avatars/                                                       │   │
-│  │  ├── avatar-user-uuid-1699123456789.jpg                                │   │
-│  │  ├── avatar-user-uuid-1699123456790.png                                │   │
-│  │  └── avatar-user-uuid-1699123456791.gif                                │   │
+│  │  1. Client requests: GET /avatar/{uuid}                                │   │
+│  │  2. Controller queries database by uuid                                │   │
+│  │  3. Database returns BLOB data + metadata                              │   │
+│  │  4. Controller sets HTTP headers:                                      │   │
+│  │     • Content-Type: {avatar_mime_type}                                 │   │
+│  │     • Content-Length: {avatar_size_bytes}                              │   │
+│  │     • Last-Modified: {avatar_uploaded_at}                              │   │
+│  │     • Cache-Control: public, max-age=86400                             │   │
+│  │  5. Send BLOB data directly to client                                  │   │
 │  │                                                                         │   │
-│  │  Production Alternative:                                                │   │
-│  │  • AWS S3 / Google Cloud Storage                                       │   │
-│  │  • CDN Integration (CloudFront, CloudFlare)                            │   │
-│  │  • Image Processing Pipeline (Sharp, Jimp)                             │   │
+│  │  Advantages over filesystem:                                           │   │
+│  │  • No static file serving configuration                                │   │
+│  │  • Database handles concurrent access                                  │   │
+│  │  • Built-in access control via application layer                      │   │
 │  └─────────────────────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -540,15 +545,15 @@ Load Balanced (Future):
                     └─────────────┘
 ```
 
-### 6. Avatar Upload Flow - Detailed Sequence
+### 6. Avatar Upload Flow - Detailed Sequence (BLOB Storage)
 
 ```
-User: Profile Page → File Selection → Upload → Database Update → UI Refresh
+User: Profile Page → File Selection → Upload → Database BLOB Update → UI Refresh
 
-┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
-│    User     │ │  Frontend   │ │   Multer    │ │   NestJS    │ │  Database   │ │ File System │
-│  Interface  │ │  (React)    │ │ Middleware  │ │  Backend    │ │  (MariaDB)  │ │  (uploads/) │
-└─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘
+┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+│    User     │ │  Frontend   │ │   Multer    │ │   NestJS    │ │  Database   │
+│  Interface  │ │  (React)    │ │ Middleware  │ │  Backend    │ │  (MariaDB)  │
+└─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘
        │               │               │               │               │               │
        │ 1. Select     │               │               │               │               │
        │    Image      │               │               │               │               │
@@ -583,83 +588,89 @@ User: Profile Page → File Selection → Upload → Database Update → UI Refr
        │               │               │ 8. JWT Auth   │               │               │
        │               │               │    Validation │               │               │
        │               │               │ ◀─────────────│               │               │
-       │               │               │ 9. Process    │               │               │
-       │               │               │    Upload     │               │               │
-       │               │               │ ──────────────│               │               │
-       │               │               │ 10. File      │               │               │
-       │               │               │     Type      │               │               │
-       │               │               │     Check     │               │               │
-       │               │               │     (MIME)    │               │               │
-       │               │               │ ──────────────│               │               │
-       │               │               │ 11. Size      │               │               │
-       │               │               │     Limit     │               │               │
-       │               │               │     (5MB)     │               │               │
-       │               │               │ ──────────────│               │               │
-       │               │               │ 12. Generate  │               │               │
-       │               │               │     Filename  │               │               │
-       │               │               │     (UUID+    │               │               │
-       │               │               │     timestamp)│               │               │
-       │               │               │ ──────────────│               │               │
-       │               │               │ 13. Save File │               │               │
-       │               │               │ ─────────────────────────────────────────────▶│
-       │               │               │               │ 14. File      │               │
-       │               │               │               │     Saved     │               │
-       │               │               │               │ ◀─────────────────────────────│
-       │               │               │ 15. File      │               │               │
-       │               │               │     Metadata  │               │               │
-       │               │               │ ◀─────────────│               │               │
-       │               │               │ 16. Update    │               │               │
-       │               │               │     User      │               │               │
-       │               │               │     Avatar    │               │               │
-       │               │               │     Fields    │               │               │
-       │               │               │ ─────────────────────────────▶│               │
-       │               │               │               │ 17. UPDATE    │               │
-       │               │               │               │     users     │               │
-       │               │               │               │     SET       │               │
-       │               │               │               │     avatar_*  │               │
-       │               │               │               │ ──────────────│               │
-       │               │               │               │ 18. Success   │               │
-       │               │               │               │ ◀─────────────│               │
-       │               │ 19. Upload    │               │               │               │
-       │               │     Success   │               │               │               │
-       │               │ ◀─────────────────────────────│               │               │
-       │ 20. Success   │               │               │               │               │
-       │     Message   │               │               │               │               │
-       │ ◀─────────────│               │               │               │               │
-       │               │ 21. Refresh   │               │               │               │
-       │               │     User      │               │               │               │
-       │               │     Profile   │               │               │               │
-       │               │     (GET      │               │               │               │
-       │               │     /auth/me) │               │               │               │
-       │               │ ─────────────────────────────▶│               │               │
-       │               │               │               │ 22. SELECT    │               │
-       │               │               │               │     * FROM    │               │
-       │               │               │               │     users     │               │
-       │               │               │               │     WHERE     │               │
-       │               │               │               │     uuid=?    │               │
-       │               │               │               │ ─────────────▶│               │
-       │               │               │               │ 23. User      │               │
-       │               │               │               │     Data      │               │
-       │               │               │               │     with      │               │
-       │               │               │               │     Avatar    │               │
-       │               │               │               │ ◀─────────────│               │
-       │               │ 24. Updated   │               │               │               │
-       │               │     Profile   │               │               │               │
-       │               │     with      │               │               │               │
-       │               │     Avatar    │               │               │               │
-       │               │ ◀─────────────────────────────│               │               │
-       │ 25. UI        │               │               │               │               │
-       │     Update    │               │               │               │               │
-       │     (Avatar   │               │               │               │               │
-       │     Displayed │               │               │               │               │
-       │     in Header,│               │               │               │               │
-       │     Tables)   │               │               │               │               │
-       │ ◀─────────────│               │               │               │               │
-       │               │               │               │               │               │
+       │               │               │ 9. Process    │               │
+       │               │               │    Upload     │               │
+       │               │               │    (memory)   │               │
+       │               │               │ ──────────────│               │
+       │               │               │ 10. File      │               │
+       │               │               │     Type      │               │
+       │               │               │     Check     │               │
+       │               │               │     (MIME)    │               │
+       │               │               │ ──────────────│               │
+       │               │               │ 11. Size      │               │
+       │               │               │     Limit     │               │
+       │               │               │     (5MB)     │               │
+       │               │               │ ──────────────│               │
+       │               │               │ 12. Extract   │               │
+       │               │               │     Buffer    │               │
+       │               │               │     and       │               │
+       │               │               │     Metadata  │               │
+       │               │               │ ──────────────│               │
+       │               │               │ 13. Update    │               │
+       │               │               │     User      │               │
+       │               │               │     Avatar    │               │
+       │               │               │     BLOB      │               │
+       │               │               │ ─────────────────────────────▶│
+       │               │               │ 14. UPDATE    │               │
+       │               │               │     users     │               │
+       │               │               │     SET       │               │
+       │               │               │     avatar_   │               │
+       │               │               │     data=?,   │               │
+       │               │               │     mime_type │               │
+       │               │               │     =?, etc.  │               │
+       │               │               │ ──────────────│               │
+       │               │               │ 15. BLOB      │               │
+       │               │               │     Success   │               │
+       │               │               │ ◀─────────────│               │
+       │               │ 16. Upload    │               │               │
+       │               │     Success   │               │               │
+       │               │ ◀─────────────────────────────│               │
+       │ 17. Success   │               │               │               │
+       │     Message   │               │               │               │
+       │ ◀─────────────│               │               │               │
+       │               │ 18. Refresh   │               │               │
+       │               │     User      │               │               │
+       │               │     Profile   │               │               │
+       │               │     (GET      │               │               │
+       │               │     /auth/me) │               │               │
+       │               │ ─────────────────────────────▶│               │
+       │               │               │               │ 19. SELECT    │
+       │               │               │               │     uuid,     │
+       │               │               │               │     email,    │
+       │               │               │               │     role      │
+       │               │               │               │     FROM      │
+       │               │               │               │     users     │
+       │               │               │               │     WHERE     │
+       │               │               │               │     uuid=?    │
+       │               │               │               │ ─────────────▶│
+       │               │               │               │ 20. User      │
+       │               │               │               │     Data      │
+       │               │               │               │     (no BLOB) │
+       │               │               │               │ ◀─────────────│
+       │               │ 21. Updated   │               │               │
+       │               │     Profile   │               │               │
+       │               │     Data      │               │               │
+       │               │ ◀─────────────────────────────│               │
+       │ 22. UI        │               │               │               │
+       │     Update    │               │               │               │
+       │     (Avatar   │               │               │               │
+       │     Loads via │               │               │               │
+       │     /avatar/  │               │               │               │
+       │     {uuid})   │               │               │               │
+       │ ◀─────────────│               │               │               │
+       │               │               │               │               │
+
+BLOB Storage Benefits:
+• No file system management → Simplified deployment
+• Atomic transactions → Data consistency guaranteed
+• No orphaned files → Automatic cleanup via database
+• Direct serving → No static file configuration needed
+• Integrated access control → Database permissions apply
 
 Error Handling:
 • File too large → Client validation prevents upload
-• Invalid file type → Multer rejects with error
+• Invalid file type → Multer rejects with error  
+• Database error → Transaction rollback ensures consistency
 • Network failure → Frontend shows retry option
 • Server error → File cleanup and user notification
 • Database error → Rollback file save

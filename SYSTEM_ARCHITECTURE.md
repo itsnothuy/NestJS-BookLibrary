@@ -637,61 +637,46 @@ const handleDelete = async () => {
 
 ### 1. Database Schema Design
 
-#### Avatar Metadata Storage Strategy
+#### BLOB-Based Avatar Storage Strategy
 
 ```sql
--- Avatar fields added to existing users table
+-- Avatar fields in users table (Current Implementation)
+-- Using BLOB storage for direct database storage
 ALTER TABLE users 
-ADD COLUMN avatar_filename VARCHAR(255) NULL,    -- Original filename for reference
-ADD COLUMN avatar_path VARCHAR(500) NULL,        -- Server file path for operations
-ADD COLUMN avatar_url VARCHAR(500) NULL,         -- Public URL for serving
-ADD COLUMN avatar_mime_type VARCHAR(100) NULL,   -- Content-Type validation
-ADD COLUMN avatar_size_bytes INT NULL,           -- File size for quotas
-ADD COLUMN avatar_width INT NULL,                -- Image dimensions for UI
-ADD COLUMN avatar_height INT NULL,               -- Image dimensions for UI
-ADD COLUMN avatar_uploaded_at DATETIME(6) NULL;  -- Upload timestamp
+ADD COLUMN avatar_data LONGBLOB NULL,            -- Raw binary image data stored as BLOB
+ADD COLUMN avatar_mime_type VARCHAR(100) NULL,   -- MIME type for Content-Type headers
+ADD COLUMN avatar_size_bytes INT NULL,           -- File size for Content-Length headers
+ADD COLUMN avatar_uploaded_at DATETIME(6) NULL;  -- Upload timestamp for cache control
 ```
 
 #### Design Rationale
 
-1. **Separation of Concerns**:
-   - `avatar_path`: Internal server operations (file management, backups)
-   - `avatar_url`: Public-facing client access (CDN-ready)
-   - Enables seamless migration to cloud storage without client changes
+1. **BLOB Storage Benefits**:
+   - `avatar_data`: Direct binary storage eliminates file system complexity
+   - No file path management or directory structure needed
+   - Atomic transactions ensure data consistency
+   - Simplified backup and replication (database handles everything)
 
-2. **Metadata Completeness**:
-   - File dimensions prevent UI layout shifts during image loading
-   - MIME type enables proper Content-Type headers and security validation
-   - Size tracking for storage analytics and quota management
-   - Timestamp for cache invalidation and audit trails
+2. **Essential Metadata Only**:
+   - MIME type enables proper Content-Type headers for browser rendering
+   - Size bytes enables Content-Length headers for download progress
+   - Upload timestamp powers HTTP caching strategy (Last-Modified headers)
+   - Removed width/height fields (not being stored from frontend)
 
-3. **Future Scalability**:
-   - Support for multiple image variants (thumbnails, compressed versions)
-   - Storage quota management per user role
-   - Image processing pipeline integration (cropping, resizing)
+3. **Simplified Architecture**:
+   - Single storage location (database) instead of database + filesystem
+   - No file cleanup concerns or orphaned files
+   - Easier deployment (no persistent volume mounts needed)
+   - Better security (no direct file system access)
 
 ### 2. NestJS File Upload Processing
 
-#### Multer Middleware Integration
+#### Multer Memory Storage Integration
 
 ```typescript
 @Post('avatar')
 @UseInterceptors(FileInterceptor('avatar', {
-  storage: diskStorage({
-    destination: (req, file, cb) => {
-      const uploadPath = join(process.cwd(), 'uploads', 'avatars');
-      if (!existsSync(uploadPath)) {
-        mkdirSync(uploadPath, { recursive: true });
-      }
-      cb(null, uploadPath);
-    },
-    filename: (req, file, cb) => {
-      const user = (req as any).user;
-      const ext = extname(file.originalname);
-      const filename = `avatar-${user.uuid}-${Date.now()}${ext}`;
-      cb(null, filename);
-    },
-  }),
+  storage: memoryStorage(), // Use memory storage for BLOB storage
   fileFilter: (req, file, cb) => {
     if (file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
       cb(null, true);
@@ -711,66 +696,103 @@ async uploadAvatar(
 }
 ```
 
+#### BLOB Storage Implementation
+
+```typescript
+// users.service.ts - updateAvatar method
+async updateAvatar(uuid: string, file: Express.Multer.File): Promise<UserResponseDto> {
+  if (!file) {
+    throw new NotFoundException('No file uploaded');
+  }
+
+  // Store file buffer directly in database as BLOB
+  const patch = {
+    avatarData: file.buffer,        // Raw binary data
+    avatarMimeType: file.mimetype,  // e.g., 'image/jpeg'
+    avatarSizeBytes: file.size,     // File size in bytes
+    avatarUploadedAt: new Date(),   // Current timestamp
+  };
+
+  const updated = await this.repo.updateByUuid(uuid, patch);
+  if (!updated) throw new NotFoundException('User not found');
+  return UserResponseDto.fromEntity(updated);
+}
+```
+
 #### Security and Performance Considerations
 
-1. **Multi-Layer Validation**:
+1. **Memory vs Disk Storage**:
+   - **memoryStorage()** used instead of diskStorage()
+   - Files processed in memory buffer, then stored as BLOB
+   - No temporary files on filesystem to clean up
+   - Better for containerized deployments
+
+2. **Multi-Layer Validation**:
    - JWT authentication ensures user authorization
    - MIME type filtering prevents malicious file uploads
    - File size limits protect against DoS attacks
-   - Filename sanitization prevents directory traversal
-
-2. **Storage Strategy**:
-   - **diskStorage** chosen over **memoryStorage** for scalability
-   - Automatic directory creation for deployment flexibility
-   - UUID-based naming prevents enumeration attacks
-   - Timestamp inclusion prevents filename collisions
+   - Database constraints ensure data integrity
 
 3. **Error Handling**:
    ```typescript
-   // Graceful error handling in file processing
+   // Simplified error handling (no file cleanup needed)
    try {
      const result = await this.users.updateAvatar(user.uuid, file);
      return result;
    } catch (error) {
-     // Clean up uploaded file on processing failure
-     if (file.path && existsSync(file.path)) {
-       unlinkSync(file.path);
-     }
+     // No file cleanup needed with memory storage
      throw error;
    }
    ```
 
-### 3. Static File Serving Architecture
+### 3. Avatar Serving Architecture
 
-#### NestJS Static Assets Configuration
-
-```typescript
-// main.ts - Application bootstrap
-app.useStaticAssets(join(__dirname, '..', 'uploads'), {
-  prefix: '/users/avatar/',
-});
-```
-
-#### Production-Ready Enhancements
+#### Direct Database Serving
 
 ```typescript
-// Environment-specific static serving
-if (process.env.NODE_ENV === 'production') {
-  // Use CDN or nginx for static files in production
-  app.useStaticAssets('/var/www/uploads', {
-    prefix: '/static/',
-    maxAge: '1y',        // Browser caching
-    etag: true,          // ETag headers for caching
-    immutable: true,     // Immutable cache headers
-  });
-} else {
-  // Development file serving
-  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
-    prefix: '/users/avatar/',
-    maxAge: 0,           // No caching in development
-  });
+// avatar.controller.ts - BLOB serving
+@Get(':uuid')
+async getAvatar(@Param('uuid') uuid: string, @Res() res: Response) {
+  const user = await this.usersRepo.findByUuid(uuid);
+
+  if (!user || !user.avatarData) {
+    return res.status(404).json({ message: 'Avatar not found' });
+  }
+
+  // Set proper headers for image serving
+  res.setHeader('Content-Type', user.avatarMimeType || 'image/jpeg');
+  res.setHeader('Content-Length', user.avatarSizeBytes || user.avatarData.length);
+  
+  // Set cache headers for better performance
+  if (user.avatarUploadedAt) {
+    res.setHeader('Last-Modified', user.avatarUploadedAt.toUTCString());
+    res.setHeader('Cache-Control', 'public, max-age=86400'); // 24 hours
+  }
+
+  // Send the BLOB data directly
+  return res.send(user.avatarData);
 }
 ```
+
+#### BLOB Storage Benefits
+
+1. **Simplified Architecture**:
+   - No file system management required
+   - Atomic transactions ensure data consistency
+   - Easier backup and replication (database handles everything)
+   - No orphaned files or cleanup concerns
+
+2. **Performance Considerations**:
+   - Direct database serving for small/medium images (< 5MB)
+   - HTTP caching with Last-Modified headers
+   - Content-Length enables download progress
+   - Future: Consider CDN integration for larger scale
+
+3. **Security Benefits**:
+   - No direct file system access needed
+   - Database permissions control access
+   - No path traversal vulnerabilities
+   - Centralized access control
 
 ---
 
@@ -877,7 +899,6 @@ sequenceDiagram
     participant NestJS
     participant Multer
     participant Database
-    participant FileSystem
 
     User->>Frontend: Select avatar file
     Frontend->>Frontend: Validate file (size, type)
@@ -889,12 +910,12 @@ sequenceDiagram
     NestJS->>Multer: Process multipart upload
     
     Multer->>Multer: Validate file type/size
-    Multer->>FileSystem: Save to uploads/avatars/
-    Multer->>NestJS: Return file metadata
+    Multer->>Multer: Store in memory buffer
+    Multer->>NestJS: Return file buffer + metadata
     
-    NestJS->>Database: UPDATE users SET avatar_* = ?
-    Database->>NestJS: Confirm metadata saved
-    NestJS->>Frontend: Return success + avatar URL
+    NestJS->>Database: UPDATE users SET avatar_data = ?, avatar_mime_type = ?, etc.
+    Database->>NestJS: Confirm BLOB data saved
+    NestJS->>Frontend: Return success response
     
     Frontend->>Frontend: Update UI state
     Frontend->>NestJS: GET /auth/me (refresh user)
@@ -918,7 +939,7 @@ const AvatarDisplay = ({ user, size = 40, onClick }) => (
       width: `${size}px`,
       height: `${size}px`,
       borderRadius: "50%",
-      backgroundColor: user?.avatarUrl ? "transparent" : "#e5e7eb",
+      backgroundColor: user?.avatarData ? "transparent" : "#e5e7eb",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
@@ -929,9 +950,9 @@ const AvatarDisplay = ({ user, size = 40, onClick }) => (
     }}
     title={onClick ? "Click to edit profile" : undefined}
   >
-    {user?.avatarUrl ? (
+    {user?.uuid ? (
       <img
-        src={`${API_BASE}${user.avatarUrl}`}
+        src={`${API_BASE}/avatar/${user.uuid}`}
         alt={`${user.email} avatar`}
         style={{
           width: "100%",
