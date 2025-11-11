@@ -15,8 +15,6 @@ interface User {
   avatarUrl: string | null; // BLOB avatar URL
   avatarMimeType: string | null;
   avatarSizeBytes: number | null;
-  avatarWidth: number | null;
-  avatarHeight: number | null;
   avatarUploadedAt: string | null;
 }
 
@@ -296,11 +294,9 @@ export default function PaginatedUsersTable() {
               const fallback = document.createElement('div');
               const initials = user.email.split('@')[0].substring(0, 2).toUpperCase();
               fallback.className = 'paginated-users-avatar-fallback';
-              fallback.style.cssText += `
-                width: ${size}px;
-                height: ${size}px;
-                font-size: ${Math.floor(size / 2.5)}px;
-              `;
+              fallback.style.width = `${size}px`;
+              fallback.style.height = `${size}px`;
+              fallback.style.fontSize = `${Math.floor(size / 2.5)}px`;
               fallback.textContent = initials;
               target.parentElement.appendChild(fallback);
             }

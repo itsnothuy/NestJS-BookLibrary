@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from './AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
+import './Signup.css';
 
 export default function Signup() {
   const { signup } = useAuth();
@@ -25,13 +26,13 @@ export default function Signup() {
   };
 
   return (
-    <div style={{ maxWidth: 420, margin: '60px auto', fontFamily: 'ui-sans-serif', padding: '20px' }}>
+    <div className="signup-container">
       <h1>Sign up</h1>
       <form onSubmit={onSubmit}>
-        <div style={{ marginBottom: '15px' }}>
+        <div className="signup-form-group">
           <label>Email<br/>
             <input 
-              style={{ width: '100%', padding: '8px', marginTop: '5px' }}
+              className="signup-input"
               value={email} 
               onChange={e=>setEmail(e.target.value)} 
               type="email" 
@@ -41,10 +42,10 @@ export default function Signup() {
           </label>
         </div>
         
-        <div style={{ marginBottom: '15px' }}>
+        <div className="signup-form-group">
           <label>Password<br/>
             <input 
-              style={{ width: '100%', padding: '8px', marginTop: '5px' }}
+              className="signup-input"
               value={password} 
               onChange={e=>setPassword(e.target.value)} 
               type="password" 
@@ -54,10 +55,10 @@ export default function Signup() {
           </label>
         </div>
         
-        <div style={{ marginBottom: '20px' }}>
+        <div className="signup-form-group-bottom">
           <label>Role<br/>
             <select 
-              style={{ width: '100%', padding: '8px', marginTop: '5px' }}
+              className="signup-select"
               value={role} 
               onChange={e=>setRole(e.target.value as 'student' | 'admin')}
             >
@@ -70,21 +71,13 @@ export default function Signup() {
         <button 
           disabled={busy} 
           type="submit"
-          style={{
-            width: '100%',
-            padding: '10px',
-            backgroundColor: '#3b82f6',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: busy ? 'not-allowed' : 'pointer'
-          }}
+          className="signup-button"
         >
           {busy ? 'Creating…' : 'Create account'}
         </button>
       </form>
-      {error && <p style={{ color: 'crimson', marginTop: '15px' }}>{error}</p>}
-      <p style={{ marginTop: '20px', textAlign: 'center' }}>
+      {error && <p className="signup-error">{error}</p>}
+      <p className="signup-footer">
         Have an account? <Link to="/login">Log in</Link>
       </p>
     </div>

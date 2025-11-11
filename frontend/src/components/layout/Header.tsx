@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../modules/auth/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import './Header.css';
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 
@@ -54,88 +55,42 @@ export default function Header() {
     };
 
     return (
-        <header style={{
-            backgroundColor: "white",
-            borderBottom: "1px solid #e5e7eb",
-            padding: "1rem 2rem",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center"
-        }}>
-            <h1 style={{
-            fontSize: "1.5rem",
-            fontWeight: "bold",
-            color: "#1f2937",
-            margin: 0
-            }}>
-            Student Library System
+        <header className="header">
+            <h1 className="header-title">
+                Student Library System
             </h1>
-            <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-            <span style={{ color: "#6b7280" }}>
-                Welcome, {user?.email} ({user?.role})
-            </span>
-            {/* Avatar */}
-            <div
-                onClick={handleAvatarClick}
-                style={{
-                    width: "40px",
-                    height: "40px",
-                    borderRadius: "50%",
-                    backgroundColor: user?.avatarUrl ? "transparent" : "#e5e7eb",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: "pointer",
-                    border: "2px solid #e5e7eb",
-                    overflow: "hidden",
-                    transition: "border-color 0.2s"
-                }}
-                onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = "#3b82f6";
-                }}
-                onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = "#e5e7eb";
-                }}
-                title="Click to edit profile"
-            >
-                {user?.avatarUrl && !avatarError ? (
-                    <img
-                        src={`${API_BASE}${user.avatarUrl}`}
-                        alt="User avatar"
-                        style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover"
-                        }}
-                        onError={() => {
-                            console.log('Avatar failed to load:', `${API_BASE}${user.avatarUrl}`);
-                            setAvatarError(true);
-                        }}
-                    />
-                ) : (
-                    <span style={{ 
-                        color: "#6b7280", 
-                        fontSize: "14px",
-                        fontWeight: "bold"
-                    }}>
-                        {user?.email?.charAt(0).toUpperCase() || '?'}
-                    </span>
-                )}
-            </div>
-            <button
-                onClick={logout}
-                style={{
-                padding: "0.5rem 1rem",
-                backgroundColor: "#dc2626",
-                color: "white",
-                border: "none",
-                borderRadius: "0.375rem",
-                cursor: "pointer",
-                fontSize: "0.875rem"
-                }}
-            >
-                Logout
-            </button>
+            <div className="header-user-section">
+                <span className="header-welcome-text">
+                    Welcome, {user?.email} ({user?.role})
+                </span>
+                {/* Avatar */}
+                <div
+                    onClick={handleAvatarClick}
+                    className="header-avatar"
+                    title="Click to edit profile"
+                >
+                    {user?.avatarUrl && !avatarError ? (
+                        <img
+                            src={`${API_BASE}${user.avatarUrl}`}
+                            alt="User avatar"
+                            className="header-avatar-img"
+                            onError={() => {
+                                console.log('Avatar failed to load:', `${API_BASE}${user.avatarUrl}`);
+                                setAvatarError(true);
+                            }}
+                        />
+                    ) : (
+                        <span className="header-avatar-fallback">
+                            {user?.email?.charAt(0).toUpperCase() || '?'}
+                        </span>
+                    )}
+                </div>
+                <button
+                    onClick={logout}
+                    className="header-logout-button"
+                >
+                    Logout
+                </button>
             </div>
         </header>
     );

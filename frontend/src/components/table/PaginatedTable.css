@@ -1,0 +1,126 @@
+/* PaginatedTable Component Styles */
+
+.paginated-table-container {
+  position: relative;
+}
+
+.paginated-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.paginated-table-th {
+  background-color: #f9fafb;
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 1px solid #e5e7eb;
+  user-select: none;
+}
+
+.paginated-table-th-sortable {
+  background-color: #f9fafb;
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 1px solid #e5e7eb;
+  user-select: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.paginated-table-th-sortable:hover {
+  background-color: #f3f4f6 !important;
+}
+
+.paginated-table-th-content {
+  display: flex;
+  align-items: center;
+}
+
+.paginated-table-sort-icon {
+  margin-left: 4px;
+}
+
+.paginated-table-sort-icon-inactive {
+  color: #d1d5db;
+  margin-left: 4px;
+}
+
+.paginated-table-sort-icon-active {
+  margin-left: 4px;
+  color: #3b82f6;
+}
+
+.paginated-table-td {
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #374151;
+  vertical-align: top;
+}
+
+.paginated-table-td-empty {
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #374151;
+  vertical-align: top;
+  text-align: center;
+  padding: 40px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.paginated-table-row:hover {
+  background-color: #f9fafb !important;
+}
+
+.paginated-table-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: 8px;
+}
+
+.paginated-table-loading-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.paginated-table-loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #e5e7eb;
+  border-top: 2px solid #3b82f6;
+  border-radius: 50%;
+  animation: paginated-table-spin 1s linear infinite;
+}
+
+.paginated-table-loading-text {
+  color: #374151;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+@keyframes paginated-table-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

@@ -1,3 +1,5 @@
+import './Pagination.css';
+
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
@@ -43,60 +45,19 @@ export default function Pagination({
 
   const visiblePages = getVisiblePageNumbers();
 
-  const buttonStyle = {
-    padding: '8px 12px',
-    border: '1px solid #d1d5db',
-    backgroundColor: 'white',
-    color: '#374151',
-    cursor: 'pointer',
-    borderRadius: '6px',
-    fontSize: '14px',
-    fontWeight: '500',
-    transition: 'all 0.2s ease',
-    minWidth: '44px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
-  };
-
-  const activeButtonStyle = {
-    ...buttonStyle,
-    backgroundColor: '#3b82f6',
-    color: 'white',
-    borderColor: '#3b82f6'
-  };
-
-  const disabledButtonStyle = {
-    ...buttonStyle,
-    backgroundColor: '#f9fafb',
-    color: '#9ca3af',
-    cursor: 'not-allowed',
-    borderColor: '#e5e7eb'
-  };
-
   if (totalPages <= 1) {
     return null;
   }
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      gap: '16px',
-      margin: '24px 0'
-    }}>
+    <div className="pagination-container">
       {/* Pagination Controls */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '4px'
-      }}>
+      <div className="pagination-controls">
         {/* First Page */}
         <button
           onClick={() => onPageChange(1)}
           disabled={currentPage === 1}
-          style={currentPage === 1 ? disabledButtonStyle : buttonStyle}
+          className={currentPage === 1 ? 'pagination-button-disabled' : 'pagination-button'}
           title="First page"
         >
           ⟪
@@ -106,7 +67,7 @@ export default function Pagination({
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={!hasPreviousPage}
-          style={!hasPreviousPage ? disabledButtonStyle : buttonStyle}
+          className={!hasPreviousPage ? 'pagination-button-disabled' : 'pagination-button'}
           title="Previous page"
         >
           ⟨
@@ -119,7 +80,7 @@ export default function Pagination({
             {visiblePages[0] > 1 && (
               <>
                 {visiblePages[0] > 2 && (
-                  <span style={{ padding: '0 8px', color: '#6b7280' }}>…</span>
+                  <span className="pagination-ellipsis">…</span>
                 )}
               </>
             )}
@@ -128,7 +89,7 @@ export default function Pagination({
               <button
                 key={pageNum}
                 onClick={() => onPageChange(pageNum)}
-                style={pageNum === currentPage ? activeButtonStyle : buttonStyle}
+                className={pageNum === currentPage ? 'pagination-button-active' : 'pagination-button'}
                 title={`Page ${pageNum}`}
               >
                 {pageNum}
@@ -139,7 +100,7 @@ export default function Pagination({
             {visiblePages[visiblePages.length - 1] < totalPages && (
               <>
                 {visiblePages[visiblePages.length - 1] < totalPages - 1 && (
-                  <span style={{ padding: '0 8px', color: '#6b7280' }}>…</span>
+                  <span className="pagination-ellipsis">…</span>
                 )}
               </>
             )}
@@ -150,7 +111,7 @@ export default function Pagination({
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={!hasNextPage}
-          style={!hasNextPage ? disabledButtonStyle : buttonStyle}
+          className={!hasNextPage ? 'pagination-button-disabled' : 'pagination-button'}
           title="Next page"
         >
           ⟩
@@ -160,7 +121,7 @@ export default function Pagination({
         <button
           onClick={() => onPageChange(totalPages)}
           disabled={currentPage === totalPages}
-          style={currentPage === totalPages ? disabledButtonStyle : buttonStyle}
+          className={currentPage === totalPages ? 'pagination-button-disabled' : 'pagination-button'}
           title="Last page"
         >
           ⟫
@@ -168,13 +129,7 @@ export default function Pagination({
       </div>
 
       {/* Page Info */}
-      <div style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        gap: '16px',
-        fontSize: '14px',
-        color: '#6b7280'
-      }}>
+      <div className="pagination-info">
         <span>
           Page {currentPage} of {totalPages}
         </span>

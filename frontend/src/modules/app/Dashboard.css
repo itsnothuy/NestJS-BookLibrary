@@ -1,0 +1,10 @@
+/* Dashboard Component Styles */
+
+.dashboard-container {
+  min-height: 100vh;
+  background-color: #f9fafb;
+}
+
+.dashboard-main {
+  padding: 2rem;
+}

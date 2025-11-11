@@ -4,6 +4,7 @@ import PaginatedBooksTable from '../../components/books/PaginatedBooksTable';
 import PaginatedUsersTable from '../../components/users/PaginatedUsersTable';
 import NavTab from '../../components/layout/NavTab';
 import Header from '../../components/layout/Header';
+import './Dashboard.css';
 
 export const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000';
 
@@ -32,7 +33,7 @@ export default function Dashboard() {
   }, [token]);
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#f9fafb" }}>
+    <div className="dashboard-container">
       {/* Header */}
       <Header />
       {/* Navigation Tabs */}
@@ -40,7 +41,7 @@ export default function Dashboard() {
       {/* Breadcrumbs */}
       {/* <Breadcrumbs /> */}
       {/* Main Content */}
-      <main style={{ padding: "2rem" }}>
+      <main className="dashboard-main">
         {activeTab === 'books' && <PaginatedBooksTable/ >}
         {activeTab === 'users' && user?.role === 'admin' && <PaginatedUsersTable />}
       </main>

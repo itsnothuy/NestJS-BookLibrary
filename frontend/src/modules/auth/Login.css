@@ -1,0 +1,70 @@
+/* Login Component Styles */
+
+.login-container {
+  max-width: 420px;
+  margin: 60px auto;
+  font-family: ui-sans-serif;
+  padding: 20px;
+}
+
+.login-form-group {
+  margin-bottom: 15px;
+}
+
+.login-form-group-bottom {
+  margin-bottom: 20px;
+}
+
+.login-input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.login-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px #3b82f6;
+}
+
+.login-button {
+  width: 100%;
+  padding: 10px;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.login-button:hover:not(:disabled) {
+  background-color: #2563eb;
+}
+
+.login-button:disabled {
+  cursor: not-allowed;
+  background-color: #9ca3af;
+}
+
+.login-error {
+  color: crimson;
+  margin-top: 15px;
+}
+
+.login-footer {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.login-footer a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+.login-footer a:hover {
+  text-decoration: underline;
+}

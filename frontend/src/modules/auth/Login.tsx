@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from './AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
+import './Login.css';
 
 export default function Login() {
   const { login } = useAuth();
@@ -24,13 +25,13 @@ export default function Login() {
   };
 
   return (
-    <div style={{ maxWidth: 420, margin: '60px auto', fontFamily: 'ui-sans-serif', padding: '20px' }}>
+    <div className="login-container">
       <h1>Login</h1>
       <form onSubmit={onSubmit}>
-        <div style={{ marginBottom: '15px' }}>
+        <div className="login-form-group">
           <label>Email<br/>
             <input 
-              style={{ width: '100%', padding: '8px', marginTop: '5px' }}
+              className="login-input"
               value={email} 
               onChange={e=>setEmail(e.target.value)} 
               type="email" 
@@ -40,10 +41,10 @@ export default function Login() {
           </label>
         </div>
         
-        <div style={{ marginBottom: '20px' }}>
+        <div className="login-form-group-bottom">
           <label>Password<br/>
             <input 
-              style={{ width: '100%', padding: '8px', marginTop: '5px' }}
+              className="login-input"
               value={password} 
               onChange={e=>setPassword(e.target.value)} 
               type="password" 
@@ -56,21 +57,13 @@ export default function Login() {
         <button 
           disabled={busy} 
           type="submit"
-          style={{
-            width: '100%',
-            padding: '10px',
-            backgroundColor: '#3b82f6',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: busy ? 'not-allowed' : 'pointer'
-          }}
+          className="login-button"
         >
           {busy ? 'Logging in…' : 'Login'}
         </button>
       </form>
-      {error && <p style={{ color: 'crimson', marginTop: '15px' }}>{error}</p>}
-      <p style={{ marginTop: '20px', textAlign: 'center' }}>
+      {error && <p className="login-error">{error}</p>}
+      <p className="login-footer">
         New here? <Link to="/signup">Create an account</Link>
       </p>
     </div>
