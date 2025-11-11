@@ -12,7 +12,6 @@ export class CreateBookDto {
 
   // Most modern codes are ISBN-13; adjust if you need ISBN-10 as well.
   @IsString() 
-  @IsISBN('13')
   isbn!: string;
 
   @IsOptional() 

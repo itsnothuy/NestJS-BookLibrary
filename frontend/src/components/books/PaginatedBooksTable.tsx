@@ -20,10 +20,8 @@ interface BookFormData {
   title: string;
   author: string;
   isbn: string;
-  publisher: string;
   publishedYear: number;
-  totalCopies: number;
-  location: string;
+  
 }
 
 interface PaginationResponse {
@@ -60,10 +58,7 @@ export default function PaginatedBooksTable() {
     title: "",
     author: "",
     isbn: "",
-    publisher: "",
     publishedYear: 0,
-    totalCopies: 0,
-    location: "",
   });
   
   const [showAddModal, setShowAddModal] = useState(false);
@@ -226,10 +221,7 @@ export default function PaginatedBooksTable() {
       title: "",
       author: "",
       isbn: "",
-      publisher: "",
       publishedYear: 0,
-      totalCopies: 0,
-      location: "",
     });
     setSelectedBook(null);
   };
@@ -240,10 +232,7 @@ export default function PaginatedBooksTable() {
       title: book.title,
       author: book.author,
       isbn: book.isbn,
-      publisher: "", // Note: Book interface doesn't have these fields, using defaults
       publishedYear: book.publishedYear || 0,
-      totalCopies: 0,
-      location: "",
     });
     setShowEditModal(true);
   };
@@ -497,18 +486,7 @@ export default function PaginatedBooksTable() {
                 placeholder="Enter ISBN (13 digits)"
               />
             </div>
-            <div className="paginated-books-form-group">
-              <label className="paginated-books-label">Publisher</label>
-              <input
-                className="paginated-books-input"
-                type="text"
-                value={formData.publisher}
-                onChange={(e) =>
-                  setFormData({ ...formData, publisher: e.target.value })
-                }
-                placeholder="Enter publisher name"
-              />
-            </div>
+            
             <div className="paginated-books-form-group">
               <label className="paginated-books-label">Published Year</label>
               <input
@@ -522,33 +500,6 @@ export default function PaginatedBooksTable() {
                   })
                 }
                 placeholder="Enter published year"
-              />
-            </div>
-            <div className="paginated-books-form-group">
-              <label className="paginated-books-label">Total Copies</label>
-              <input
-                className="paginated-books-input"
-                type="number"
-                value={formData.totalCopies?.toString() || ""}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    totalCopies: e.target.value ? parseInt(e.target.value) : 0,
-                  })
-                }
-                placeholder="Enter total copies"
-              />
-            </div>
-            <div className="paginated-books-form-group">
-              <label className="paginated-books-label">Location</label>
-              <input
-                className="paginated-books-input"
-                type="text"
-                value={formData.location}
-                onChange={(e) =>
-                  setFormData({ ...formData, location: e.target.value })
-                }
-                placeholder="Enter shelf location"
               />
             </div>
             <div className="paginated-books-modal-buttons">
@@ -605,17 +556,6 @@ export default function PaginatedBooksTable() {
               />
             </div>
             <div className="paginated-books-form-group">
-              <label className="paginated-books-label">Publisher</label>
-              <input
-                className="paginated-books-input"
-                type="text"
-                value={formData.publisher}
-                onChange={(e) =>
-                  setFormData({ ...formData, publisher: e.target.value })
-                }
-              />
-            </div>
-            <div className="paginated-books-form-group">
               <label className="paginated-books-label">Published Year</label>
               <input
                 className="paginated-books-input"
@@ -626,31 +566,6 @@ export default function PaginatedBooksTable() {
                     ...formData,
                     publishedYear: e.target.value ? parseInt(e.target.value) : 0,
                   })
-                }
-              />
-            </div>
-            <div className="paginated-books-form-group">
-              <label className="paginated-books-label">Total Copies</label>
-              <input
-                className="paginated-books-input"
-                type="number"
-                value={formData.totalCopies?.toString() || ""}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    totalCopies: e.target.value ? parseInt(e.target.value) : 0,
-                  })
-                }
-              />
-            </div>
-            <div className="paginated-books-form-group">
-              <label className="paginated-books-label">Location</label>
-              <input
-                className="paginated-books-input"
-                type="text"
-                value={formData.location}
-                onChange={(e) =>
-                  setFormData({ ...formData, location: e.target.value })
                 }
               />
             </div>
