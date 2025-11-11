@@ -70,11 +70,9 @@ export class UsersService {
       throw new NotFoundException('No file uploaded');
     }
 
-    // For filesystem storage, we store the file path and metadata
+    // For simplified filesystem storage, we only store the filename
     const patch = {
-      avatarFilename: file.originalname, // Original filename 
-      avatarPath: file.path, // Full server file path (e.g., "uploads/avatars/avatar-123456789.jpg")
-      avatarUrl: `/users/avatar/${file.filename}`, // Public URL path for serving
+      avatarFilename: file.filename, // Generated unique filename (e.g., "avatar-123456789.jpg")
       avatarMimeType: file.mimetype,
       avatarSizeBytes: file.size,
       avatarUploadedAt: new Date(),

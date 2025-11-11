@@ -10,15 +10,17 @@ export class AvatarController {
 
   @Get(':uuid')
   async getAvatar(@Param('uuid') uuid: string, @Res() res: Response) {
-    // Find user by UUID and get avatar file path
+    // Find user by UUID and get avatar filename
     const user = await this.usersRepo.findByUuid(uuid);
 
-    if (!user || !user.avatarPath) {
+    if (!user || !user.avatarFilename) {
       return res.status(404).json({ message: 'Avatar not found' });
     }
 
-    // Check if file exists on filesystem
-    const absolutePath = path.resolve(user.avatarPath);
+    // Construct file path from hardcoded directory and stored filename
+    const avatarPath = path.join('./uploads/avatars', user.avatarFilename);
+    const absolutePath = path.resolve(avatarPath);
+    
     if (!fs.existsSync(absolutePath)) {
       return res.status(404).json({ message: 'Avatar file not found on server' });
     }

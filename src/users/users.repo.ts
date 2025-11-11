@@ -22,11 +22,10 @@ export class UsersRepo implements PaginatedRepository<UserRow> {
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
       avatarFilename: row.avatar_filename,
-      avatarPath: row.avatar_path,
-      avatarUrl: row.avatar_url,
       avatarMimeType: row.avatar_mime_type,
       avatarSizeBytes: row.avatar_size_bytes,
       avatarUploadedAt: row.avatar_uploaded_at,
+      
     };
   }
 
@@ -139,7 +138,7 @@ export class UsersRepo implements PaginatedRepository<UserRow> {
     return (await this.findById(insertId))!;
   }
 
-  async updateByUuid(uuid: string, patch: Partial<Pick<UserRow,'email'|'passwordHash'|'role'|'avatarFilename'|'avatarPath'|'avatarUrl'|'avatarMimeType'|'avatarSizeBytes'|'avatarUploadedAt'>>): Promise<UserRow | null> {
+  async updateByUuid(uuid: string, patch: Partial<Pick<UserRow,'email'|'passwordHash'|'role'|'avatarFilename'|'avatarMimeType'|'avatarSizeBytes'|'avatarUploadedAt'>>): Promise<UserRow | null> {
     const user = await this.findByUuid(uuid);  
     if (!user) return null;
     
@@ -150,8 +149,6 @@ export class UsersRepo implements PaginatedRepository<UserRow> {
     if (patch.passwordHash !== undefined) { fields.push('passwordHash = ?'); params.push(patch.passwordHash); }
     if (patch.role !== undefined) { fields.push('role = ?'); params.push(patch.role); }
     if (patch.avatarFilename !== undefined) { fields.push('avatar_filename = ?'); params.push(patch.avatarFilename); }
-    if (patch.avatarPath !== undefined) { fields.push('avatar_path = ?'); params.push(patch.avatarPath); }
-    if (patch.avatarUrl !== undefined) { fields.push('avatar_url = ?'); params.push(patch.avatarUrl); }
     if (patch.avatarMimeType !== undefined) { fields.push('avatar_mime_type = ?'); params.push(patch.avatarMimeType); }
     if (patch.avatarSizeBytes !== undefined) { fields.push('avatar_size_bytes = ?'); params.push(patch.avatarSizeBytes); }
     if (patch.avatarUploadedAt !== undefined) { fields.push('avatar_uploaded_at = ?'); params.push(patch.avatarUploadedAt); }

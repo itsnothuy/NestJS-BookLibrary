@@ -17,9 +17,9 @@ async function bootstrap() {
     }),
   );
 
-  // Serve static avatar files
+  // Serve static avatar files directly from uploads directory
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
-    prefix: '/users/', // This makes files available at /users/avatar/filename.jpg
+    prefix: '/uploads/', // This makes files available at /uploads/avatars/filename.jpg
   });
   
   app.enableCors({
