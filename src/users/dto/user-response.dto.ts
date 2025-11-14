@@ -6,11 +6,8 @@ export class UserResponseDto {
   role: 'student' | 'admin';
   createdAt: Date;
   updatedAt: Date;
-  // Avatar fields - Filesystem storage
+  // Avatar fields - Filesystem storage (only URL)
   avatarUrl?: string; // URL to filesystem avatar
-  avatarMimeType?: string;
-  avatarSizeBytes?: number;
-  avatarUploadedAt?: Date;
 
   static fromEntity(user: UserRow): UserResponseDto {
     // For simplified filesystem storage, construct URL from filename
@@ -25,10 +22,7 @@ export class UserResponseDto {
       role: user.role,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
-      avatarUrl: avatarUrl, // Constructed URL from filename
-      avatarMimeType: user.avatarMimeType,
-      avatarSizeBytes: user.avatarSizeBytes,
-      avatarUploadedAt: user.avatarUploadedAt,
+      avatarUrl: avatarUrl,
     };
   }
 }

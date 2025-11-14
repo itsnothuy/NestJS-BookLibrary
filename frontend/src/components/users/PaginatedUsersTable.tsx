@@ -44,7 +44,7 @@ interface PaginationResponse {
 
 export default function PaginatedUsersTable() {
   const { token } = useAuth();
-  const pagination = usePagination(5); // Start with 5 users per page
+  const pagination = usePagination(10); // Start with 5 users per page
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

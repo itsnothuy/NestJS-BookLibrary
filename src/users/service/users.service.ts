@@ -70,12 +70,8 @@ export class UsersService {
       throw new NotFoundException('No file uploaded');
     }
 
-    // For simplified filesystem storage, we only store the filename
     const patch = {
-      avatarFilename: file.filename, // Generated unique filename (e.g., "avatar-123456789.jpg")
-      avatarMimeType: file.mimetype,
-      avatarSizeBytes: file.size,
-      avatarUploadedAt: new Date(),
+      avatarFilename: file.filename, // "avatar-123456789.jpg"
     };
 
     const updated = await this.repo.updateByUuid(uuid, patch);

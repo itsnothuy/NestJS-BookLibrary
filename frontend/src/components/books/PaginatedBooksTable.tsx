@@ -44,7 +44,7 @@ interface PaginationResponse {
 
 export default function PaginatedBooksTable() {
   const { token } = useAuth();
-  const pagination = usePagination(5); // Start with 5 books per page
+  const pagination = usePagination(10); // Start with 10 books page
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

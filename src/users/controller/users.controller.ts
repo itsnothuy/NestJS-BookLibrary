@@ -76,22 +76,19 @@ export class UsersController {
         cb(null, uploadPath);
       },
       filename: (req, file, cb) => {
-        // Generate unique filename with timestamp and random number
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const fileExtension = path.extname(file.originalname);
-        const fileName = `avatar-${uniqueSuffix}${fileExtension}`;
+        const fileName = file.originalname; 
         cb(null, fileName);
       }
     }),
     fileFilter: (req, file, cb) => {
-      if (file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
+      if (file) {
         cb(null, true);
       } else {
         cb(new Error('Only image files are allowed!'), false);
       }
     },
     limits: {
-      fileSize: 5 * 1024 * 1024, // 5MB limit
+      fileSize: 5 * 1024 * 1024,
     },
   }))
   async uploadAvatar(
@@ -100,5 +97,5 @@ export class UsersController {
   ) {
     return this.users.updateAvatar((req as any).user.uuid, file);
   }
-
+  
 }

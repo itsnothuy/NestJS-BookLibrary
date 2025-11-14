@@ -25,8 +25,10 @@ async function bootstrap() {
   app.enableCors({
     origin: ['http://localhost:5173', 'http://localhost:5174'],
     credentials: false, // switch to true if you later move to cookies
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
     methods: ['GET','POST','PATCH','DELETE','OPTIONS'],
+    exposedHeaders: ['Authorization'],
+    maxAge: 86400, // Cache preflight for 24 hours
   });
   await app.listen(process.env.PORT ?? 3000);
 }

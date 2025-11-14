@@ -32,8 +32,13 @@ export default function Header() {
 
     // Add effect to listen for profile refresh events
     useEffect(() => {
-        const handleProfileRefresh = () => {
-            if (token) {
+        const handleProfileRefresh = (event: CustomEvent) => {
+            // Use profile data from event detail if available, otherwise fetch
+            if (event.detail) {
+                setUser(event.detail);
+                setAvatarError(false);
+            } else if (token) {
+                // Fallback to fetching if no data provided
                 fetch(`${API_BASE}/auth/me`, {
                     headers: { Authorization: `Bearer ${token}` }
                 }).then(res => res.json()).then(profile => {
@@ -46,8 +51,8 @@ export default function Header() {
         };
 
         // Listen for custom profile refresh event
-        window.addEventListener('profile-updated', handleProfileRefresh);
-        return () => window.removeEventListener('profile-updated', handleProfileRefresh);
+        window.addEventListener('profile-updated', handleProfileRefresh as EventListener);
+        return () => window.removeEventListener('profile-updated', handleProfileRefresh as EventListener);
     }, [token]);
 
     const handleAvatarClick = () => {

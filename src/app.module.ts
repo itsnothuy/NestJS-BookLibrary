@@ -7,7 +7,6 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HealthController } from './health.controller';
 import { BooksModule } from './books/module/books.module';
-import { AvatarModule } from './avatar/avatar.module';
 
 
 @Module({
@@ -26,7 +25,6 @@ import { AvatarModule } from './avatar/avatar.module';
       synchronize: true, // Set to false in production
     }),
     BooksModule,
-    AvatarModule, // Import AvatarModule instead of direct controller
   ],
   controllers: [AppController, HealthController],
   providers: [AppService],
