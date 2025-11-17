@@ -44,7 +44,7 @@ interface PaginationResponse {
 }
 
 export default function PaginatedBooksTable() {
-  const { token, user } = useAuth();
+  const { token, user, loading: authLoading } = useAuth();
   const pagination = usePagination(10); // Start with 10 books page
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(false);
@@ -265,6 +265,20 @@ export default function PaginatedBooksTable() {
   // Remove the useEffect that fetches user profile - now from AuthContext
 
   const userRole = user?.role; // Get role from AuthContext user
+
+  // Wait for authentication to complete before rendering table
+  if (authLoading) {
+    return (
+      <div className="paginated-books-container">
+        <div className="paginated-books-header">
+          <h2 className="paginated-books-title">Books Library</h2>
+        </div>
+        <div style={{ padding: '40px', textAlign: 'center' }}>
+          <p>Loading authentication...</p>
+        </div>
+      </div>
+    );
+  }
 
   const columns = useMemo(() =>[
     {

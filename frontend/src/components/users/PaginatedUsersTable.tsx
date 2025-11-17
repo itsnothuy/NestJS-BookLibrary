@@ -45,7 +45,7 @@ interface PaginationResponse {
 }
 
 export default function PaginatedUsersTable() {
-  const { token, user } = useAuth();
+  const { token, user, loading: authLoading } = useAuth();
   const pagination = usePagination(10); // Start with 5 users per page
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
@@ -326,6 +326,34 @@ export default function PaginatedUsersTable() {
       </div>
     );}
   );
+
+  // Wait for authentication to complete before rendering table
+  if (authLoading) {
+    return (
+      <div className="paginated-users-container">
+        <div className="paginated-users-header">
+          <h2 className="paginated-users-title">User Management</h2>
+        </div>
+        <div style={{ padding: '40px', textAlign: 'center' }}>
+          <p>Loading authentication...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Require authentication for this component
+  if (!token || !user) {
+    return (
+      <div className="paginated-users-container">
+        <div className="paginated-users-header">
+          <h2 className="paginated-users-title">User Management</h2>
+        </div>
+        <div className="paginated-users-error">
+          <p>Please log in to view users.</p>
+        </div>
+      </div>
+    );
+  }
 
   const columns = useMemo(() => [
     {
