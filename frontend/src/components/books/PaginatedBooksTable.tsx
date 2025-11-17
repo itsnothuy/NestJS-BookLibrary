@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useAuth } from '../../modules/auth/AuthContext';
 import { usePagination } from '../../hooks/usePagination';
 import PaginatedTable from '../table/PaginatedTable';
 import './PaginatedBooksTable.css';
+import { useDebounce } from '../../hooks/useDebounceHook';
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000';
 
@@ -43,16 +44,19 @@ interface PaginationResponse {
 }
 
 export default function PaginatedBooksTable() {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const pagination = usePagination(10); // Start with 10 books page
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [authorFilter, setAuthorFilter] = useState<string>('');
   const [yearFilter, setYearFilter] = useState<string>('');
+  const debouncedAuthor = useDebounce(authorFilter, 300);
+  const debouncedYear = useDebounce(yearFilter, 300);
+  const debouncedSearch = useDebounce(pagination.state.search, 300);
+
   
   // CRUD Modal states
-  const [userRole, setUserRole] = useState<string | null>(null);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [formData, setFormData] = useState<BookFormData>({
     title: "",
@@ -65,10 +69,17 @@ export default function PaginatedBooksTable() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const fetchBooks = async () => {
     setLoading(true);
     setError(null);
+    
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
     
     try {
       const queryParams = new URLSearchParams({
@@ -76,12 +87,12 @@ export default function PaginatedBooksTable() {
         limit: pagination.state.limit.toString(),
         sortBy: pagination.state.sortBy,
         sortOrder: pagination.state.sortOrder,
-        ...(pagination.state.search && { search: pagination.state.search }),
-        ...(authorFilter && { author: authorFilter }),
-        ...(yearFilter && { publishedYear: yearFilter })
+        ...(debouncedSearch && { search: debouncedSearch }),
+        ...(debouncedAuthor && { author: debouncedAuthor }),
+        ...(debouncedYear && { publishedYear: debouncedYear })
       });
 
-      const response = await fetch(`${API_BASE}/books?${queryParams}`);
+      const response = await fetch(`${API_BASE}/books?${queryParams}`, { signal: abortController.signal });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -95,7 +106,8 @@ export default function PaginatedBooksTable() {
         hasNextPage: result.meta.hasNextPage,
         hasPreviousPage: result.meta.hasPreviousPage
       });
-    } catch (error) {
+    } catch (error: any) {
+      if (error.name === 'AbortError') return;
       console.error('Error fetching books:', error);
       setError(error instanceof Error ? error.message : 'Failed to fetch books');
     } finally {
@@ -103,21 +115,7 @@ export default function PaginatedBooksTable() {
     }
   };
 
-  // Fetch user profile to get role
-  const fetchUserProfile = async () => {
-    if (!token) return;
-    try {
-      const response = await fetch(`${API_BASE}/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (response.ok) {
-        const profile = await response.json();
-        setUserRole(profile.role);
-      }
-    } catch (error) {
-      console.error("Error fetching user profile:", error);
-    }
-  };
+  // Remove fetchUserProfile - role now comes from AuthContext
 
   // Create book
   const handleCreate = async () => {
@@ -141,7 +139,9 @@ export default function PaginatedBooksTable() {
         throw new Error(errorData.message || "Failed to create book");
       }
       
-      await fetchBooks();
+      const newBook = await response.json();
+      setBooks([newBook, ...books]);
+      pagination.updatePagination({ total: pagination.state.total + 1 });
       setShowAddModal(false);
       resetForm();
       alert("Book created successfully!");
@@ -174,7 +174,8 @@ export default function PaginatedBooksTable() {
         throw new Error(errorData.message || "Failed to update book");
       }
       
-      await fetchBooks();
+      const updatedBook = await response.json();
+      setBooks(books.map(book => book.id === updatedBook.id ? updatedBook : book));
       setShowEditModal(false);
       resetForm();
       alert("Book updated successfully!");
@@ -205,7 +206,9 @@ export default function PaginatedBooksTable() {
         throw new Error(errorData.message || "Failed to delete book");
       }
       
-      await fetchBooks();
+      await response;
+      setBooks(books.filter(book => book.id !== selectedBook.id));
+      pagination.updatePagination({ total: pagination.state.total - 1 });
       setShowDeleteModal(false);
       setSelectedBook(null);
       alert("Book deleted successfully!");
@@ -249,18 +252,21 @@ export default function PaginatedBooksTable() {
 
   useEffect(() => {
     fetchBooks();
-    fetchUserProfile();
   }, [
     pagination.state.page, 
     pagination.state.limit, 
     pagination.state.sortBy, 
     pagination.state.sortOrder,
-    pagination.state.search,
-    authorFilter,
-    yearFilter
+    debouncedAuthor,
+    debouncedYear,
+    debouncedSearch
   ]);
 
-  const columns = [
+  // Remove the useEffect that fetches user profile - now from AuthContext
+
+  const userRole = user?.role; // Get role from AuthContext user
+
+  const columns = useMemo(() =>[
     {
       key: 'title',
       label: 'Title',
@@ -351,7 +357,7 @@ export default function PaginatedBooksTable() {
         </div>
       )
     }
-  ];
+  ], [userRole]);
 
   if (error) {
     return (
@@ -638,3 +644,4 @@ export default function PaginatedBooksTable() {
     </div>
   );
 }
+

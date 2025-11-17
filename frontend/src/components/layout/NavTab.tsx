@@ -1,31 +1,11 @@
-import { useState, useEffect } from "react";
 import { useAuth } from "../../modules/auth/AuthContext";
 
 
 export const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000';
 
 export default function NavTab({ activeTab, setActiveTab }: { activeTab: string | null; setActiveTab: (tab: string | null) => void }) {
-    const {token} = useAuth();
-    const [user, setUser] = useState<any>(null);
+    const { user } = useAuth();
 
-    // Fetch user profile
-    useEffect(() => {
-    if (token) {
-        (async () => {
-        try {
-            const res = await fetch(`${API_BASE}/auth/me`, {
-            headers: { Authorization: `Bearer ${token}` }
-            });
-            if (res.ok) {
-            const profile = await res.json();
-            setUser(profile);
-            }
-        } catch (error) {
-            console.error('Failed to fetch profile:', error);
-        }
-        })();
-    }
-    }, [token]);
   return (
     <nav style={{
         backgroundColor: "white",

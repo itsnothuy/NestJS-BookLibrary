@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useAuth } from '../../modules/auth/AuthContext';
 import { usePagination } from '../../hooks/usePagination';
 import PaginatedTable from '../table/PaginatedTable';
 import './PaginatedUsersTable.css';
+import React from 'react';
+import { useDebounce } from '../../hooks/useDebounceHook';
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000';
 
@@ -43,13 +45,13 @@ interface PaginationResponse {
 }
 
 export default function PaginatedUsersTable() {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const pagination = usePagination(10); // Start with 5 users per page
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const debouncedSearch = useDebounce(pagination.state.search, 300);
   // Removed unused roleFilter for now
-  const [userRole, setUserRole] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [formData, setFormData] = useState<UserFormData>({
     email: "",
@@ -61,12 +63,19 @@ export default function PaginatedUsersTable() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const fetchUsers = async () => {
     if (!token) return;
     
     setLoading(true);
     setError(null);
+
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
     
     try {
       const queryParams = new URLSearchParams({
@@ -74,14 +83,15 @@ export default function PaginatedUsersTable() {
         limit: pagination.state.limit.toString(),
         sortBy: pagination.state.sortBy,
         sortOrder: pagination.state.sortOrder,
-        ...(pagination.state.search && { search: pagination.state.search })
+        ...(debouncedSearch && { search: debouncedSearch })
       });
 
       const response = await fetch(`${API_BASE}/users?${queryParams}`, {
         headers: { 
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
-        }
+        },
+        signal: abortController.signal
       });
 
       if (!response.ok) {
@@ -96,7 +106,8 @@ export default function PaginatedUsersTable() {
         hasNextPage: result.meta.hasNextPage,
         hasPreviousPage: result.meta.hasPreviousPage
       });
-    } catch (error) {
+    } catch (error: any) {
+      if (error.name === 'AbortError') return; 
       console.error('Error fetching users:', error);
       setError(error instanceof Error ? error.message : 'Failed to fetch users');
     } finally {
@@ -104,33 +115,22 @@ export default function PaginatedUsersTable() {
     }
   };
 
-  // Fetch user profile to get role
-  const fetchUserProfile = async () => {
-    if (!token) return;
-    try {
-      const response = await fetch(`${API_BASE}/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (response.ok) {
-        const profile = await response.json();
-        setUserRole(profile.role);
-      }
-    } catch (error) {
-      console.error("Error fetching user profile:", error);
-    }
-  };
+  // Remove fetchUserProfile - role now comes from AuthContext
 
   useEffect(() => {
     fetchUsers();
-    fetchUserProfile();
   }, [
     pagination.state.page, 
     pagination.state.limit, 
     pagination.state.sortBy, 
     pagination.state.sortOrder,
-    pagination.state.search,
+    debouncedSearch,
     token
   ]);
+
+  // Remove the useEffect that fetches user profile - now from AuthContext
+  
+  const userRole = user?.role; // Get role from AuthContext user
 
   // Create user
   const handleCreate = async () => {
@@ -154,7 +154,9 @@ export default function PaginatedUsersTable() {
         throw new Error(errorData.message || "Failed to create user");
       }
       
-      await fetchUsers();
+      const newUser = await response.json();
+      setUsers([newUser, ...users]);
+      pagination.updatePagination({ total: pagination.state.total + 1 });
       setShowAddModal(false);
       resetForm();
       alert("User created successfully!");
@@ -197,7 +199,8 @@ export default function PaginatedUsersTable() {
         throw new Error(errorData.message || "Failed to update user");
       }
       
-      await fetchUsers();
+      const updatedUser = await response.json();
+      setUsers(users.map(user => user.id === updatedUser.id ? updatedUser : user));
       setShowEditModal(false);
       resetForm();
       alert("User updated successfully!");
@@ -228,9 +231,11 @@ export default function PaginatedUsersTable() {
         throw new Error(errorData.message || "Failed to delete user");
       }
       
-      await fetchUsers();
+      await response;
+      setUsers(users.filter(user => user.id !== selectedUser.id));
       setShowDeleteModal(false);
       setSelectedUser(null);
+      pagination.updatePagination({ total: pagination.state.total - 1 });
       alert("User deleted successfully!");
     } catch (error: any) {
       console.error("Error deleting user:", error);
@@ -278,7 +283,8 @@ export default function PaginatedUsersTable() {
     }
   };
 
-  const AvatarDisplay = ({ user, size = 32 }: { user: User; size?: number }) => {
+  const AvatarDisplay = React.memo(
+    ({ user, size = 32 }: { user: User; size?: number }) => {
     if (user.avatarUrl) {
       return (
         <img
@@ -318,10 +324,10 @@ export default function PaginatedUsersTable() {
       >
         {initials}
       </div>
-    );
-  };
+    );}
+  );
 
-  const columns = [
+  const columns = useMemo(() => [
     {
       key: 'avatar',
       label: 'Avatar',
@@ -395,7 +401,7 @@ export default function PaginatedUsersTable() {
         </div>
       )
     }
-  ];
+  ], [userRole]);
 
   if (error) {
     return (

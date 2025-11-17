@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../auth/AuthContext';
 import PaginatedBooksTable from '../../components/books/PaginatedBooksTable';
 import PaginatedUsersTable from '../../components/users/PaginatedUsersTable';
@@ -9,28 +9,8 @@ import './Dashboard.css';
 export const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000';
 
 export default function Dashboard() {
-  const { token } = useAuth();
-  const [user, setUser] = useState<any>(null);
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<string | null>(null); // Allow null as a valid type
-
-  // Fetch user profile
-  useEffect(() => {
-    if (token) {
-      (async () => {
-        try {
-          const res = await fetch(`${API_BASE}/auth/me`, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          if (res.ok) {
-            const profile = await res.json();
-            setUser(profile);
-          }
-        } catch (error) {
-          console.error('Failed to fetch profile:', error);
-        }
-      })();
-    }
-  }, [token]);
 
   return (
     <div className="dashboard-container">

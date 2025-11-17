@@ -6,8 +6,8 @@ import './Login.css';
 export default function Login() {
   const { login } = useAuth();
   const nav = useNavigate();
-  const [email, setEmail] = useState('testuser@example.com');
-  const [password, setPassword] = useState('TestPassword123');
+  const [email, setEmail] = useState('admin@gmail.com');
+  const [password, setPassword] = useState('1234');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
