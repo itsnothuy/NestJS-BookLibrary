@@ -5,6 +5,7 @@ export interface Book {
   author: string;
   isbn: string;
   publishedYear: number | null;
+  coverImageFilename?: string; // book-cover-123456789.jpg
   createdAt: Date;
   updatedAt: Date;
 }

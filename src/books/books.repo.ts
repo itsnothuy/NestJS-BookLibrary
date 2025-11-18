@@ -133,6 +133,7 @@ export class BooksRepo implements PaginatedRepository<BookRow> {
         if (patch.author !== undefined) { fields.push('author = ?'); params.push(patch.author); }
         if (patch.isbn !== undefined) { fields.push('isbn = ?'); params.push(patch.isbn); }
         if (patch.publishedYear !== undefined) { fields.push('publishedYear = ?'); params.push(patch.publishedYear); }
+        if (patch.coverImageFilename !== undefined) { fields.push('coverImageFilename = ?'); params.push(patch.coverImageFilename); }
 
         if (fields.length === 0) {
             return this.findByUuid(uuid);

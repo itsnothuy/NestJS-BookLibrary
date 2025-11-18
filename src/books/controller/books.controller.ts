@@ -1,6 +1,11 @@
 import {
   Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, ParseUUIDPipe, Query,
+  UseInterceptors, UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import type { Express } from 'express';
+import { diskStorage } from 'multer';
+import * as fs from 'fs';
 import { BooksService } from '../service/books.service';
 import { CreateBookDto } from '../dto/create-book.dto';
 import { UpdateBookDto } from '../dto/update-book.dto';
@@ -56,5 +61,41 @@ export class BooksController {
   @Roles('admin')
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.books.remove(id);
+  }
+
+  // ADMIN - Upload book cover image
+  @Post(':id/cover')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  @UseInterceptors(FileInterceptor('cover', {
+    storage: diskStorage({
+      destination: (req, file, cb) => {
+        const uploadPath = './uploads/book-covers';
+        if (!fs.existsSync(uploadPath)) {
+          fs.mkdirSync(uploadPath, { recursive: true });
+        }
+        cb(null, uploadPath);
+      },
+      filename: (req, file, cb) => {
+        const fileName = file.originalname;
+        cb(null, fileName);
+      }
+    }),
+    fileFilter: (req, file, cb) => {
+      if (file) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only image files are allowed!'), false);
+      }
+    },
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5MB
+    },
+  }))
+  async uploadCoverImage(
+    @Param('id', ParseUUIDPipe) id: string,
+    @UploadedFile() file: Express.Multer.File
+  ) {
+    return this.books.updateCoverImage(id, file);
   }
 }

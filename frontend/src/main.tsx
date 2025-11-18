@@ -7,12 +7,24 @@ import Login from './modules/auth/Login';
 import Signup from './modules/auth/Signup';
 import Profile from './modules/auth/Profile';
 import Dashboard from './modules/app/Dashboard';
+import StudentDashboard from './modules/app/StudentDashboard';
 import './index.css';
 
 function ProtectedRoute({ children }: { children: React.ReactElement }) {
   const { isAuthenticated } = useAuth();
   return isAuthenticated ? children : <Navigate to="/login" replace />;
 }
+
+function RoleBasedDashboard() {
+  const { user } = useAuth();
+  
+  if (user?.role === 'admin') {
+    return <Dashboard />;
+  }
+  
+  return <StudentDashboard />;
+}
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <HeroUIProvider>
@@ -34,7 +46,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
               path="/dashboard"
               element={
                 <ProtectedRoute>
-                  <Dashboard />
+                  <RoleBasedDashboard />
                 </ProtectedRoute>
               }
             />

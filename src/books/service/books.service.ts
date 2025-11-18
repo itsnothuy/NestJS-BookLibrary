@@ -5,6 +5,7 @@ import { BookResponseDto } from '../dto/book-response.dto';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PaginationQueryDto } from '../../common/dto/pagination.dto';
 import { PaginationResultDto } from '../../common/dto/pagination-result.dto';
+import type { Express } from 'express';
 
 @Injectable()
 export class BooksService {
@@ -58,5 +59,19 @@ export class BooksService {
     if (!existing) throw new NotFoundException('Book not found');
     const deleted = await this.repo.deleteByUuid(uuid);
     if (!deleted) throw new NotFoundException('Failed to delete book');
+  }
+
+  async updateCoverImage(uuid: string, file: Express.Multer.File): Promise<BookResponseDto> {
+    if (!file) {
+      throw new NotFoundException('No file uploaded');
+    }
+
+    const patch = {
+      coverImageFilename: file.filename,
+    };
+
+    const updated = await this.repo.updateByUuid(uuid, patch);
+    if (!updated) throw new NotFoundException('Book not found');
+    return BookResponseDto.fromEntity(updated);
   }
 }

@@ -1,0 +1,152 @@
+/* StudentBooksGallery Component Styles */
+
+.student-books-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.student-books-title {
+  margin: 0 0 24px 0;
+  color: #1f2937;
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+.student-books-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (min-width: 640px) {
+  .student-books-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .student-books-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1280px) {
+  .student-books-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+.student-book-card {
+  background-color: white;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.student-book-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.student-book-card-body {
+  overflow: visible;
+  padding: 0;
+}
+
+.student-book-cover {
+  width: 100%;
+  object-fit: cover;
+  height: 280px;
+}
+
+.student-book-card-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background-color: white;
+}
+
+.student-book-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.student-book-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.student-book-author {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.student-book-year {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin: 0;
+}
+
+.student-book-button {
+  width: 100%;
+  padding: 8px 16px;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.student-book-button:hover {
+  background-color: #2563eb;
+}
+
+.student-book-button:active {
+  background-color: #1d4ed8;
+}
+
+.student-books-loading {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6b7280;
+  font-size: 1.125rem;
+}
+
+.student-books-error {
+  text-align: center;
+  padding: 60px 20px;
+  color: #dc2626;
+  font-size: 1rem;
+  background-color: #fee2e2;
+  border-radius: 8px;
+  border: 1px solid #fca5a5;
+}
+
+.student-books-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6b7280;
+  font-size: 1rem;
+}
