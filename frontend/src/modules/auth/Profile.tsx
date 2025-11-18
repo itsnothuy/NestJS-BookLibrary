@@ -107,7 +107,7 @@ export default function Profile() {
         const formData = new FormData();
         formData.append('avatar', avatarFile);
 
-        const avatarRes = await fetch(`${API_BASE}/users/avatar`, {
+        const avatarRes = await fetch(`${API_BASE}/auth/avatar`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`

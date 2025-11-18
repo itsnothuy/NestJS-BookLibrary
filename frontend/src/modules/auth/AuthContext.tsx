@@ -89,25 +89,65 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [token]);
 
   const login = async (email: string, password: string) => {
-    const res = await fetch(`${API_BASE}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
-    if (!res.ok) throw new Error('Login failed');
-    const data = await res.json();
-    setToken(data.access_token); // matches your Nest response
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      if (!res.ok) throw new Error('Login failed');
+      const data = await res.json();
+      const newToken = data.access_token;
+      
+      // Fetch user profile immediately after getting token
+      const profileRes = await fetch(`${API_BASE}/auth/me`, {
+        headers: { Authorization: `Bearer ${newToken}` }
+      });
+      
+      if (!profileRes.ok) {
+        throw new Error('Failed to fetch user profile');
+      }
+      
+      const profile = await profileRes.json();
+      
+      // Set token and user together
+      setToken(newToken);
+      setUser(profile);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const signup = async (email: string, password: string, role: 'student' | 'admin' = 'student') => {
-    const res = await fetch(`${API_BASE}/auth/signup`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, role }),
-    });
-    if (!res.ok) throw new Error('Signup failed');
-    const data = await res.json();
-    setToken(data.access_token);
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/auth/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, role }),
+      });
+      if (!res.ok) throw new Error('Signup failed');
+      const data = await res.json();
+      const newToken = data.access_token;
+      
+      // Fetch user profile immediately
+      const profileRes = await fetch(`${API_BASE}/auth/me`, {
+        headers: { Authorization: `Bearer ${newToken}` }
+      });
+      
+      if (!profileRes.ok) {
+        throw new Error('Failed to fetch user profile');
+      }
+      
+      const profile = await profileRes.json();
+      
+      // Set token and user together
+      setToken(newToken);
+      setUser(profile);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const logout = () => {

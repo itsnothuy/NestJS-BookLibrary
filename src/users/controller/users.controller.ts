@@ -62,40 +62,5 @@ export class UsersController {
   remove(@Param('id', ParseUUIDPipe) id: string) { 
     return this.users.remove(id); 
   }
-
-  @UseGuards(JwtAuthGuard) // Remove admin role requirement for own avatar
-  @Post('avatar')
-  @UseInterceptors(FileInterceptor('avatar', {
-    storage: diskStorage({
-      destination: (req, file, cb) => {
-        const uploadPath = './uploads/avatars';
-        // Create directory if it doesn't exist
-        if (!fs.existsSync(uploadPath)) {
-          fs.mkdirSync(uploadPath, { recursive: true });
-        }
-        cb(null, uploadPath);
-      },
-      filename: (req, file, cb) => {
-        const fileName = file.originalname; 
-        cb(null, fileName);
-      }
-    }),
-    fileFilter: (req, file, cb) => {
-      if (file) {
-        cb(null, true);
-      } else {
-        cb(new Error('Only image files are allowed!'), false);
-      }
-    },
-    limits: {
-      fileSize: 5 * 1024 * 1024,
-    },
-  }))
-  async uploadAvatar(
-    @UploadedFile() file: Express.Multer.File,
-    @Request() req: any
-  ) {
-    return this.users.updateAvatar((req as any).user.uuid, file);
-  }
   
 }
