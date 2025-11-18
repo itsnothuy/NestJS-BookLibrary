@@ -8,6 +8,7 @@ import Signup from './modules/auth/Signup';
 import Profile from './modules/auth/Profile';
 import Dashboard from './modules/app/Dashboard';
 import StudentDashboard from './modules/app/StudentDashboard';
+import StudentBooksPage from './components/books/StudentBooksPage';
 import './index.css';
 
 function ProtectedRoute({ children }: { children: React.ReactElement }) {
@@ -64,6 +65,14 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
               element={
                 <ProtectedRoute>
                   <RoleBasedDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/student/books"
+              element={
+                <ProtectedRoute>
+                  <StudentBooksPage />
                 </ProtectedRoute>
               }
             />

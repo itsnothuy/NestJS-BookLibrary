@@ -1,0 +1,144 @@
+/* FeaturedSection Component Styles */
+
+.featured-section-container {
+  background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+  padding: 60px 20px;
+}
+
+.featured-section-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 60px;
+}
+
+/* Stats Section */
+.stats-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 32px;
+}
+
+.stat-card {
+  text-align: center;
+  padding: 32px 24px;
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #3b82f6;
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  font-size: 1rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Promotional Banner */
+.promo-banner {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 24px;
+  padding: 60px 40px;
+  color: white;
+  overflow: hidden;
+  position: relative;
+}
+
+.promo-content {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .promo-content {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+.promo-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.promo-title {
+  font-size: 2.25rem;
+  font-weight: bold;
+  margin: 0;
+  line-height: 1.2;
+}
+
+@media (min-width: 768px) {
+  .promo-title {
+    font-size: 2.75rem;
+  }
+}
+
+.promo-description {
+  font-size: 1.125rem;
+  line-height: 1.75;
+  opacity: 0.95;
+  margin: 0;
+  max-width: 600px;
+}
+
+.promo-features {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+@media (min-width: 640px) {
+  .promo-features {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.feature-icon {
+  font-size: 1.5rem;
+}
+
+.feature-text {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.promo-image {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 400px;
+}
+
+.promo-svg {
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.2));
+}

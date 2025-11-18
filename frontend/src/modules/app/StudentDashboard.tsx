@@ -1,5 +1,7 @@
 import Header from '../../components/layout/Header';
-import StudentBooksGallery from '../../components/books/StudentBooksGallery';
+import HomeBanner from '../../components/home/HomeBanner';
+import BookCarousel from '../../components/home/BookCarousel';
+import FeaturedSection from '../../components/home/FeaturedSection';
 import './StudentDashboard.css';
 
 export default function StudentDashboard() {
@@ -10,7 +12,9 @@ export default function StudentDashboard() {
       
       {/* Main Content */}
       <main className="student-dashboard-main">
-        <StudentBooksGallery />
+        <HomeBanner />
+        <BookCarousel />
+        <FeaturedSection />
       </main>
     </div>
   );
