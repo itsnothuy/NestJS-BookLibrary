@@ -30,7 +30,7 @@ const API_BASE = import.meta.env.VITE_API_BASE;
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('jwt') || null);
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Start as true
 
   useEffect(() => {
     if (token) localStorage.setItem('jwt', token);
@@ -41,31 +41,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!token) {
       setUser(null);
+      setLoading(false);
       return;
     }
 
-    let cancelled = false;
-    setLoading(true);
+    let isMounted = true;
+    const abortController = new AbortController();
 
     (async () => {
       try {
         const res = await fetch(`${API_BASE}/auth/me`, {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
+          signal: abortController.signal,
         });
-        if (res.ok && !cancelled) {
+        
+        if (!res.ok) {
+          // Token might be invalid
+          if (isMounted) {
+            setToken(null);
+            setUser(null);
+          }
+          return;
+        }
+        
+        if (isMounted) {
           const profile = await res.json();
           setUser(profile);
         }
       } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') {
+          return; // Ignore abort errors
+        }
         console.error('Failed to fetch user profile:', error);
-        if (!cancelled) setUser(null);
+        if (isMounted) {
+          setToken(null);
+          setUser(null);
+        }
       } finally {
-        if (!cancelled) setLoading(false);
+        if (isMounted) setLoading(false);
       }
     })();
 
     return () => {
-      cancelled = true;
+      isMounted = false;
+      abortController.abort();
     };
   }, [token]);
 
@@ -100,15 +119,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!token) return;
     
     setLoading(true);
+    const abortController = new AbortController();
+    
     try {
       const res = await fetch(`${API_BASE}/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
+        signal: abortController.signal,
       });
       if (res.ok) {
         const profile = await res.json();
         setUser(profile);
       }
     } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        return;
+      }
       console.error('Failed to refresh profile:', error);
     } finally {
       setLoading(false);
@@ -119,7 +144,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     token,
     user,
     loading,
-    isAuthenticated: !!token,
+    isAuthenticated: !!token && !!user,
     login,
     signup,
     logout,

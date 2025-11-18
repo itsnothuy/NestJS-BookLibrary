@@ -1,6 +1,6 @@
 import {
   Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, ParseUUIDPipe, Query,
-  UseInterceptors, UploadedFile,
+  UseInterceptors, UploadedFile, BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Express } from 'express';
@@ -77,15 +77,19 @@ export class BooksController {
         cb(null, uploadPath);
       },
       filename: (req, file, cb) => {
-        const fileName = file.originalname;
-        cb(null, fileName);
+        // Security: Generate safe filename with timestamp
+        const ext = file.originalname.split('.').pop()?.toLowerCase() || 'jpg';
+        const safeFilename = `book-cover-${Date.now()}.${ext}`;
+        cb(null, safeFilename);
       }
     }),
     fileFilter: (req, file, cb) => {
-      if (file) {
+      // Security: Only allow image MIME types
+      const allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+      if (allowedMimes.includes(file.mimetype)) {
         cb(null, true);
       } else {
-        cb(new Error('Only image files are allowed!'), false);
+        cb(new Error('Only image files (JPEG, PNG, GIF, WebP, SVG) are allowed!'), false);
       }
     },
     limits: {
@@ -96,6 +100,9 @@ export class BooksController {
     @Param('id', ParseUUIDPipe) id: string,
     @UploadedFile() file: Express.Multer.File
   ) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
     return this.books.updateCoverImage(id, file);
   }
 }
