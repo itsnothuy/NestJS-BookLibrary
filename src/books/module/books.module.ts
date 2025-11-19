@@ -10,6 +10,6 @@ import { MysqlModule } from 'src/database/mysql.module'; // provides MYSQL
   imports: [MysqlModule],
   controllers: [BooksController, BookCoverController],
   providers: [BooksService, BooksRepo], 
-  exports: [BooksService],
+  exports: [BooksService, BooksRepo], // Export BooksRepo so other modules can use it
 })
 export class BooksModule {}

@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HealthController } from './health.controller';
 import { BooksModule } from './books/module/books.module';
+import { BorrowingsModule } from './borrowings/module/borrowings.module';
 
 
 @Module({
@@ -25,6 +26,7 @@ import { BooksModule } from './books/module/books.module';
       synchronize: true, // Set to false in production
     }),
     BooksModule,
+    BorrowingsModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService],
