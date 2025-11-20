@@ -1224,3 +1224,47 @@ Auth:     JWT + Role Guards
 **Design Complete:** Ready for Implementation  
 **Next Step:** Create database migrations and start backend implementation  
 **Estimated Time:** 3-4 weeks for full implementation
+
+
+───────────────────────────────────────────────────────────────────────────
+🔒 CRITICAL SECURITY UPDATE - JANUARY 2025 🔒
+───────────────────────────────────────────────────────────────────────────
+
+**IMPORTANT:** This design document describes the original implementation.
+A critical security vulnerability was discovered and fixed after initial deployment.
+
+Security Issue: Exposed Database Integer IDs
+─────────────────────────────────────────────
+The original implementation exposed internal integer IDs in:
+- JWT tokens (userId as integer)
+- API responses (userId, bookId, requestId as integers)  
+- Frontend code (using integer IDs throughout)
+
+Security Fix: UUID-Only External Interface
+───────────────────────────────────────────
+All external communication now uses UUIDs exclusively:
+✅ JWT: {sub: uuid, email, role} - NO integer userId
+✅ API parameters: /borrowings/:uuid (UUID string)
+✅ API responses: All IDs are UUIDs
+✅ Frontend: Uses UUIDs throughout
+✅ Backend: UUID → ID translation layer in service
+
+Benefits:
+- Prevents user enumeration
+- Prevents IDOR attacks
+- Hides database internals
+- Maintains performance (integer IDs used internally)
+
+Updated Documentation:
+📄 LENDING_SYSTEM_SECURITY_UPDATE.md - Comprehensive security guide
+📄 SECURITY_POSTMORTEM_UUID_ARCHITECTURE.md - Vulnerability analysis
+📄 SECURITY_FIX_SUMMARY.md - Implementation details
+📄 BORROWING_SYSTEM_POSTMORTEM.md - Complete system postmortem
+
+**When implementing this design:**
+1. Use UUIDs for all external communication
+2. Implement UUID → ID translation in service layer
+3. Keep integer IDs for internal database operations
+4. Never expose integer IDs to clients
+
+Status: ✅ SECURITY ENHANCED - PRODUCTION READY

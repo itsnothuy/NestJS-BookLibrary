@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../auth/AuthContext';
 import PaginatedBooksTable from '../../components/books/PaginatedBooksTable';
 import PaginatedUsersTable from '../../components/users/PaginatedUsersTable';
+import { AdminBorrowingManager } from '../../components/borrowing/AdminBorrowingManager';
 import NavTab from '../../components/layout/NavTab';
 import Header from '../../components/layout/Header';
 import './Dashboard.css';
@@ -24,6 +25,7 @@ export default function Dashboard() {
       <main className="dashboard-main">
         {activeTab === 'books' && <PaginatedBooksTable/ >}
         {activeTab === 'users' && user?.role === 'admin' && <PaginatedUsersTable />}
+        {activeTab === 'borrowings' && user?.role === 'admin' && <AdminBorrowingManager />}
       </main>
     </div>
   );

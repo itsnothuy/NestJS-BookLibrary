@@ -10,6 +10,9 @@ import Profile from './modules/auth/Profile';
 import Dashboard from './modules/app/Dashboard';
 import StudentDashboard from './modules/app/StudentDashboard';
 import StudentBooksPage from './components/books/StudentBooksPage';
+import { MyBorrowings } from './components/borrowing/MyBorrowings';
+import { BorrowingHistory } from './components/borrowing/BorrowingHistory';
+import { AdminBorrowingManager } from './components/borrowing/AdminBorrowingManager';
 import './index.css';
 
 function ProtectedRoute({ children }: { children: React.ReactElement }) {
@@ -89,6 +92,32 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                 element={
                   <ProtectedRoute>
                     <StudentBooksPage />
+                  </ProtectedRoute>
+                }
+              />
+              {/* Student Borrowing Routes */}
+              <Route
+                path="/my-borrowings"
+                element={
+                  <ProtectedRoute>
+                    <MyBorrowings />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/borrowing-history"
+                element={
+                  <ProtectedRoute>
+                    <BorrowingHistory />
+                  </ProtectedRoute>
+                }
+              />
+              {/* Admin Borrowing Route */}
+              <Route
+                path="/admin/borrowings"
+                element={
+                  <ProtectedRoute>
+                    <AdminBorrowingManager />
                   </ProtectedRoute>
                 }
               />

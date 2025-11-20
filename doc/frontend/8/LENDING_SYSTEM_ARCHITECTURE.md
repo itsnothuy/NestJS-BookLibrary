@@ -1,11 +1,16 @@
 # Book Lending System - Architecture Visualization
 
+**Last Updated:** January 2025  
+**Security Model:** UUID-Only External Interface  
+**Status:** ✅ Production Ready with Enhanced Security
+
 ## System Flow Diagram
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                        BOOK LENDING SYSTEM                              │
 │                     Complete Architecture Overview                      │
+│              🔒 UUID-Based Security Architecture 🔒                     │
 └─────────────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -459,3 +464,31 @@ Status: ✅ Production Ready
 Time: ~4 hours
 Quality: ⭐⭐⭐⭐⭐
 Next: Deploy and test!
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│              🔒 SECURITY ENHANCEMENT - JANUARY 2025 🔒                  │
+└─────────────────────────────────────────────────────────────────────────┘
+
+**CRITICAL UPDATE:** UUID-Only External Interface Implemented
+
+Security Issue Discovered & Fixed:
+- ❌ Original implementation exposed database integer IDs
+- ❌ JWT contained userId (integer), enabling user enumeration
+- ❌ API responses contained userId, bookId (integers)
+- ✅ Fixed with UUID-only external architecture
+
+See detailed documentation:
+📄 LENDING_SYSTEM_SECURITY_UPDATE.md - Complete security architecture guide
+📄 SECURITY_POSTMORTEM_UUID_ARCHITECTURE.md - Vulnerability analysis
+📄 SECURITY_FIX_SUMMARY.md - Implementation details
+
+Current Security Model:
+✅ JWT contains only UUID: {sub: uuid, email, role}
+✅ All API endpoints use UUID parameters
+✅ All API responses contain UUIDs only
+✅ Internal integer IDs hidden from external access
+✅ UUID → ID translation layer in service
+✅ IDOR attacks prevented
+
+Status: ✅ PRODUCTION READY WITH ENHANCED SECURITY

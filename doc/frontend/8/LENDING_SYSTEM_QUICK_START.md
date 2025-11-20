@@ -238,3 +238,66 @@ Once all tests pass, you're ready to deploy!
 ---
 
 **Built with:** NestJS + MariaDB + React + TypeScript + ❤️
+
+
+───────────────────────────────────────────────────────────────────────────
+⚠️ IMPORTANT SECURITY NOTICE - JANUARY 2025 ⚠️
+───────────────────────────────────────────────────────────────────────────
+
+**CRITICAL UPDATE:** UUID-Only Architecture Required
+
+Security Enhancement Implemented
+─────────────────────────────────
+The borrowing system now uses UUID-only external interface to prevent:
+- User enumeration attacks
+- IDOR (Insecure Direct Object Reference) vulnerabilities
+- Information leakage about database internals
+
+Required Changes for Integration:
+──────────────────────────────────
+1. ✅ JWT must contain UUID (not integer userId)
+2. ✅ All API calls must use UUIDs (bookUuid, not bookId)
+3. ✅ API responses return UUIDs only
+4. ✅ Frontend components use UUID props
+
+Quick Verification:
+───────────────────
+# Decode your JWT - should contain UUID
+echo $TOKEN | cut -d'.' -f2 | base64 -d | jq
+# Expected: {"sub": "uuid-string", "email": "...", "role": "..."}
+# Should NOT contain: "userId" or any integer ID
+
+# Test API request
+curl -X POST http://localhost:3000/borrowings/request \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"bookUuid": "your-book-uuid", "requestedDays": 14}'
+# Use bookUuid (not bookId)
+
+Updated Integration Steps:
+──────────────────────────
+1. Verify JWT contains UUID-only payload
+2. Update BorrowRequestButton props:
+   <BorrowRequestButton 
+     bookUuid={book.uuid}    // ✅ Use UUID
+     bookTitle={book.title} 
+   />
+
+3. BorrowingContext automatically uses UUIDs
+4. All admin operations use UUID parameters
+
+Security Benefits:
+──────────────────
+✅ No user enumeration (random UUIDs)
+✅ No predictable resource IDs
+✅ IDOR attacks prevented
+✅ Database size hidden from attackers
+✅ Performance maintained (internal integer IDs)
+
+Detailed Documentation:
+───────────────────────
+📄 LENDING_SYSTEM_SECURITY_UPDATE.md - Complete security guide
+📄 SECURITY_POSTMORTEM_UUID_ARCHITECTURE.md - Vulnerability details
+📄 SECURITY_FIX_SUMMARY.md - Implementation changes
+
+Status: ✅ SECURE & PRODUCTION READY
