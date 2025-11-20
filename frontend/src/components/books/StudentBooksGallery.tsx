@@ -7,8 +7,7 @@ const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000';
 const FALLBACK_IMAGE = 'https://via.placeholder.com/300x400/e5e7eb/6b7280?text=No+Cover';
 
 interface Book {
-  id: string;
-  uuid: string; // Add uuid for borrowing system
+  id: string; // This is the UUID from backend
   title: string;
   author: string;
   isbn: string;
@@ -181,7 +180,7 @@ export default function StudentBooksGallery() {
             <div className="paginated-books-form-group" style={{ marginTop: '24px', padding: '16px', backgroundColor: '#f9fafb', borderRadius: '8px' }}>
               <h3 style={{ marginTop: 0, marginBottom: '12px', fontSize: '1.1rem' }}>Borrow This Book</h3>
               <BorrowRequestButton 
-                bookUuid={selectedBook.uuid} 
+                bookUuid={selectedBook.id} 
                 bookTitle={selectedBook.title}
               />
             </div>
