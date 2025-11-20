@@ -132,13 +132,13 @@
                                         │                            │
                                         │                            │
                                         ▼                            │
-                             ┌──────────────────────┐               │
-                             │    borrowings        │               │
-                             ├──────────────────────┤               │
-                             │ id (PK)              │               │
-                             │ uuid                 │               │
-                             │ userId (FK)          │◄──────────────┤
-                             │ bookId (FK)          │◄──────────────┘
+                             ┌──────────────────────┐                │
+                             │    borrowings        │                │
+                             ├──────────────────────┤                │ 
+                             │ id (PK)              │                │
+                             │ uuid                 │                │
+                             │ userId (FK)          │◄───────────────┤
+                             │ bookId (FK)          │◄───────────────┘
                              │ requestId (FK)       │
                              │ borrowedAt           │
                              │ dueDate              │
@@ -171,22 +171,22 @@
 ├─────────────────────────────────────────────────────────────────────────┤
 │ POST   /borrowings/request                                              │
 │        └─► Create new borrow request                                    │
-│                                                                          │
+│                                                                         │
 │ GET    /borrowings/my-borrowings                                        │
 │        └─► Get user's active borrowings                                 │
-│                                                                          │
+│                                                                         │
 │ GET    /borrowings/my-history                                           │
 │        └─► Get user's returned borrowings                               │
-│                                                                          │
+│                                                                         │
 │ GET    /borrowings/my-requests                                          │
 │        └─► Get user's borrow requests                                   │
-│                                                                          │
+│                                                                         │
 │ PATCH  /borrowings/cancel/:uuid                                         │
 │        └─► Cancel pending request                                       │
-│                                                                          │
+│                                                                         │
 │ GET    /borrowings/:uuid                                                │
 │        └─► Get borrowing details                                        │
-│                                                                          │
+│                                                                         │
 │ GET    /borrowings/availability/:bookUuid                               │
 │        └─► Check book availability                                      │
 └─────────────────────────────────────────────────────────────────────────┘
@@ -196,16 +196,16 @@
 ├─────────────────────────────────────────────────────────────────────────┤
 │ GET    /borrowings/admin/pending-requests                               │
 │        └─► Get all pending requests                                     │
-│                                                                          │
+│                                                                         │
 │ PATCH  /borrowings/admin/process/:uuid                                  │
 │        └─► Approve/reject request                                       │
-│                                                                          │
+│                                                                         │
 │ POST   /borrowings/admin/return/:uuid                                   │
 │        └─► Process book return                                          │
-│                                                                          │
+│                                                                         │
 │ GET    /borrowings/admin/overdue                                        │
 │        └─► Get all overdue borrowings                                   │
-│                                                                          │
+│                                                                         │
 │ POST   /borrowings/admin/update-overdue                                 │
 │        └─► Manually trigger overdue update                              │
 └─────────────────────────────────────────────────────────────────────────┘
@@ -255,8 +255,8 @@
 │  ├─ AuthModule          │
 │  ├─ UsersModule         │
 │  ├─ BooksModule         │
-│  └─ BorrowingsModule ◄──┼──────────────┐
-└─────────────────────────┘              │
+│  └─ BorrowingsModule ◄──┼───────────────┐
+└─────────────────────────┘               │
                                           │
             ┌─────────────────────────────┴──────────────────┐
             │                                                │

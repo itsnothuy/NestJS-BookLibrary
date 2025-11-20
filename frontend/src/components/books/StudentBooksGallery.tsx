@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Card, CardBody, CardFooter, Image } from '@heroui/react';
+import { BorrowRequestButton } from '../borrowing/BorrowRequestButton';
 import './StudentBooksGallery.css';
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000';
@@ -7,6 +8,7 @@ const FALLBACK_IMAGE = 'https://via.placeholder.com/300x400/e5e7eb/6b7280?text=N
 
 interface Book {
   id: string;
+  uuid: string; // Add uuid for borrowing system
   title: string;
   author: string;
   isbn: string;
@@ -20,6 +22,8 @@ export default function StudentBooksGallery() {
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true); // Start as true
   const [error, setError] = useState<string | null>(null);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -65,8 +69,8 @@ export default function StudentBooksGallery() {
   }, []); // Empty dependency array - only fetch once on mount
 
   const handleBookClick = useCallback((book: Book) => {
-    console.log('Book clicked:', book);
-    // TODO: Navigate to book detail page or show modal
+    setSelectedBook(book);
+    setShowViewModal(true);
   }, []);
 
   const getBookCoverUrl = useCallback((book: Book) => {
@@ -127,7 +131,8 @@ export default function StudentBooksGallery() {
                   className="student-book-button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    console.log('Borrow clicked for:', book.title);
+                    setSelectedBook(book);
+                    setShowViewModal(true);
                   }}
                 >
                   Borrow
@@ -139,6 +144,57 @@ export default function StudentBooksGallery() {
       ) : (
         <div className="student-books-empty">
           No books available at the moment.
+        </div>
+      )}
+
+      {/* View Book Modal with Borrow Form */}
+      {showViewModal && selectedBook && (
+        <div className="paginated-books-modal" onClick={() => setShowViewModal(false)}>
+          <div className="paginated-books-modal-content" onClick={(e) => e.stopPropagation()}>
+            <h2>Book Details</h2>
+            
+            {/* Book Cover */}
+            {selectedBook.coverImageUrl && (
+              <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                <img 
+                  src={getBookCoverUrl(selectedBook)} 
+                  alt={selectedBook.title}
+                  style={{ maxWidth: '200px', borderRadius: '8px' }}
+                />
+              </div>
+            )}
+            
+            <div className="paginated-books-form-group">
+              <strong>Title:</strong> {selectedBook.title}
+            </div>
+            <div className="paginated-books-form-group">
+              <strong>Author:</strong> {selectedBook.author}
+            </div>
+            <div className="paginated-books-form-group">
+              <strong>ISBN:</strong> {selectedBook.isbn}
+            </div>
+            <div className="paginated-books-form-group">
+              <strong>Published Year:</strong> {selectedBook.publishedYear || "Unknown"}
+            </div>
+            
+            {/* Borrow Request Section */}
+            <div className="paginated-books-form-group" style={{ marginTop: '24px', padding: '16px', backgroundColor: '#f9fafb', borderRadius: '8px' }}>
+              <h3 style={{ marginTop: 0, marginBottom: '12px', fontSize: '1.1rem' }}>Borrow This Book</h3>
+              <BorrowRequestButton 
+                bookUuid={selectedBook.uuid} 
+                bookTitle={selectedBook.title}
+              />
+            </div>
+            
+            <div className="paginated-books-modal-buttons">
+              <button
+                className="paginated-books-button"
+                onClick={() => setShowViewModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

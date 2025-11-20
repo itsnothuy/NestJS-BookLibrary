@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import { useAuth } from '../auth/AuthContext';
 
 // ============= TYPES =============
@@ -78,14 +78,6 @@ export function BorrowingProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Auto-refresh on mount if authenticated
-  useEffect(() => {
-    if (isAuthenticated) {
-      refreshBorrowings();
-      refreshRequests();
-    }
-  }, [isAuthenticated]);
-
   // ============= FETCH FUNCTIONS =============
 
   const refreshBorrowings = useCallback(async () => {
@@ -155,6 +147,14 @@ export function BorrowingProvider({ children }: { children: React.ReactNode }) {
     }
   }, [token]);
 
+  // Auto-refresh on mount if authenticated - moved below function definitions
+  useEffect(() => {
+    if (isAuthenticated && token) {
+      refreshBorrowings();
+      refreshRequests();
+    }
+  }, [isAuthenticated, token, refreshBorrowings, refreshRequests]);
+
   // ============= ACTION FUNCTIONS =============
 
   const requestBorrow = async (bookUuid: string, days = 14) => {
@@ -211,7 +211,7 @@ export function BorrowingProvider({ children }: { children: React.ReactNode }) {
 
   // ============= CONTEXT VALUE =============
 
-  const value: BorrowingContextType = {
+  const value: BorrowingContextType = useMemo(() => ({
     borrowings,
     requests,
     history,
@@ -223,7 +223,16 @@ export function BorrowingProvider({ children }: { children: React.ReactNode }) {
     refreshRequests,
     refreshHistory,
     checkBookAvailability,
-  };
+  }), [
+    borrowings,
+    requests,
+    history,
+    loading,
+    error,
+    refreshBorrowings,
+    refreshRequests,
+    refreshHistory,
+  ]);
 
   return (
     <BorrowingContext.Provider value={value}>

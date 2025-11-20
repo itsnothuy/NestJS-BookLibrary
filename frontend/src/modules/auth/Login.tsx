@@ -6,8 +6,8 @@ import './Login.css';
 export default function Login() {
   const { login } = useAuth();
   const nav = useNavigate();
-  const [email, setEmail] = useState('admin@gmail.com');
-  const [password, setPassword] = useState('1234');
+  const [email, setEmail] = useState('huy@gmail.com');
+  const [password, setPassword] = useState('123456');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -16,7 +16,8 @@ export default function Login() {
     setError(null); setBusy(true);
     try {
       await login(email, password);
-      nav('/dashboard');
+      // Redirect to home - routing logic will handle role-based navigation
+      nav('/');
     } catch (err: any) {
       setError(err.message || 'Login failed');
     } finally {
