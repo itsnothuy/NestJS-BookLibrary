@@ -1,0 +1,308 @@
+/* MyBorrowings Component Styles */
+
+.my-borrowings-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Header Section */
+.my-borrowings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.my-borrowings-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.my-borrowings-refresh-button {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: transparent;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.my-borrowings-refresh-button:hover {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+/* Stats Cards Grid */
+.my-borrowings-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.my-borrowings-stat-card {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 1px solid #e5e7eb;
+}
+
+.my-borrowings-stat-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.my-borrowings-stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 0.75rem;
+  margin-right: 1rem;
+  flex-shrink: 0;
+}
+
+.my-borrowings-stat-icon-primary {
+  background-color: #dbeafe;
+  color: #3b82f6;
+}
+
+.my-borrowings-stat-icon-danger {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+.my-borrowings-stat-icon-warning {
+  background-color: #fef3c7;
+  color: #f59e0b;
+}
+
+.my-borrowings-stat-content {
+  flex: 1;
+}
+
+.my-borrowings-stat-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.my-borrowings-stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.my-borrowings-stat-value-danger {
+  color: #ef4444;
+}
+
+.my-borrowings-stat-value-warning {
+  color: #f59e0b;
+}
+
+/* Table Cell Styles */
+.my-borrowings-book-cell {
+  display: flex;
+  flex-direction: column;
+}
+
+.my-borrowings-book-title {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.my-borrowings-book-author {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.my-borrowings-date-cell {
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.my-borrowings-due-date-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.my-borrowings-due-normal {
+  font-size: 0.75rem;
+  color: #10b981;
+  font-weight: 500;
+}
+
+.my-borrowings-due-warning {
+  font-size: 0.75rem;
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.my-borrowings-status-badge {
+  display: inline-block;
+  padding: 0.375rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.my-borrowings-status-active {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.my-borrowings-status-overdue {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.my-borrowings-status-returned {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.my-borrowings-status-default {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.my-borrowings-fee-cell {
+  font-weight: 600;
+}
+
+.my-borrowings-fee-amount {
+  color: #dc2626;
+}
+
+.my-borrowings-no-fee {
+  color: #9ca3af;
+}
+
+/* Loading State */
+.my-borrowings-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 1rem;
+  color: #6b7280;
+}
+
+/* Error State */
+.my-borrowings-error {
+  padding: 2rem;
+  background-color: #fef2f2;
+  border-radius: 0.75rem;
+  text-align: center;
+  border: 1px solid #fecaca;
+}
+
+.my-borrowings-error h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #dc2626;
+  margin-bottom: 0.5rem;
+}
+
+.my-borrowings-error p {
+  color: #991b1b;
+  margin-bottom: 1rem;
+}
+
+.my-borrowings-retry-button {
+  padding: 0.5rem 1.5rem;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.my-borrowings-retry-button:hover {
+  background-color: #dc2626;
+}
+
+/* Empty State */
+.my-borrowings-empty {
+  padding: 3rem;
+  text-align: center;
+  background-color: #f9fafb;
+  border-radius: 0.75rem;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.my-borrowings-empty h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+.my-borrowings-empty p {
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+  max-width: 32rem;
+}
+
+.my-borrowings-browse-button {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background-color: #3b82f6;
+  color: white;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.my-borrowings-browse-button:hover {
+  background-color: #2563eb;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .my-borrowings-container {
+    padding: 1rem;
+  }
+
+  .my-borrowings-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .my-borrowings-title {
+    font-size: 1.5rem;
+  }
+
+  .my-borrowings-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .my-borrowings-stat-value {
+    font-size: 1.5rem;
+  }
+}

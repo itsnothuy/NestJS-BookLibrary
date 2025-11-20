@@ -1,0 +1,433 @@
+/* AdminBorrowingManager Component Styles */
+
+.admin-borrowing-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Header Section */
+.admin-borrowing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.admin-borrowing-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.admin-borrowing-refresh-button {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: transparent;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.admin-borrowing-refresh-button:hover {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+/* Stats Cards Grid */
+.admin-borrowing-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.admin-borrowing-stat-card {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 1px solid #e5e7eb;
+}
+
+.admin-borrowing-stat-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.admin-borrowing-stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 0.75rem;
+  margin-right: 1rem;
+  flex-shrink: 0;
+}
+
+.admin-borrowing-stat-icon-primary {
+  background-color: #dbeafe;
+  color: #3b82f6;
+}
+
+.admin-borrowing-stat-icon-danger {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+.admin-borrowing-stat-icon-warning {
+  background-color: #fef3c7;
+  color: #f59e0b;
+}
+
+.admin-borrowing-stat-content {
+  flex: 1;
+}
+
+.admin-borrowing-stat-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.admin-borrowing-stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.admin-borrowing-stat-value-primary {
+  color: #3b82f6;
+}
+
+.admin-borrowing-stat-value-danger {
+  color: #ef4444;
+}
+
+.admin-borrowing-stat-value-warning {
+  color: #f59e0b;
+}
+
+/* Tabs */
+.admin-borrowing-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.admin-borrowing-tab {
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.admin-borrowing-tab:hover {
+  color: #3b82f6;
+  background-color: #f3f4f6;
+}
+
+.admin-borrowing-tab-active {
+  color: #3b82f6;
+  border-bottom-color: #3b82f6;
+}
+
+/* Table Cell Styles */
+.admin-borrowing-book-cell {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-borrowing-book-title {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.admin-borrowing-book-author {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.admin-borrowing-user-cell {
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.admin-borrowing-duration-cell {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.admin-borrowing-date-cell {
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.admin-borrowing-overdue-text {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.admin-borrowing-overdue-days {
+  font-size: 0.875rem;
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.admin-borrowing-late-fee {
+  font-size: 0.875rem;
+  color: #dc2626;
+  font-weight: 700;
+}
+
+/* Action Buttons */
+.admin-borrowing-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.admin-borrowing-btn-approve {
+  padding: 0.375rem 0.75rem;
+  background-color: #10b981;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.admin-borrowing-btn-approve:hover {
+  background-color: #059669;
+}
+
+.admin-borrowing-btn-reject {
+  padding: 0.375rem 0.75rem;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.admin-borrowing-btn-reject:hover {
+  background-color: #dc2626;
+}
+
+.admin-borrowing-btn-return {
+  padding: 0.375rem 0.75rem;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.admin-borrowing-btn-return:hover {
+  background-color: #2563eb;
+}
+
+/* Modal Styles */
+.admin-borrowing-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.admin-borrowing-modal {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.admin-borrowing-modal-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 1.5rem;
+}
+
+.admin-borrowing-modal-content {
+  margin-bottom: 1.5rem;
+}
+
+.admin-borrowing-modal-content p {
+  margin-bottom: 0.75rem;
+  color: #4b5563;
+}
+
+.admin-borrowing-modal-confirm {
+  margin-top: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.admin-borrowing-modal-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.admin-borrowing-modal-textarea {
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+
+.admin-borrowing-modal-textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.admin-borrowing-modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.admin-borrowing-modal-btn-confirm {
+  padding: 0.625rem 1.25rem;
+  background-color: #10b981;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.admin-borrowing-modal-btn-confirm:hover {
+  background-color: #059669;
+}
+
+.admin-borrowing-modal-btn-danger {
+  padding: 0.625rem 1.25rem;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.admin-borrowing-modal-btn-danger:hover {
+  background-color: #dc2626;
+}
+
+.admin-borrowing-modal-btn-cancel {
+  padding: 0.625rem 1.25rem;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.admin-borrowing-modal-btn-cancel:hover {
+  background-color: #e5e7eb;
+}
+
+.admin-borrowing-overdue-warning {
+  color: #dc2626;
+  font-weight: 700;
+  margin-top: 0.5rem;
+}
+
+/* Loading State */
+.admin-borrowing-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 1rem;
+  color: #6b7280;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .admin-borrowing-container {
+    padding: 1rem;
+  }
+
+  .admin-borrowing-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .admin-borrowing-title {
+    font-size: 1.5rem;
+  }
+
+  .admin-borrowing-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-borrowing-stat-value {
+    font-size: 1.5rem;
+  }
+
+  .admin-borrowing-tabs {
+    overflow-x: auto;
+  }
+
+  .admin-borrowing-modal {
+    width: 95%;
+    padding: 1.5rem;
+  }
+
+  .admin-borrowing-modal-actions {
+    flex-direction: column;
+  }
+
+  .admin-borrowing-modal-actions button {
+    width: 100%;
+  }
+}

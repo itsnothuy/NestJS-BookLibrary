@@ -1,0 +1,266 @@
+/* BorrowingHistory Component Styles */
+
+.borrowing-history-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Header Section */
+.borrowing-history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.borrowing-history-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.borrowing-history-refresh-button {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: transparent;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.borrowing-history-refresh-button:hover {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+/* Stats Cards Grid */
+.borrowing-history-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.borrowing-history-stat-card {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 1px solid #e5e7eb;
+}
+
+.borrowing-history-stat-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.borrowing-history-stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 0.75rem;
+  margin-right: 1rem;
+  flex-shrink: 0;
+}
+
+.borrowing-history-stat-icon-success {
+  background-color: #d1fae5;
+  color: #10b981;
+}
+
+.borrowing-history-stat-icon-danger {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+.borrowing-history-stat-icon-warning {
+  background-color: #fef3c7;
+  color: #f59e0b;
+}
+
+.borrowing-history-stat-content {
+  flex: 1;
+}
+
+.borrowing-history-stat-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.borrowing-history-stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.borrowing-history-stat-value-danger {
+  color: #ef4444;
+}
+
+.borrowing-history-stat-value-warning {
+  color: #f59e0b;
+}
+
+/* Table Cell Styles */
+.borrowing-history-book-cell {
+  display: flex;
+  flex-direction: column;
+}
+
+.borrowing-history-book-title {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.borrowing-history-book-author {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.borrowing-history-date-cell {
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.borrowing-history-duration-cell {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.borrowing-history-fee-cell {
+  font-weight: 600;
+}
+
+.borrowing-history-fee-amount {
+  color: #dc2626;
+}
+
+.borrowing-history-no-fee {
+  color: #10b981;
+}
+
+/* Loading State */
+.borrowing-history-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 1rem;
+  color: #6b7280;
+}
+
+/* Error State */
+.borrowing-history-error {
+  padding: 2rem;
+  background-color: #fef2f2;
+  border-radius: 0.75rem;
+  text-align: center;
+  border: 1px solid #fecaca;
+}
+
+.borrowing-history-error h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #dc2626;
+  margin-bottom: 0.5rem;
+}
+
+.borrowing-history-error p {
+  color: #991b1b;
+  margin-bottom: 1rem;
+}
+
+.borrowing-history-retry-button {
+  padding: 0.5rem 1.5rem;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.borrowing-history-retry-button:hover {
+  background-color: #dc2626;
+}
+
+/* Empty State */
+.borrowing-history-empty {
+  padding: 3rem;
+  text-align: center;
+  background-color: #f9fafb;
+  border-radius: 0.75rem;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.borrowing-history-empty h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+.borrowing-history-empty p {
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+  max-width: 32rem;
+}
+
+.borrowing-history-browse-button {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background-color: #3b82f6;
+  color: white;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.borrowing-history-browse-button:hover {
+  background-color: #2563eb;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .borrowing-history-container {
+    padding: 1rem;
+  }
+
+  .borrowing-history-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .borrowing-history-title {
+    font-size: 1.5rem;
+  }
+
+  .borrowing-history-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .borrowing-history-stat-value {
+    font-size: 1.5rem;
+  }
+}
