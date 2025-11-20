@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { BorrowingsRepo } from './borrowings.repo';
 import { BooksRepo } from '../books/books.repo';
+import { UsersRepo } from '../users/users.repo';
 import { CreateBorrowRequestDto } from './dto/create-borrow-request.dto';
 import { ProcessRequestDto } from './dto/process-request.dto';
 import { ReturnBookDto } from './dto/return-book.dto';
@@ -18,6 +19,7 @@ export class BorrowingsService {
   constructor(
     private readonly borrowingsRepo: BorrowingsRepo,
     private readonly booksRepo: BooksRepo,
+    private readonly usersRepo: UsersRepo,
   ) {}
 
   // ============= STUDENT OPERATIONS =============
@@ -310,5 +312,61 @@ export class BorrowingsService {
 
     this.logger.log(`Updated ${overdues.length} overdue borrowings`);
     return { updated: overdues.length };
+  }
+
+  // ============= UUID-BASED WRAPPERS (for external API) =============
+
+  /**
+   * Request borrow by user UUID (converts to internal ID)
+   */
+  async requestBorrowByUuid(userUuid: string, dto: CreateBorrowRequestDto) {
+    const user = await this.usersRepo.findByUuid(userUuid);
+    if (!user) throw new NotFoundException('User not found');
+    return this.requestBorrow(user.id, dto);
+  }
+
+  /**
+   * Get user's active borrowings by UUID
+   */
+  async getMyBorrowingsByUuid(userUuid: string) {
+    const user = await this.usersRepo.findByUuid(userUuid);
+    if (!user) throw new NotFoundException('User not found');
+    return this.getMyBorrowings(user.id);
+  }
+
+  /**
+   * Get user's borrowing history by UUID
+   */
+  async getMyHistoryByUuid(userUuid: string) {
+    const user = await this.usersRepo.findByUuid(userUuid);
+    if (!user) throw new NotFoundException('User not found');
+    return this.getMyHistory(user.id);
+  }
+
+  /**
+   * Get user's borrow requests by UUID
+   */
+  async getMyRequestsByUuid(userUuid: string) {
+    const user = await this.usersRepo.findByUuid(userUuid);
+    if (!user) throw new NotFoundException('User not found');
+    return this.getMyRequests(user.id);
+  }
+
+  /**
+   * Cancel request by user UUID
+   */
+  async cancelRequestByUuid(userUuid: string, requestUuid: string) {
+    const user = await this.usersRepo.findByUuid(userUuid);
+    if (!user) throw new NotFoundException('User not found');
+    return this.cancelRequest(user.id, requestUuid);
+  }
+
+  /**
+   * Process request by admin UUID
+   */
+  async processRequestByUuid(adminUuid: string, requestUuid: string, dto: ProcessRequestDto) {
+    const admin = await this.usersRepo.findByUuid(adminUuid);
+    if (!admin) throw new NotFoundException('Admin not found');
+    return this.processRequest(admin.id, requestUuid, dto);
   }
 }

@@ -33,7 +33,7 @@ export class BorrowingsController {
   @Post('request')
   @HttpCode(HttpStatus.CREATED)
   async requestBorrow(@Request() req, @Body() dto: CreateBorrowRequestDto) {
-    return this.borrowingsService.requestBorrow(req.user.id, dto);
+    return this.borrowingsService.requestBorrowByUuid(req.user.uuid, dto);
   }
 
   /**
@@ -42,7 +42,7 @@ export class BorrowingsController {
    */
   @Get('my-borrowings')
   async getMyBorrowings(@Request() req) {
-    return this.borrowingsService.getMyBorrowings(req.user.id);
+    return this.borrowingsService.getMyBorrowingsByUuid(req.user.uuid);
   }
 
   /**
@@ -51,7 +51,7 @@ export class BorrowingsController {
    */
   @Get('my-history')
   async getMyHistory(@Request() req) {
-    return this.borrowingsService.getMyHistory(req.user.id);
+    return this.borrowingsService.getMyHistoryByUuid(req.user.uuid);
   }
 
   /**
@@ -60,7 +60,7 @@ export class BorrowingsController {
    */
   @Get('my-requests')
   async getMyRequests(@Request() req) {
-    return this.borrowingsService.getMyRequests(req.user.id);
+    return this.borrowingsService.getMyRequestsByUuid(req.user.uuid);
   }
 
   /**
@@ -69,7 +69,7 @@ export class BorrowingsController {
    */
   @Patch('cancel/:uuid')
   async cancelRequest(@Request() req, @Param('uuid') uuid: string) {
-    return this.borrowingsService.cancelRequest(req.user.id, uuid);
+    return this.borrowingsService.cancelRequestByUuid(req.user.uuid, uuid);
   }
 
   /**
@@ -106,7 +106,7 @@ export class BorrowingsController {
     @Param('uuid') uuid: string,
     @Body() dto: ProcessRequestDto
   ) {
-    return this.borrowingsService.processRequest(req.user.id, uuid, dto);
+    return this.borrowingsService.processRequestByUuid(req.user.uuid, uuid, dto);
   }
 
   /**

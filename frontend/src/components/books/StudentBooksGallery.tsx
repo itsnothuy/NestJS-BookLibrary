@@ -102,12 +102,14 @@ export default function StudentBooksGallery() {
           {books.map((book) => (
             <Card 
               key={book.id} 
-              isPressable 
               shadow="sm" 
-              onPress={() => handleBookClick(book)}
               className="student-book-card"
             >
-              <CardBody className="student-book-card-body">
+              <CardBody 
+                className="student-book-card-body"
+                style={{ cursor: 'pointer' }}
+                onClick={() => handleBookClick(book)}
+              >
                 <Image
                   alt={book.title}
                   className="student-book-cover"
