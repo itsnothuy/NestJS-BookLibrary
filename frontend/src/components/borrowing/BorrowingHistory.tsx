@@ -1,7 +1,5 @@
 import { useEffect, useMemo } from 'react';
 import { useBorrowing } from '../../modules/borrowing/BorrowingContext';
-import Header from '../layout/Header';
-import NavTab from '../layout/NavTab';
 import PaginatedTable from '../table/PaginatedTable';
 import { usePagination } from '../../hooks/usePagination';
 import './BorrowingHistory.css';
@@ -102,61 +100,46 @@ export function BorrowingHistory() {
 
   if (loading) {
     return (
-      <>
-        <Header />
-        <NavTab activeTab="borrowing-history" setActiveTab={() => {}} />
-        <div className="borrowing-history-container">
-          <div className="borrowing-history-loading">
-            <span className="loading loading-spinner loading-lg"></span>
-            <span>Loading your borrowing history...</span>
-          </div>
+      <div className="borrowing-history-container">
+        <div className="borrowing-history-loading">
+          <span className="loading loading-spinner loading-lg"></span>
+          <span>Loading your borrowing history...</span>
         </div>
-      </>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <>
-        <Header />
-        <NavTab activeTab="borrowing-history" setActiveTab={() => {}} />
-        <div className="borrowing-history-container">
-          <div className="borrowing-history-error">
-            <h3>Error Loading History</h3>
-            <p>{error}</p>
-            <button onClick={refreshHistory} className="borrowing-history-retry-button">
-              Try Again
-            </button>
-          </div>
+      <div className="borrowing-history-container">
+        <div className="borrowing-history-error">
+          <h3>Error Loading History</h3>
+          <p>{error}</p>
+          <button onClick={refreshHistory} className="borrowing-history-retry-button">
+            Try Again
+          </button>
         </div>
-      </>
+      </div>
     );
   }
 
   if (history.length === 0) {
     return (
-      <>
-        <Header />
-        <NavTab activeTab="borrowing-history" setActiveTab={() => {}} />
-        <div className="borrowing-history-container">
-          <div className="borrowing-history-empty">
-            <h2>No Borrowing History</h2>
-            <p>You haven't returned any books yet. Your borrowing history will appear here.</p>
-            <a href="/student/books" className="borrowing-history-browse-button">
-              Return to Book Gallery
-            </a>
-          </div>
+      <div className="borrowing-history-container">
+        <div className="borrowing-history-empty">
+          <h2>No Borrowing History</h2>
+          <p>You haven't returned any books yet. Your borrowing history will appear here.</p>
+          <a href="/student/books" className="borrowing-history-browse-button">
+            Return to Book Gallery
+          </a>
         </div>
-      </>
+      </div>
     );
   }
 
   return (
-    <>
-      <Header />
-      <NavTab activeTab="borrowing-history" setActiveTab={() => {}} />
-      <div className="borrowing-history-container">
-        <div className="borrowing-history-header">
+    <div className="borrowing-history-container">
+      <div className="borrowing-history-header">
           <h2 className="borrowing-history-title">Borrowing History</h2>
           <button onClick={refreshHistory} className="borrowing-history-refresh-button">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -230,7 +213,6 @@ export function BorrowingHistory() {
           loading={loading}
           emptyMessage="No borrowing history"
         />
-      </div>
-    </>
+    </div>
   );
 }

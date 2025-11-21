@@ -1,0 +1,15 @@
+/* StudentLayout Component Styles */
+
+.student-layout-container {
+  min-height: 100vh;
+  background-color: #f9fafb;
+}
+
+.student-layout-main {
+  padding: 0;
+}
+
+/* Ensure content components fill the space */
+.student-layout-main > * {
+  width: 100%;
+}

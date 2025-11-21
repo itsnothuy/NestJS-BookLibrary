@@ -1,7 +1,5 @@
 import { useEffect, useMemo } from 'react';
 import { useBorrowing } from '../../modules/borrowing/BorrowingContext';
-import Header from '../layout/Header';
-import NavTab from '../layout/NavTab';
 import PaginatedTable from '../table/PaginatedTable';
 import { usePagination } from '../../hooks/usePagination';
 import './MyBorrowings.css';
@@ -115,60 +113,45 @@ export function MyBorrowings() {
 
   if (loading) {
     return (
-      <>
-        <Header />
-        <NavTab activeTab="my-borrowings" setActiveTab={() => {}} />
-        <div className="my-borrowings-container">
-          <div className="my-borrowings-loading">
-            <span className="loading loading-spinner loading-lg"></span>
-            <span>Loading your borrowings...</span>
-          </div>
+      <div className="my-borrowings-container">
+        <div className="my-borrowings-loading">
+          <span className="loading loading-spinner loading-lg"></span>
+          <span>Loading your borrowings...</span>
         </div>
-      </>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <>
-        <Header />
-        <NavTab activeTab="my-borrowings" setActiveTab={() => {}} />
-        <div className="my-borrowings-container">
-          <div className="my-borrowings-error">
-            <h3>Error Loading Borrowings</h3>
-            <p>{error}</p>
-            <button onClick={refreshBorrowings} className="my-borrowings-retry-button">
-              Try Again
-            </button>
-          </div>
+      <div className="my-borrowings-container">
+        <div className="my-borrowings-error">
+          <h3>Error Loading Borrowings</h3>
+          <p>{error}</p>
+          <button onClick={refreshBorrowings} className="my-borrowings-retry-button">
+            Try Again
+          </button>
         </div>
-      </>
+      </div>
     );
   }
 
   if (borrowings.length === 0) {
     return (
-      <>
-        <Header />
-        <NavTab activeTab="my-borrowings" setActiveTab={() => {}} />
-        <div className="my-borrowings-container">
-          <div className="my-borrowings-empty">
-            <h2>No Borrowed Books</h2>
-            <p>You don't have any borrowed books at the moment. Browse our collection and request to borrow a book!</p>
-            <a href="/student/books" className="my-borrowings-browse-button">
-              Browse Books
-            </a>
-          </div>
+      <div className="my-borrowings-container">
+        <div className="my-borrowings-empty">
+          <h2>No Borrowed Books</h2>
+          <p>You don't have any borrowed books at the moment. Browse our collection and request to borrow a book!</p>
+          <a href="/student/books" className="my-borrowings-browse-button">
+            Browse Books
+          </a>
         </div>
-      </>
+      </div>
     );
   }
 
   return (
-    <>
-      <Header />
-      <NavTab activeTab="my-borrowings" setActiveTab={() => {}} />
-      <div className="my-borrowings-container">
+    <div className="my-borrowings-container">
         <div className="my-borrowings-header">
           <h2 className="my-borrowings-title">My Borrowed Books</h2>
           <button onClick={refreshBorrowings} className="my-borrowings-refresh-button">
@@ -243,7 +226,6 @@ export function MyBorrowings() {
           loading={loading}
           emptyMessage="No borrowed books"
         />
-      </div>
-    </>
+    </div>
   );
 }

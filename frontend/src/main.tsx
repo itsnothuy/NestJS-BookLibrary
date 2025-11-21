@@ -8,11 +8,7 @@ import Login from './modules/auth/Login';
 import Signup from './modules/auth/Signup';
 import Profile from './modules/auth/Profile';
 import Dashboard from './modules/app/Dashboard';
-import StudentDashboard from './modules/app/StudentDashboard';
-import StudentBooksPage from './components/books/StudentBooksPage';
-import { MyBorrowings } from './components/borrowing/MyBorrowings';
-import { BorrowingHistory } from './components/borrowing/BorrowingHistory';
-import { AdminBorrowingManager } from './components/borrowing/AdminBorrowingManager';
+import StudentLayout from './modules/app/StudentLayout';
 import './index.css';
 
 function ProtectedRoute({ children }: { children: React.ReactElement }) {
@@ -40,9 +36,9 @@ function ProtectedRoute({ children }: { children: React.ReactElement }) {
 function HomeRedirect() {
   const { user } = useAuth();
   
-  // Students go to home (/), admins go to dashboard
+  // Students see StudentLayout (centralized with tabs), admins go to dashboard
   if (user?.role === 'student') {
-    return <StudentDashboard />;
+    return <StudentLayout />;
   }
   
   if (user?.role === 'admin') {
@@ -84,40 +80,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                 element={
                   <ProtectedRoute>
                     <Dashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/student/books"
-                element={
-                  <ProtectedRoute>
-                    <StudentBooksPage />
-                  </ProtectedRoute>
-                }
-              />
-              {/* Student Borrowing Routes */}
-              <Route
-                path="/my-borrowings"
-                element={
-                  <ProtectedRoute>
-                    <MyBorrowings />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/borrowing-history"
-                element={
-                  <ProtectedRoute>
-                    <BorrowingHistory />
-                  </ProtectedRoute>
-                }
-              />
-              {/* Admin Borrowing Route */}
-              <Route
-                path="/admin/borrowings"
-                element={
-                  <ProtectedRoute>
-                    <AdminBorrowingManager />
                   </ProtectedRoute>
                 }
               />

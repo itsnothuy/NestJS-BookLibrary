@@ -1,7 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useAuth } from '../../modules/auth/AuthContext';
-import Header from '../layout/Header';
-import NavTab from '../layout/NavTab';
 import PaginatedTable from '../table/PaginatedTable';
 import { usePagination } from '../../hooks/usePagination';
 import type { BorrowingRequest } from '../../modules/borrowing/BorrowingContext';
@@ -288,24 +286,17 @@ export function AdminBorrowingManager() {
 
   if (loading) {
     return (
-      <>
-        <Header />
-        <NavTab activeTab="admin-borrowings" setActiveTab={() => {}} />
-        <div className="admin-borrowing-container">
-          <div className="admin-borrowing-loading">
-            <span className="loading loading-spinner loading-lg"></span>
-            <span>Loading borrowing data...</span>
-          </div>
+      <div className="admin-borrowing-container">
+        <div className="admin-borrowing-loading">
+          <span className="loading loading-spinner loading-lg"></span>
+          <span>Loading borrowing data...</span>
         </div>
-      </>
+      </div>
     );
   }
 
   return (
-    <>
-      <Header />
-      <NavTab activeTab="admin-borrowings" setActiveTab={() => {}} />
-      <div className="admin-borrowing-container">
+    <div className="admin-borrowing-container">
         <div className="admin-borrowing-header">
           <h2 className="admin-borrowing-title">Borrowing Management</h2>
           <button
@@ -551,7 +542,6 @@ export function AdminBorrowingManager() {
             </div>
           </div>
         )}
-      </div>
-    </>
+    </div>
   );
 }
