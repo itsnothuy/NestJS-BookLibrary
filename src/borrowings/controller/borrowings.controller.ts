@@ -73,6 +73,17 @@ export class BorrowingsController {
   }
 
   /**
+   * POST /borrowings/return/:uuid
+   * Return a borrowed book (Student self-return)
+   */
+  @Post('return/:uuid')
+  @HttpCode(HttpStatus.OK)
+  async returnBookSelf(@Request() req, @Param('uuid') uuid: string, @Body() dto: ReturnBookDto) {
+    // Verify the borrowing belongs to the requesting user
+    return this.borrowingsService.returnBookByStudent(req.user.uuid, uuid, dto);
+  }
+
+  /**
    * GET /borrowings/:uuid
    * Get details of a specific borrowing
    */

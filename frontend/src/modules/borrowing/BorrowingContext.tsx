@@ -46,6 +46,7 @@ interface BorrowingContextType {
   error: string | null;
   requestBorrow: (bookUuid: string, days?: number) => Promise<void>;
   cancelRequest: (requestUuid: string) => Promise<void>;
+  returnBook: (borrowingUuid: string, returnNotes?: string) => Promise<void>;
   refreshBorrowings: () => Promise<void>;
   refreshRequests: () => Promise<void>;
   refreshHistory: () => Promise<void>;
@@ -195,6 +196,27 @@ export function BorrowingProvider({ children }: { children: React.ReactNode }) {
     await refreshRequests();
   };
 
+  const returnBook = async (borrowingUuid: string, returnNotes?: string) => {
+    if (!token) throw new Error('Not authenticated');
+    
+    const res = await fetch(`${API_BASE}/borrowings/return/${borrowingUuid}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ returnNotes: returnNotes || undefined }),
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || 'Failed to return book');
+    }
+
+    // Refresh both borrowings and history
+    await Promise.all([refreshBorrowings(), refreshHistory()]);
+  };
+
   const checkBookAvailability = async (bookUuid: string): Promise<BookAvailability> => {
     if (!token) throw new Error('Not authenticated');
     
@@ -219,6 +241,7 @@ export function BorrowingProvider({ children }: { children: React.ReactNode }) {
     error,
     requestBorrow,
     cancelRequest,
+    returnBook,
     refreshBorrowings,
     refreshRequests,
     refreshHistory,

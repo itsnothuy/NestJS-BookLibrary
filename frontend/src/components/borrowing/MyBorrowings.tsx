@@ -1,12 +1,16 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useBorrowing } from '../../modules/borrowing/BorrowingContext';
 import PaginatedTable from '../table/PaginatedTable';
 import { usePagination } from '../../hooks/usePagination';
 import './MyBorrowings.css';
 
 export function MyBorrowings() {
-  const { borrowings, loading, error, refreshBorrowings } = useBorrowing();
+  const { borrowings, loading, error, refreshBorrowings, returnBook } = useBorrowing();
   const pagination = usePagination(10);
+  const [returningUuid, setReturningUuid] = useState<string | null>(null);
+  const [showReturnModal, setShowReturnModal] = useState(false);
+  const [returnNotes, setReturnNotes] = useState('');
+  const [selectedBorrowing, setSelectedBorrowing] = useState<any>(null);
 
   useEffect(() => {
     refreshBorrowings();
@@ -39,6 +43,28 @@ export function MyBorrowings() {
   const handleSort = (columnKey: string) => {
     const newOrder = pagination.state.sortBy === columnKey && pagination.state.sortOrder === 'asc' ? 'desc' : 'asc';
     pagination.updateSort(columnKey, newOrder);
+  };
+
+  const handleReturnClick = (borrowing: any) => {
+    setSelectedBorrowing(borrowing);
+    setShowReturnModal(true);
+  };
+
+  const handleReturnBook = async () => {
+    if (!selectedBorrowing) return;
+    
+    try {
+      setReturningUuid(selectedBorrowing.uuid);
+      await returnBook(selectedBorrowing.uuid, returnNotes);
+      alert(`Book "${selectedBorrowing.book?.title}" returned successfully!`);
+      setShowReturnModal(false);
+      setReturnNotes('');
+      setSelectedBorrowing(null);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Failed to return book');
+    } finally {
+      setReturningUuid(null);
+    }
   };
 
   const columns = useMemo(() => [
@@ -105,6 +131,23 @@ export function MyBorrowings() {
             <span className="my-borrowings-fee-amount">${borrowing.lateFeeAmount.toFixed(2)}</span>
           ) : (
             <span className="my-borrowings-no-fee">$0.00</span>
+          )}
+        </div>
+      )
+    },
+    {
+      key: 'actions',
+      label: 'Actions',
+      width: '150px',
+      render: (borrowing: any) => (
+        <div className="my-borrowings-actions">
+          {(borrowing.status === 'active' || borrowing.status === 'overdue') && (
+            <button
+              onClick={() => handleReturnClick(borrowing)}
+              className="my-borrowings-return-button"
+            >
+              Return Book
+            </button>
           )}
         </div>
       )
@@ -226,6 +269,56 @@ export function MyBorrowings() {
           loading={loading}
           emptyMessage="No borrowed books"
         />
+
+        {/* Return Book Modal */}
+        {showReturnModal && selectedBorrowing && (
+          <div className="my-borrowings-modal-overlay" onClick={() => setShowReturnModal(false)}>
+            <div className="my-borrowings-modal" onClick={(e) => e.stopPropagation()}>
+              <h3 className="my-borrowings-modal-title">Return Book</h3>
+              <div className="my-borrowings-modal-content">
+                <p>Are you sure you want to return <strong>{selectedBorrowing.book?.title}</strong>?</p>
+                
+                {selectedBorrowing.lateFeeAmount > 0 && (
+                  <div className="my-borrowings-late-fee-warning">
+                    <p><strong>Late Fee: ${selectedBorrowing.lateFeeAmount.toFixed(2)}</strong></p>
+                    <p>This book is overdue. The late fee will be applied to your account.</p>
+                  </div>
+                )}
+                
+                <div className="my-borrowings-modal-field">
+                  <label>Notes (Optional):</label>
+                  <textarea
+                    value={returnNotes}
+                    onChange={(e) => setReturnNotes(e.target.value)}
+                    placeholder="Add any notes about the book condition..."
+                    rows={3}
+                    className="my-borrowings-modal-textarea"
+                  />
+                </div>
+              </div>
+              <div className="my-borrowings-modal-actions">
+                <button
+                  onClick={() => {
+                    setShowReturnModal(false);
+                    setReturnNotes('');
+                    setSelectedBorrowing(null);
+                  }}
+                  className="my-borrowings-modal-btn my-borrowings-modal-btn-cancel"
+                  disabled={returningUuid === selectedBorrowing.uuid}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleReturnBook}
+                  className="my-borrowings-modal-btn my-borrowings-modal-btn-confirm"
+                  disabled={returningUuid === selectedBorrowing.uuid}
+                >
+                  {returningUuid === selectedBorrowing.uuid ? 'Returning...' : 'Confirm Return'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
     </div>
   );
 }

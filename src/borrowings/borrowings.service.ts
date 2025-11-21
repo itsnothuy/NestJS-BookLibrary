@@ -184,7 +184,9 @@ export class BorrowingsService {
     // If approved, create borrowing record
     if (dto.action === 'approved') {
       const dueDate = new Date();
-      dueDate.setDate(dueDate.getDate() + request.requestedDays);
+      // Support fractional days for testing (e.g., 0.000116 days = 10 seconds)
+      const milliseconds = request.requestedDays * 24 * 60 * 60 * 1000;
+      dueDate.setTime(dueDate.getTime() + milliseconds);
 
       await this.borrowingsRepo.createBorrowing({
         userId: request.userId,
@@ -231,6 +233,42 @@ export class BorrowingsService {
     await this.borrowingsRepo.incrementAvailableCopies(borrowing.bookId);
 
     this.logger.log(`Book returned: ${borrowingUuid}`);
+
+    return this.borrowingsRepo.findBorrowingByUuidWithDetails(returned.uuid);
+  }
+
+  /**
+   * Return a borrowed book (Student self-return)
+   */
+  async returnBookByStudent(userUuid: string, borrowingUuid: string, dto: ReturnBookDto) {
+    this.logger.log(`Student ${userUuid} returning borrowing ${borrowingUuid}`);
+
+    const borrowing = await this.borrowingsRepo.findBorrowingByUuid(borrowingUuid);
+
+    if (!borrowing) {
+      throw new NotFoundException('Borrowing record not found');
+    }
+
+    // Verify ownership
+    const user = await this.usersRepo.findByUuid(userUuid);
+    if (!user || borrowing.userId !== user.id) {
+      throw new ForbiddenException('You can only return your own borrowed books');
+    }
+
+    if (borrowing.status === 'returned') {
+      throw new BadRequestException('This book has already been returned');
+    }
+
+    // Calculate late fee if overdue
+    await this.borrowingsRepo.calculateLateFee(borrowing.id);
+
+    // Mark as returned with student's note
+    const returned = await this.borrowingsRepo.returnBook(borrowing.id, dto.returnNotes || 'Returned by student');
+
+    // Increment available copies
+    await this.borrowingsRepo.incrementAvailableCopies(borrowing.bookId);
+
+    this.logger.log(`Book returned by student: ${borrowingUuid}`);
 
     return this.borrowingsRepo.findBorrowingByUuidWithDetails(returned.uuid);
   }

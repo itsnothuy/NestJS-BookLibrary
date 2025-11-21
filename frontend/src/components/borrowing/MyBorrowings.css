@@ -4,6 +4,7 @@
   padding: 2rem;
   max-width: 1400px;
   margin: 0 auto;
+  font-family: system-ui, -apple-system, sans-serif;
 }
 
 /* Header Section */
@@ -282,6 +283,139 @@
   background-color: #2563eb;
 }
 
+/* Actions Column */
+.my-borrowings-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.my-borrowings-return-button {
+  padding: 0.5rem 1rem;
+  background-color: #10b981;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.my-borrowings-return-button:hover {
+  background-color: #059669;
+}
+
+/* Return Modal */
+.my-borrowings-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.my-borrowings-modal {
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.my-borrowings-modal-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+.my-borrowings-modal-content {
+  margin-bottom: 1.5rem;
+}
+
+.my-borrowings-late-fee-warning {
+  background-color: #fef3c7;
+  border-left: 4px solid #f59e0b;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 0.375rem;
+}
+
+.my-borrowings-late-fee-warning p {
+  margin: 0.25rem 0;
+  color: #92400e;
+}
+
+.my-borrowings-modal-field {
+  margin-top: 1rem;
+}
+
+.my-borrowings-modal-field label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.my-borrowings-modal-textarea {
+  width: 100%;
+  padding: 0.625rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.my-borrowings-modal-textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.my-borrowings-modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.my-borrowings-modal-btn {
+  padding: 0.625rem 1.25rem;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.my-borrowings-modal-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.my-borrowings-modal-btn-cancel {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.my-borrowings-modal-btn-cancel:hover:not(:disabled) {
+  background-color: #e5e7eb;
+}
+
+.my-borrowings-modal-btn-confirm {
+  background-color: #10b981;
+  color: white;
+}
+
+.my-borrowings-modal-btn-confirm:hover:not(:disabled) {
+  background-color: #059669;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .my-borrowings-container {
@@ -304,5 +438,9 @@
 
   .my-borrowings-stat-value {
     font-size: 1.5rem;
+  }
+
+  .my-borrowings-modal {
+    width: 95%;
   }
 }
