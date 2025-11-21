@@ -9,6 +9,15 @@ import Signup from './modules/auth/Signup';
 import Profile from './modules/auth/Profile';
 import Dashboard from './modules/app/Dashboard';
 import StudentLayout from './modules/app/StudentLayout';
+import HomeBanner from './components/home/HomeBanner';
+import BookCarousel from './components/home/BookCarousel';
+import FeaturedSection from './components/home/FeaturedSection';
+import StudentBooksPage from './components/books/StudentBooksPage';
+import { MyBorrowings } from './components/borrowing/MyBorrowings';
+import { BorrowingHistory } from './components/borrowing/BorrowingHistory';
+import PaginatedBooksTable from './components/books/PaginatedBooksTable';
+import PaginatedUsersTable from './components/users/PaginatedUsersTable';
+import { AdminBorrowingManager } from './components/borrowing/AdminBorrowingManager';
 import './index.css';
 
 function ProtectedRoute({ children }: { children: React.ReactElement }) {
@@ -33,19 +42,31 @@ function ProtectedRoute({ children }: { children: React.ReactElement }) {
   return isAuthenticated ? children : <Navigate to="/login" replace />;
 }
 
-function HomeRedirect() {
-  const { user } = useAuth();
-  
-  // Students see StudentLayout (centralized with tabs), admins go to dashboard
-  if (user?.role === 'student') {
-    return <StudentLayout />;
-  }
-  
-  if (user?.role === 'admin') {
-    return <Navigate to="/dashboard" replace />;
-  }
-  
-  return <Navigate to="/login" replace />;
+// Default home view component for students
+function StudentHome() {
+  return (
+    <>
+      <HomeBanner />
+      <BookCarousel />
+      <FeaturedSection />
+    </>
+  );
+}
+
+// Default dashboard stats view for admins
+function DashboardStats() {
+  return (
+    <div className="dashboard-welcome">
+      <h2>Welcome to Admin Dashboard</h2>
+      <p>Select a tab above to manage books, users, or borrowings.</p>
+      <div className="dashboard-stats">
+        <div className="stat-card">
+          <h3>Quick Stats</h3>
+          <p>Use the navigation tabs above to access different management sections.</p>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -55,15 +76,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <BorrowingProvider>
           <BrowserRouter>
             <Routes>
-              {/* Home route - students see StudentDashboard, admins redirected to /dashboard */}
-              <Route
-                path="/"
-                element={
-                  <ProtectedRoute>
-                    <HomeRedirect />
-                  </ProtectedRoute>
-                }
-              />
+              {/* Auth routes */}
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route
@@ -74,7 +87,25 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                   </ProtectedRoute>
                 }
               />
-              {/* Dashboard route - admin only */}
+              
+              {/* Student routes - wrapped in StudentLayout */}
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <StudentLayout />
+                  </ProtectedRoute>
+                }
+              >
+                {/* Default home view - index route */}
+                <Route index element={<StudentHome />} />
+                {/* Tab routes */}
+                <Route path="books" element={<StudentBooksPage />} />
+                <Route path="my-borrowings" element={<MyBorrowings />} />
+                <Route path="borrowing-history" element={<BorrowingHistory />} />
+              </Route>
+              
+              {/* Admin routes - wrapped in Dashboard */}
               <Route
                 path="/dashboard"
                 element={
@@ -82,7 +113,14 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                     <Dashboard />
                   </ProtectedRoute>
                 }
-              />
+              >
+                {/* Default dashboard view - index route */}
+                <Route index element={<DashboardStats />} />
+                {/* Tab routes */}
+                <Route path="books" element={<PaginatedBooksTable />} />
+                <Route path="users" element={<PaginatedUsersTable />} />
+                <Route path="borrowings" element={<AdminBorrowingManager />} />
+              </Route>
             </Routes>
           </BrowserRouter>
         </BorrowingProvider>

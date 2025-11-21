@@ -1,0 +1,128 @@
+/* Borrow Request Button Styles */
+
+.borrow-status {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.borrow-status .badge {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.borrow-status .badge-info {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.borrow-status .badge-warning {
+  background-color: #f59e0b;
+  color: white;
+}
+
+.borrow-request-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.borrow-request-form .space-y-3 > * + * {
+  margin-top: 0.75rem;
+}
+
+.borrow-request-form .form-control {
+  display: flex;
+  flex-direction: column;
+}
+
+.borrow-request-form .label {
+  display: flex;
+  margin-bottom: 0.5rem;
+}
+
+.borrow-request-form .label-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.borrow-request-form .select {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  background-color: white;
+  cursor: pointer;
+  transition: border-color 0.2s ease-in-out;
+}
+
+.borrow-request-form .select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.borrow-request-form .select-bordered {
+  border: 1px solid #d1d5db;
+}
+
+.borrow-request-form .btn {
+  padding: 0.625rem 1.25rem;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  text-align: center;
+}
+
+.borrow-request-form .btn-primary {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.borrow-request-form .btn-primary:hover:not(:disabled) {
+  background-color: #2563eb;
+}
+
+.borrow-request-form .btn-primary:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.borrow-request-form .btn-disabled {
+  background-color: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.borrow-request-form .w-full {
+  width: 100%;
+}
+
+.borrow-request-form .text-xs {
+  font-size: 0.75rem;
+}
+
+.borrow-request-form .text-sm {
+  font-size: 0.875rem;
+}
+
+.borrow-request-form .text-gray-500 {
+  color: #6b7280;
+}
+
+.borrow-request-form .mt-1 {
+  margin-top: 0.25rem;
+}
+
+.borrow-request-form > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}

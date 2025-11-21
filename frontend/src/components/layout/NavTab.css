@@ -1,0 +1,51 @@
+/* Navigation Tab Styles */
+.nav-tab-container {
+  background-color: white;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0 2rem;
+}
+
+.nav-tab-wrapper {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav-tab-button {
+  padding: 1rem 0;
+  background-color: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #6b7280;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.nav-tab-button:hover {
+  color: #3b82f6;
+}
+
+.nav-tab-button.active {
+  border-bottom-color: #3b82f6;
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+/* Admin specific styles */
+.nav-tab-button.admin {
+  border-bottom-width: 2px;
+}
+
+.nav-tab-button.admin.active {
+  font-weight: 600;
+}
+
+/* Student specific styles */
+.nav-tab-button.student {
+  border-bottom-width: 3px;
+}
+
+.nav-tab-button.student.active {
+  font-weight: 600;
+}

@@ -40,9 +40,23 @@ export default function Header() {
         navigate('/profile');
     };
 
+    const handleTitleClick = () => {
+        // Navigate to home based on user role
+        if (user?.role === 'admin') {
+            navigate('/dashboard');
+        } else {
+            navigate('/');
+        }
+    };
+
     return (
         <header className="header">
-            <h1 className="header-title">
+            <h1 
+                className="header-title"
+                onClick={handleTitleClick}
+                style={{ cursor: 'pointer' }}
+                title={user?.role === 'admin' ? 'Go to Dashboard' : 'Go to Home'}
+            >
                 Student Library System
             </h1>
             <div className="header-user-section">

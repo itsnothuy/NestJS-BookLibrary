@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useBorrowing } from '../../modules/borrowing/BorrowingContext';
+import './BorrowRequestButton.css';
 
 interface Props {
   bookUuid: string;
@@ -93,6 +94,7 @@ export function BorrowRequestButton({ bookUuid, bookTitle }: Props) {
           onChange={(e) => setDays(Number(e.target.value))}
           className="select select-bordered w-full"
         >
+          <option value={0.000116}>10 seconds (testing)</option>
           <option value={7}>1 week (7 days)</option>
           <option value={14}>2 weeks (14 days)</option>
           <option value={21}>3 weeks (21 days)</option>
