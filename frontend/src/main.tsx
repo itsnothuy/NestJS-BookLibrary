@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { HeroUIProvider } from '@heroui/react';
 import { AuthProvider, useAuth } from './modules/auth/AuthContext';
+import { BooksProvider } from './modules/books/BooksContext';
 import { BorrowingProvider } from './modules/borrowing/BorrowingContext';
 import Login from './modules/auth/Login';
 import Signup from './modules/auth/Signup';
@@ -18,6 +19,7 @@ import { BorrowingHistory } from './components/borrowing/BorrowingHistory';
 import PaginatedBooksTable from './components/books/PaginatedBooksTable';
 import PaginatedUsersTable from './components/users/PaginatedUsersTable';
 import { AdminBorrowingManager } from './components/borrowing/AdminBorrowingManager';
+import BooksContextTest from './components/test/BooksContextTest';
 import './index.css';
 
 function ProtectedRoute({ children }: { children: React.ReactElement }) {
@@ -73,12 +75,17 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <HeroUIProvider>
       <AuthProvider>
-        <BorrowingProvider>
-          <BrowserRouter>
+        <BooksProvider>
+          <BorrowingProvider>
+            <BrowserRouter>
             <Routes>
               {/* Auth routes */}
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              
+              {/* TEST ROUTE - Phase 1, Step 1.5 - TO BE DELETED AFTER TESTING */}
+              <Route path="/test-books-context" element={<BooksContextTest />} />
+              
               <Route
                 path="/profile"
                 element={
@@ -124,7 +131,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             </Routes>
           </BrowserRouter>
         </BorrowingProvider>
-      </AuthProvider>
-    </HeroUIProvider>
-  </React.StrictMode>
+      </BooksProvider>
+    </AuthProvider>
+  </HeroUIProvider>
+</React.StrictMode>
 );

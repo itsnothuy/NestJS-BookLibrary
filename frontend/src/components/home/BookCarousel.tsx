@@ -13,15 +13,14 @@ import './BookCarousel.css';
 const API_BASE = import.meta.env.VITE_API_BASE;
 
 interface Book {
-  id: number;
+  id: string; // This is the UUID from backend
   title: string;
   author: string;
   isbn: string;
-  publishedYear: number;
-  genre: string;
-  availableCopies: number;
-  totalCopies: number;
-  coverImage?: string;
+  publishedYear: number | null;
+  coverImageUrl?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export default function BookCarousel() {
@@ -92,9 +91,9 @@ export default function BookCarousel() {
             <SwiperSlide key={book.id} className="book-swiper-slide">
               <div className="book-card-content">
                 <div className="book-cover">
-                  {book.coverImage ? (
+                  {book.coverImageUrl ? (
                     <img
-                      src={`${API_BASE}${book.coverImage}`}
+                      src={`${API_BASE}${book.coverImageUrl}`}
                       alt={book.title}
                       className="book-cover-image"
                     />
@@ -107,16 +106,6 @@ export default function BookCarousel() {
                 <div className="book-details">
                   <h3 className="book-card-title">{book.title}</h3>
                   <p className="book-card-author">{book.author}</p>
-                  <p className="book-card-genre">{book.genre}</p>
-                  <p className="book-card-availability">
-                    {book.availableCopies > 0 ? (
-                      <span className="availability-badge available">
-                        {book.availableCopies} available
-                      </span>
-                    ) : (
-                      <span className="availability-badge unavailable">Out of stock</span>
-                    )}
-                  </p>
                 </div>
               </div>
             </SwiperSlide>
@@ -125,7 +114,7 @@ export default function BookCarousel() {
       </div>
 
       <div className="book-carousel-view-all">
-        <Button as={Link} to="/student/books" color="primary" size="lg">
+        <Button as={Link} to="/books" color="primary" size="lg">
           View All Books
         </Button>
       </div>
