@@ -1,71 +1,19 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Card, CardBody, CardFooter, Image } from '@heroui/react';
 import { BorrowRequestButton } from '../borrowing/BorrowRequestButton';
+import { useBooks } from '../../modules/books/BooksContext';
+import type { Book } from '../../types';
 import './StudentBooksGallery.css';
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000';
 const FALLBACK_IMAGE = 'https://via.placeholder.com/300x400/e5e7eb/6b7280?text=No+Cover';
 
-interface Book {
-  id: string; // This is the UUID from backend
-  title: string;
-  author: string;
-  isbn: string;
-  publishedYear: number | null;
-  coverImageUrl?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
 export default function StudentBooksGallery() {
-  const [books, setBooks] = useState<Book[]>([]);
-  const [loading, setLoading] = useState(true); // Start as true
-  const [error, setError] = useState<string | null>(null);
+  // Use BooksContext instead of local state
+  const { books, loading, error } = useBooks();
+  
   const [showViewModal, setShowViewModal] = useState(false);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
-
-  useEffect(() => {
-    let isMounted = true;
-    const abortController = new AbortController();
-
-    const fetchBooks = async () => {
-      try {
-        const response = await fetch(`${API_BASE}/books`, {
-          signal: abortController.signal,
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        if (isMounted) {
-          setBooks(data);
-          setError(null);
-        }
-      } catch (err) {
-        if (err instanceof Error && err.name === 'AbortError') {
-          return; // Ignore abort errors
-        }
-        console.error('Error fetching books:', err);
-        if (isMounted) {
-          setError('Failed to load books. Please try again later.');
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchBooks();
-
-    return () => {
-      isMounted = false;
-      abortController.abort();
-    };
-  }, []); // Empty dependency array - only fetch once on mount
 
   const handleBookClick = useCallback((book: Book) => {
     setSelectedBook(book);
@@ -102,7 +50,6 @@ export default function StudentBooksGallery() {
           {books.map((book) => (
             <Card 
               key={book.id} 
-              shadow="sm" 
               className="student-book-card"
             >
               <CardBody 
@@ -114,7 +61,6 @@ export default function StudentBooksGallery() {
                   alt={book.title}
                   className="student-book-cover"
                   radius="lg"
-                  shadow="sm"
                   src={getBookCoverUrl(book)}
                   width="100%"
                   loading="lazy"

@@ -1,53 +1,35 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useAuth } from '../../modules/auth/AuthContext';
+import { useBooks } from '../../modules/books/BooksContext';
 import { usePagination } from '../../hooks/usePagination';
+import { useDebounce } from '../../hooks/useDebounceHook';
+import type { Book } from '../../types';
 import PaginatedTable from '../table/PaginatedTable';
 import './PaginatedBooksTable.css';
-import { useDebounce } from '../../hooks/useDebounceHook';
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000';
-
-interface Book {
-  id: string;
-  title: string;
-  author: string;
-  isbn: string;
-  publishedYear: number | null;
-  createdAt: string;
-  updatedAt: string;
-}
 
 interface BookFormData {
   title: string;
   author: string;
   isbn: string;
   publishedYear: number;
-  
-}
-
-interface PaginationResponse {
-  data: Book[];
-  meta: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-  };
-  links: {
-    first: string;
-    previous?: string;
-    next?: string;
-    last: string;
-  };
 }
 
 export default function PaginatedBooksTable() {
   const { token, user, loading: authLoading } = useAuth();
-  const pagination = usePagination(10); // Start with 10 books page
-  const [books, setBooks] = useState<Book[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { 
+    books, 
+    loading, 
+    error: contextError, 
+    paginationMeta,
+    fetchBooks: fetchBooksFromContext, 
+    createBook: createBookInContext, 
+    updateBook: updateBookInContext, 
+    deleteBook: deleteBookInContext 
+  } = useBooks();
+  
+  const pagination = usePagination(10); // Start with 10 books per page
   const [error, setError] = useState<string | null>(null);
   const [authorFilter, setAuthorFilter] = useState<string>('');
   const [yearFilter, setYearFilter] = useState<string>('');
@@ -70,48 +52,32 @@ export default function PaginatedBooksTable() {
   const [showViewModal, setShowViewModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
-
+  
+  // Fetch books using BooksContext
   const fetchBooks = async () => {
-    setLoading(true);
     setError(null);
     
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-    const abortController = new AbortController();
-    abortControllerRef.current = abortController;
-    
     try {
-      const queryParams = new URLSearchParams({
-        page: pagination.state.page.toString(),
-        limit: pagination.state.limit.toString(),
+      await fetchBooksFromContext({
+        page: pagination.state.page,
+        limit: pagination.state.limit,
         sortBy: pagination.state.sortBy,
-        sortOrder: pagination.state.sortOrder,
+        sortOrder: pagination.state.sortOrder as 'asc' | 'desc',
         ...(debouncedSearch && { search: debouncedSearch }),
-        ...(debouncedAuthor && { author: debouncedAuthor }),
-        ...(debouncedYear && { publishedYear: debouncedYear })
       });
-
-      const response = await fetch(`${API_BASE}/books?${queryParams}`, { signal: abortController.signal });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      
+      // Update pagination with meta from context
+      if (paginationMeta) {
+        pagination.updatePagination({
+          total: paginationMeta.total,
+          totalPages: paginationMeta.totalPages,
+          hasNextPage: paginationMeta.hasNextPage,
+          hasPreviousPage: paginationMeta.hasPreviousPage
+        });
       }
-
-      const result: PaginationResponse = await response.json();
-      setBooks(result.data);
-      pagination.updatePagination({
-        total: result.meta.total,
-        totalPages: result.meta.totalPages,
-        hasNextPage: result.meta.hasNextPage,
-        hasPreviousPage: result.meta.hasPreviousPage
-      });
     } catch (error: any) {
-      if (error.name === 'AbortError') return;
       console.error('Error fetching books:', error);
       setError(error instanceof Error ? error.message : 'Failed to fetch books');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -119,6 +85,84 @@ export default function PaginatedBooksTable() {
 
   // Create book
   const handleCreate = async () => {
+    try {
+      await createBookInContext({
+        title: formData.title,
+        author: formData.author,
+        isbn: formData.isbn,
+        publishedYear: formData.publishedYear || undefined,
+      });
+      
+      alert("Book created successfully!");
+      setShowAddModal(false);
+      resetForm();
+      
+    } catch (error: any) {
+      if (error.message.includes('403') || error.message.includes('Permission')) {
+        alert("Permission denied: Only admin users can create books. Please log in as an admin.");
+        return;
+      }
+      alert(`Failed to create book: ${error.message}`);
+    }
+  };
+
+  const handleUpdate = async () => {
+    if (!selectedBook) return;
+    
+    try {
+      await updateBookInContext(selectedBook.id, {
+        title: formData.title,
+        author: formData.author,
+        isbn: formData.isbn,
+        publishedYear: formData.publishedYear || undefined,
+      });
+      
+      alert("Book updated successfully!");
+      setShowEditModal(false);
+      resetForm();
+      setSelectedBook(null);
+      
+    } catch (error: any) {
+      if (error.message.includes('403') || error.message.includes('Permission')) {
+        alert("Permission denied: Only admin users can update books.");
+        return;
+      }
+      alert(`Failed to update book: ${error.message}`);
+    }
+  };
+
+  // Delete book
+  const handleDelete = async () => {
+    if (!selectedBook) return;
+    
+    try {
+      await deleteBookInContext(selectedBook.id);
+      
+      alert("Book deleted successfully!");
+      setShowDeleteModal(false);
+      setSelectedBook(null);
+      
+    } catch (error: any) {
+      if (error.message.includes('403') || error.message.includes('Permission')) {
+        alert("Permission denied: Only admin users can delete books.");
+        return;
+      }
+      alert(`Failed to delete book: ${error.message}`);
+    }
+  };
+
+  // Reset form
+  const resetForm = () => {
+    setFormData({
+      title: "",
+      author: "",
+      isbn: "",
+      publishedYear: 0,
+    });
+  };
+
+  // Old handleCreate - REMOVED (replaced above)
+  const oldHandleCreate = async () => {
     try {
       const response = await fetch(`${API_BASE}/books`, {
         method: "POST",

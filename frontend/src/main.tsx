@@ -4,6 +4,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { HeroUIProvider } from '@heroui/react';
 import { AuthProvider, useAuth } from './modules/auth/AuthContext';
 import { BorrowingProvider } from './modules/borrowing/BorrowingContext';
+import { BooksProvider } from './modules/books/BooksContext';
+import { UsersProvider } from './modules/users/UsersContext';
 import Login from './modules/auth/Login';
 import Signup from './modules/auth/Signup';
 import Profile from './modules/auth/Profile';
@@ -73,9 +75,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <HeroUIProvider>
       <AuthProvider>
-        <BorrowingProvider>
-          <BrowserRouter>
-            <Routes>
+        <BooksProvider>
+          <UsersProvider>
+            <BorrowingProvider>
+              <BrowserRouter>
+                <Routes>
               {/* Auth routes */}
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
@@ -124,7 +128,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             </Routes>
           </BrowserRouter>
         </BorrowingProvider>
-      </AuthProvider>
-    </HeroUIProvider>
+      </UsersProvider>
+    </BooksProvider>
+  </AuthProvider>
+</HeroUIProvider>
   </React.StrictMode>
 );
