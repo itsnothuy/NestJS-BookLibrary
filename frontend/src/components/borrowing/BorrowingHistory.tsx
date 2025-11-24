@@ -129,7 +129,7 @@ export function BorrowingHistory() {
         <div className="borrowing-history-empty">
           <h2>No Borrowing History</h2>
           <p>You haven't returned any books yet. Your borrowing history will appear here.</p>
-          <a href="/student/books" className="borrowing-history-browse-button">
+          <a href="/books" className="borrowing-history-browse-button">
             Return to Book Gallery
           </a>
         </div>

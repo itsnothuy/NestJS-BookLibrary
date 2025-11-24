@@ -185,7 +185,7 @@ export function MyBorrowings() {
         <div className="my-borrowings-empty">
           <h2>No Borrowed Books</h2>
           <p>You don't have any borrowed books at the moment. Browse our collection and request to borrow a book!</p>
-          <a href="/student/books" className="my-borrowings-browse-button">
+          <a href="/books" className="my-borrowings-browse-button">
             Browse Books
           </a>
         </div>

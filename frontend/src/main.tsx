@@ -57,7 +57,7 @@ function StudentHome() {
 function DashboardStats() {
   return (
     <div className="dashboard-welcome">
-      <h2>Welcome to Admin Dashboard</h2>
+      <h2>Welcome to Dashboard</h2>
       <p>Select a tab above to manage books, users, or borrowings.</p>
       <div className="dashboard-stats">
         <div className="stat-card">
