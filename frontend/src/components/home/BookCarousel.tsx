@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Button } from '@heroui/react';
 import { Link } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { EffectCards, Autoplay } from 'swiper/modules';
+import { useBooks } from '../../modules/books/BooksContext';
+import type { Book } from '../../types';
 
 // Import Swiper styles - Correct paths for Swiper v12
 import 'swiper/css';
@@ -12,47 +14,12 @@ import './BookCarousel.css';
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 
-interface Book {
-  id: string; // This is the UUID from backend
-  title: string;
-  author: string;
-  isbn: string;
-  publishedYear: number | null;
-  coverImageUrl?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
 export default function BookCarousel() {
-  const [books, setBooks] = useState<Book[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { books, loading, fetchFeaturedBooks } = useBooks();
 
   useEffect(() => {
-    const abortController = new AbortController();
-    
-    const fetchFeaturedBooks = async () => {
-      try {
-        const response = await fetch(
-          `${API_BASE}/books?limit=8&sortBy=availableCopies&sortOrder=desc`,
-          { signal: abortController.signal }
-        );
-        const data = await response.json();
-        setBooks(data.data || []);
-      } catch (error) {
-        if (error instanceof Error && error.name !== 'AbortError') {
-          console.error('Error fetching featured books:', error);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchFeaturedBooks();
-    
-    return () => {
-      abortController.abort();
-    };
-  }, []);
+  }, [fetchFeaturedBooks]);
 
   if (loading) {
     return (
