@@ -1,8 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './HomeBanner.css';
+import { useBooks } from '../../modules/books/BooksContext';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, EffectCards } from 'swiper/modules';
+
+const API_BASE = import.meta.env.VITE_API_BASE;
 
 export default function HomeBanner() {
   const [searchQuery, setSearchQuery] = useState('');
+  const { books, fetchFeaturedBooks } = useBooks();
+  
+  useEffect(() => {
+    fetchFeaturedBooks();
+  }, [fetchFeaturedBooks]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,27 +54,40 @@ export default function HomeBanner() {
 
         {/* Right side - Image/Illustration */}
         <div className="home-banner-image">
-          <div className="home-banner-image-placeholder">
-            <svg 
-              viewBox="0 0 400 400" 
-              className="home-banner-svg"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              {/* Book stack illustration */}
-              <rect x="80" y="180" width="120" height="160" fill="#3b82f6" rx="8"/>
-              <rect x="100" y="160" width="120" height="160" fill="#2563eb" rx="8"/>
-              <rect x="120" y="140" width="120" height="160" fill="#1d4ed8" rx="8"/>
-              
-              {/* Book details */}
-              <line x1="130" y1="160" x2="230" y2="160" stroke="white" strokeWidth="2"/>
-              <line x1="130" y1="180" x2="210" y2="180" stroke="white" strokeWidth="2"/>
-              <line x1="130" y1="200" x2="220" y2="200" stroke="white" strokeWidth="2"/>
-              
-              {/* Decorative elements */}
-              <circle cx="300" cy="100" r="40" fill="#fbbf24" opacity="0.3"/>
-              <circle cx="320" cy="300" r="30" fill="#f59e0b" opacity="0.3"/>
-            </svg>
-          </div>
+          <Swiper
+          effect={'cards'}
+          grabCursor={true}
+          modules={[EffectCards, Autoplay]}
+          autoplay={{
+            delay: 3000,
+            disableOnInteraction: false,
+          }}
+          className="book-swiper"
+        >
+          {books.map((book) => (
+            <SwiperSlide key={book.id} className="book-swiper-slide">
+              <div className="book-card-content">
+                <div className="book-cover">
+                  {book.coverImageUrl ? (
+                    <img
+                      src={`${API_BASE}${book.coverImageUrl}`}
+                      alt={book.title}
+                      className="book-cover-image"
+                    />
+                  ) : (
+                    <div className="book-cover-placeholder">
+                      <span className="book-cover-icon">📚</span>
+                    </div>
+                  )}
+                </div>
+                <div className="book-details">
+                  <h3 className="book-card-title">{book.title}</h3>
+                  <p className="book-card-author">{book.author}</p>
+                </div>
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
         </div>
       </div>
     </div>

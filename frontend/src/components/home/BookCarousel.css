@@ -1,4 +1,4 @@
-/* BookCarousel Component Styles - Swiper Cards Effect */
+/* BookCarousel Component Styles - Grid Display */
 
 .book-carousel-container {
   max-width: 1400px;
@@ -14,43 +14,42 @@
   margin: 0 0 40px 0;
 }
 
-/* Swiper Wrapper Container */
-.swiper-wrapper-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 40px 0;
-  min-height: 550px;
+/* Grid Layout for Featured Books */
+.book-carousel-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(2, 1fr);
+  margin-bottom: 40px;
 }
 
-/* Swiper Container Sizing */
-.book-swiper {
-  width: 320px;
-  height: 450px;
-}
-
-@media (max-width: 768px) {
-  .book-swiper {
-    width: 280px;
-    height: 400px;
+@media (min-width: 640px) {
+  .book-carousel-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
-@media (max-width: 480px) {
-  .book-swiper {
-    width: 240px;
-    height: 350px;
+@media (min-width: 1024px) {
+  .book-carousel-grid {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
-/* Swiper Slide Styling */
-.book-swiper-slide {
+/* Featured Book Card Styles - Swiper Design */
+.featured-book-card {
   display: flex;
   flex-direction: column;
   border-radius: 20px;
   background: white;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 450px;
+}
+
+.featured-book-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
 }
 
 /* Book Card Content */
@@ -67,6 +66,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  object-position: center;
   position: relative;
   overflow: hidden;
 }
@@ -75,6 +75,8 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
+  
 }
 
 .book-cover-placeholder {
@@ -122,39 +124,6 @@
   white-space: nowrap;
 }
 
-.book-card-genre {
-  font-size: 0.75rem;
-  color: #9ca3af;
-  margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.book-card-availability {
-  margin: 4px 0 0 0;
-}
-
-.availability-badge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.availability-badge.available {
-  background-color: #d1fae5;
-  color: #059669;
-}
-
-.availability-badge.unavailable {
-  background-color: #fee2e2;
-  color: #dc2626;
-}
-
 /* Loading and Empty States */
 .book-carousel-loading,
 .book-carousel-empty {
@@ -173,4 +142,71 @@
   display: flex;
   justify-content: center;
   margin-top: 40px;
+}
+
+/* Modal Styles */
+.book-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.book-modal-content {
+  background-color: white;
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.book-modal-content h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #1f2937;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.book-modal-info {
+  margin-bottom: 12px;
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+.book-modal-info strong {
+  color: #1f2937;
+  margin-right: 8px;
+}
+
+.book-modal-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  justify-content: center;
+}
+
+.book-modal-close-button {
+  padding: 10px 24px;
+  background-color: #6b7280;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.book-modal-close-button:hover {
+  background-color: #4b5563;
 }

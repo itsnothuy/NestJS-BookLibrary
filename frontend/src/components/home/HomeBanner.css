@@ -1,5 +1,9 @@
 /* HomeBanner Component Styles */
 
+/* Import Swiper styles */
+@import 'swiper/css';
+@import 'swiper/css/effect-cards';
+
 .home-banner-container {
   background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
   padding: 60px 20px;
@@ -127,4 +131,99 @@
   width: 100%;
   height: 100%;
   filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.1));
+}
+
+/* Swiper Styles for HomeBanner */
+.home-banner-image .book-swiper {
+  width: 320px;
+  height: 450px;
+}
+
+@media (max-width: 768px) {
+  .home-banner-image .book-swiper {
+    width: 280px;
+    height: 400px;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-banner-image .book-swiper {
+    width: 240px;
+    height: 350px;
+  }
+}
+
+.home-banner-image .book-swiper-slide {
+  display: flex;
+  flex-direction: column;
+  border-radius: 20px;
+  background: white;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.home-banner-image .book-card-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.home-banner-image .book-cover {
+  flex: 1;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.home-banner-image .book-cover-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.home-banner-image .book-cover-placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.home-banner-image .book-cover-icon {
+  font-size: 4rem;
+  opacity: 0.8;
+}
+
+.home-banner-image .book-details {
+  padding: 20px;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.home-banner-image .book-card-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.4;
+}
+
+.home-banner-image .book-card-author {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
