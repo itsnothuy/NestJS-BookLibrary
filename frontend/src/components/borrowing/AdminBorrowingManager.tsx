@@ -26,7 +26,7 @@ export function AdminBorrowingManager() {
   useEffect(() => {
     fetchPendingRequests();
     fetchOverdueBooks();
-  }, []);
+  }, [token]);
 
   const fetchPendingRequests = async () => {
     if (!token) return;
@@ -37,7 +37,10 @@ export function AdminBorrowingManager() {
       });
       if (res.ok) {
         const data = await res.json();
+        console.log('Pending requests fetched:', data);
         setPendingRequests(data);
+      } else {
+        console.error('Failed to fetch pending requests:', res.status);
       }
     } catch (error) {
       console.error('Error fetching pending requests:', error);
@@ -48,16 +51,31 @@ export function AdminBorrowingManager() {
 
   const fetchOverdueBooks = async () => {
     if (!token) return;
+    setLoading(true);
     try {
+      // First, trigger overdue status update
+      await fetch(`${API_BASE}/borrowings/admin/update-overdue`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // Then fetch overdue books
       const res = await fetch(`${API_BASE}/borrowings/admin/overdue`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
         const data = await res.json();
+        console.log('Overdue books fetched:', data);
         setOverdueBooks(data);
+      } else {
+        console.error('Failed to fetch overdue books:', res.status);
+        setOverdueBooks([]);
       }
     } catch (error) {
       console.error('Error fetching overdue books:', error);
+      setOverdueBooks([]);
+    } finally {
+      setLoading(false);
     }
   };
 

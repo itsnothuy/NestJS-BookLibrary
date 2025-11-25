@@ -15,9 +15,13 @@ export default function Login() {
     e.preventDefault();
     setError(null); setBusy(true);
     try {
-      await login(email, password);
-      // Redirect to home - routing logic will handle role-based navigation
-      nav('/');
+      const userProfile = await login(email, password);
+      // Role-based redirection: admin -> /dashboard, student -> /
+      if (userProfile && userProfile.role === 'admin') {
+        nav('/dashboard');
+      } else {
+        nav('/');
+      }
     } catch (err: any) {
       setError(err.message || 'Login failed');
     } finally {

@@ -113,6 +113,36 @@
   color: #f59e0b;
 }
 
+/* Tabs */
+.my-borrowings-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.my-borrowings-tab {
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.my-borrowings-tab:hover {
+  color: #3b82f6;
+  background-color: #f3f4f6;
+}
+
+.my-borrowings-tab-active {
+  color: #3b82f6;
+  border-bottom-color: #3b82f6;
+}
+
 /* Table Cell Styles */
 .my-borrowings-book-cell {
   display: flex;
@@ -176,6 +206,26 @@
 .my-borrowings-status-returned {
   background-color: #d1fae5;
   color: #065f46;
+}
+
+.my-borrowings-status-pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.my-borrowings-status-approved {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.my-borrowings-status-rejected {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.my-borrowings-status-cancelled {
+  background-color: #f3f4f6;
+  color: #4b5563;
 }
 
 .my-borrowings-status-default {
@@ -305,6 +355,38 @@
   background-color: #059669;
 }
 
+.my-borrowings-view-button {
+  padding: 0.5rem 1rem;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.my-borrowings-view-button:hover {
+  background-color: #2563eb;
+}
+
+.my-borrowings-cancel-button {
+  padding: 0.5rem 1rem;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.my-borrowings-cancel-button:hover {
+  background-color: #dc2626;
+}
+
 /* Return Modal */
 .my-borrowings-modal-overlay {
   position: fixed;
@@ -414,6 +496,26 @@
 
 .my-borrowings-modal-btn-confirm:hover:not(:disabled) {
   background-color: #059669;
+}
+
+.my-borrowings-modal-btn-danger {
+  background-color: #ef4444;
+  color: white;
+}
+
+.my-borrowings-modal-btn-danger:hover:not(:disabled) {
+  background-color: #dc2626;
+}
+
+.my-borrowings-modal-info {
+  margin-bottom: 12px;
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+.my-borrowings-modal-info strong {
+  color: #1f2937;
+  margin-right: 8px;
 }
 
 /* Responsive Design */

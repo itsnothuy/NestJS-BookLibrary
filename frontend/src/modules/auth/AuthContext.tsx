@@ -17,7 +17,7 @@ type AuthCtx = {
   user: User | null;
   loading: boolean;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
   signup: (email: string, password: string, role?: 'student' | 'admin') => Promise<void>;
   logout: () => void;
   refreshProfile: () => Promise<void>;
@@ -88,7 +88,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [token]);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<User> => {
     setLoading(true);
     try {
       const res = await fetch(`${API_BASE}/auth/login`, {
@@ -114,6 +114,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Set token and user together
       setToken(newToken);
       setUser(profile);
+      
+      // Return the profile for role-based navigation
+      return profile;
     } finally {
       setLoading(false);
     }
