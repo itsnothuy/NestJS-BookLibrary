@@ -5,9 +5,8 @@ import { useNavigate } from 'react-router-dom';
 export const API_BASE = import.meta.env.VITE_API_BASE;
 
 export default function Profile() {
-  const { token, logout } = useAuth();
+  const { token, user: authUser } = useAuth();
   const navigate = useNavigate();
-  const [user, setUser] = useState<any>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -17,36 +16,28 @@ export default function Profile() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [loading, setLoading] = useState(true);
 
-  // Fetch user profile
+  // Initialize profile data from AuthContext
   useEffect(() => {
-    if (token) {
-      (async () => {
-        try {
-          const res = await fetch(`${API_BASE}/auth/me`, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          if (res.ok) {
-            const profile = await res.json();
-            setUser(profile);
-            setEmail(profile.email);
-            if (profile.avatarUrl) {
-              setAvatarPreview(`${API_BASE}${profile.avatarUrl}`);
-              setAvatarError(false);
-            } else {
-              setAvatarPreview(null);
-            }
-          }
-        } catch (error) {
-          console.error('Failed to fetch profile:', error);
-          setError('Failed to load profile');
-        } finally {
-          setLoading(false);
-        }
-      })();
+    if (authUser) {
+      setEmail(authUser.email);
+      if (authUser.avatarUrl) {
+        setAvatarPreview(`${API_BASE}${authUser.avatarUrl}`);
+        setAvatarError(false);
+      } else {
+        setAvatarPreview(null);
+      }
     }
-  }, [token]);
+  }, [authUser]);
+
+  const handleTitleClick = () => {
+    // Navigate to home based on user role
+    if (authUser?.role === 'admin') {
+      navigate('/dashboard');
+    } else {
+      navigate('/');
+    }
+  };
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -83,9 +74,9 @@ export default function Profile() {
         return;
       }
 
-      if (email !== user?.email || password) {
+      if (email !== authUser?.email || password) {
         const profileData: any = {};
-        if (email !== user?.email) profileData.email = email;
+        if (email !== authUser?.email) profileData.email = email;
         if (password) profileData.password = password;
 
         const profileRes = await fetch(`${API_BASE}/auth/profile`, {
@@ -125,23 +116,8 @@ export default function Profile() {
       setConfirmPassword('');
       setAvatarFile(null);
       
-      const res = await fetch(`${API_BASE}/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.ok) {
-        const profile = await res.json();
-        setUser(profile);
-        setEmail(profile.email);
-        if (profile.avatarUrl) {
-          setAvatarPreview(`${API_BASE}${profile.avatarUrl}`);
-          setAvatarError(false);
-        } else {
-          setAvatarPreview(null);
-        }
-        
-        // Dispatch event to notify other components about profile update
-        window.dispatchEvent(new CustomEvent('profile-updated'));
-      }
+      // Dispatch event to notify other components about profile update
+      window.dispatchEvent(new CustomEvent('profile-updated'));
     } catch (err: any) {
       setError(err.message || 'Failed to update profile');
     } finally {
@@ -149,20 +125,12 @@ export default function Profile() {
     }
   };
 
-  if (loading) {
-    return (
-      <div style={{ maxWidth: 420, margin: '60px auto', fontFamily: 'ui-sans-serif', padding: '20px', textAlign: 'center' }}>
-        <h1>Loading...</h1>
-      </div>
-    );
-  }
-
   return (
     <div style={{ maxWidth: 420, margin: '60px auto', fontFamily: 'ui-sans-serif', padding: '20px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <h1>Profile</h1>
         <button
-          onClick={() => navigate('/dashboard')}
+          onClick={handleTitleClick}
           style={{
             padding: '8px 16px',
             backgroundColor: '#6b7280',
@@ -215,7 +183,7 @@ export default function Profile() {
                   color: '#6b7280'
                 }}
               >
-                {avatarError ? user?.email?.charAt(0).toUpperCase() || '?' : 'No Image'}
+                {avatarError ? authUser?.email?.charAt(0).toUpperCase() || '?' : 'No Image'}
               </div>
             )}
           </div>
@@ -234,7 +202,7 @@ export default function Profile() {
         <div style={{ marginBottom: '15px' }}>
           <label>Email<br/>
             <input 
-              style={{ width: '100%', padding: '8px', marginTop: '5px' }}
+              style={{ width: '100%', padding: '8px', marginTop: '5px', boxSizing: 'border-box' }}
               value={email} 
               onChange={e => setEmail(e.target.value)} 
               type="email" 
@@ -248,7 +216,7 @@ export default function Profile() {
         <div style={{ marginBottom: '15px' }}>
           <label>New Password (leave blank to keep current)<br/>
             <input 
-              style={{ width: '100%', padding: '8px', marginTop: '5px' }}
+              style={{ width: '100%', padding: '8px', marginTop: '5px', boxSizing: 'border-box' }}
               value={password} 
               onChange={e => setPassword(e.target.value)} 
               type="password" 
@@ -262,7 +230,7 @@ export default function Profile() {
           <div style={{ marginBottom: '20px' }}>
             <label>Confirm New Password<br/>
               <input 
-                style={{ width: '100%', padding: '8px', marginTop: '5px' }}
+                style={{ width: '100%', padding: '8px', marginTop: '5px', boxSizing: 'border-box' }}
                 value={confirmPassword} 
                 onChange={e => setConfirmPassword(e.target.value)} 
                 type="password" 
@@ -277,8 +245,8 @@ export default function Profile() {
         <div style={{ marginBottom: '20px' }}>
           <label>Role<br/>
             <input 
-              style={{ width: '100%', padding: '8px', marginTop: '5px', backgroundColor: '#f9fafb' }}
-              value={user?.role || ''}
+              style={{ width: '100%', padding: '8px', marginTop: '5px', backgroundColor: '#f9fafb', boxSizing: 'border-box' }}
+              value={authUser?.role || ''}
               disabled
               readOnly
             />
@@ -299,26 +267,11 @@ export default function Profile() {
             border: 'none',
             borderRadius: '5px',
             cursor: busy ? 'not-allowed' : 'pointer',
-            marginBottom: '10px'
+            marginBottom: '10px',
+            boxSizing: 'border-box',
           }}
         >
           {busy ? 'Updating...' : 'Update Profile'}
-        </button>
-
-        <button 
-          type="button"
-          onClick={logout}
-          style={{
-            width: '100%',
-            padding: '10px',
-            backgroundColor: '#dc2626',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer'
-          }}
-        >
-          Logout
         </button>
       </form>
 

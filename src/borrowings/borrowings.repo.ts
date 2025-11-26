@@ -263,6 +263,28 @@ export class BorrowingsRepo {
     return rows.map((row: any) => this.mapBorrowingRowWithDetails(row));
   }
 
+  async findAllBorrowingHistory(): Promise<BorrowingWithDetails[]> {
+    const sql = `
+      SELECT 
+        bw.*,
+        u.uuid as userUuid,
+        u.email as userEmail,
+        u.role as userRole,
+        b.uuid as bookUuid,
+        b.title as bookTitle,
+        b.author as bookAuthor,
+        b.isbn as bookIsbn,
+        b.publishedYear as bookPublishedYear,
+        b.coverImageFilename as bookCover
+      FROM borrowings bw
+      LEFT JOIN users u ON bw.userId = u.id
+      LEFT JOIN book b ON bw.bookId = b.id
+      ORDER BY bw.borrowedAt DESC
+    `;
+    const [rows] = await this.pool.query<RowDataPacket[]>(sql);
+    return rows.map((row: any) => this.mapBorrowingRowWithDetails(row));
+  }
+
   async findOverdueBorrowings(): Promise<BorrowingWithDetails[]> {
     const sql = `
       SELECT 

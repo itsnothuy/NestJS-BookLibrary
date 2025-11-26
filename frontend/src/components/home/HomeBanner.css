@@ -52,7 +52,7 @@
 }
 
 .home-banner-title-accent {
-  color: #2563eb;
+  color: #101ede;
 }
 
 .home-banner-description {
@@ -92,7 +92,7 @@
 
 .home-banner-search-button {
   padding: 12px 24px;
-  background-color: #3b82f6;
+  background-color: rgb(22, 84, 254);
   color: white;
   font-size: 1rem;
   font-weight: 600;
@@ -104,11 +104,11 @@
 }
 
 .home-banner-search-button:hover {
-  background-color: #2563eb;
+  background-color: #101ede;
 }
 
 .home-banner-search-button:active {
-  background-color: #1d4ed8;
+  background-color: #101ede;
 }
 
 .home-banner-image {

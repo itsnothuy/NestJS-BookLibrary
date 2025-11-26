@@ -367,16 +367,16 @@ export function MyBorrowings() {
         {/* Tabs */}
         <div className="my-borrowings-tabs">
           <button
-            className={`my-borrowings-tab ${activeTab === 'borrowed' ? 'my-borrowings-tab-active' : ''}`}
-            onClick={() => setActiveTab('borrowed')}
-          >
-            Currently Borrowed ({borrowings.length})
-          </button>
-          <button
             className={`my-borrowings-tab ${activeTab === 'pending' ? 'my-borrowings-tab-active' : ''}`}
             onClick={() => setActiveTab('pending')}
           >
             Pending Requests ({pendingRequests.length})
+          </button>
+          <button
+            className={`my-borrowings-tab ${activeTab === 'borrowed' ? 'my-borrowings-tab-active' : ''}`}
+            onClick={() => setActiveTab('borrowed')}
+          >
+            Currently Borrowed ({borrowings.length})
           </button>
         </div>
 

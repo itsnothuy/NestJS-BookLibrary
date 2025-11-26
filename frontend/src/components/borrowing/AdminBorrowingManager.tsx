@@ -11,8 +11,9 @@ export function AdminBorrowingManager() {
   const { token } = useAuth();
   const [pendingRequests, setPendingRequests] = useState<BorrowingRequest[]>([]);
   const [overdueBooks, setOverdueBooks] = useState<any[]>([]);
+  const [allHistory, setAllHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'pending' | 'overdue'>('pending');
+  const [activeTab, setActiveTab] = useState<'pending' | 'overdue' | 'history'>('pending');
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showReturnModal, setShowReturnModal] = useState(false);
@@ -22,10 +23,12 @@ export function AdminBorrowingManager() {
 
   const pendingPagination = usePagination(10);
   const overduePagination = usePagination(10);
+  const historyPagination = usePagination(10);
 
   useEffect(() => {
     fetchPendingRequests();
     fetchOverdueBooks();
+    fetchAllHistory();
   }, [token]);
 
   const fetchPendingRequests = async () => {
@@ -74,6 +77,29 @@ export function AdminBorrowingManager() {
     } catch (error) {
       console.error('Error fetching overdue books:', error);
       setOverdueBooks([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAllHistory = async () => {
+    if (!token) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/borrowings/admin/history`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        console.log('All borrowing history fetched:', data);
+        setAllHistory(data);
+      } else {
+        console.error('Failed to fetch borrowing history:', res.status);
+        setAllHistory([]);
+      }
+    } catch (error) {
+      console.error('Error fetching borrowing history:', error);
+      setAllHistory([]);
     } finally {
       setLoading(false);
     }
@@ -150,6 +176,11 @@ export function AdminBorrowingManager() {
   const handleOverdueSort = (columnKey: string) => {
     const newOrder = overduePagination.state.sortBy === columnKey && overduePagination.state.sortOrder === 'asc' ? 'desc' : 'asc';
     overduePagination.updateSort(columnKey, newOrder);
+  };
+
+  const handleHistorySort = (columnKey: string) => {
+    const newOrder = historyPagination.state.sortBy === columnKey && historyPagination.state.sortOrder === 'asc' ? 'desc' : 'asc';
+    historyPagination.updateSort(columnKey, newOrder);
   };
 
   const pendingColumns = useMemo(() => [
@@ -302,6 +333,92 @@ export function AdminBorrowingManager() {
     }
   ], []);
 
+  const historyColumns = useMemo(() => [
+    {
+      key: 'book',
+      label: 'Book',
+      sortable: true,
+      render: (borrowing: any) => (
+        <div className="admin-borrowing-book-cell">
+          <div className="admin-borrowing-book-title">{borrowing.book?.title || 'Unknown'}</div>
+          <div className="admin-borrowing-book-author">{borrowing.book?.author || 'Unknown Author'}</div>
+        </div>
+      )
+    },
+    {
+      key: 'user',
+      label: 'User',
+      sortable: true,
+      width: '200px',
+      render: (borrowing: any) => (
+        <div className="admin-borrowing-user-cell">
+          {borrowing.user?.email || 'Unknown User'}
+        </div>
+      )
+    },
+    {
+      key: 'borrowedAt',
+      label: 'Borrowed Date',
+      sortable: true,
+      width: '130px',
+      render: (borrowing: any) => (
+        <div className="admin-borrowing-date-cell">
+          {formatDate(borrowing.borrowedAt)}
+        </div>
+      )
+    },
+    {
+      key: 'dueDate',
+      label: 'Due Date',
+      sortable: true,
+      width: '130px',
+      render: (borrowing: any) => (
+        <div className="admin-borrowing-date-cell">
+          {formatDate(borrowing.dueDate)}
+        </div>
+      )
+    },
+    {
+      key: 'returnedAt',
+      label: 'Returned Date',
+      sortable: true,
+      width: '130px',
+      render: (borrowing: any) => (
+        <div className="admin-borrowing-date-cell">
+          {borrowing.returnedAt ? formatDate(borrowing.returnedAt) : (
+            <span className={borrowing.status === 'overdue' ? 'admin-borrowing-status-badge-overdue' : 'admin-borrowing-status-badge-active'}>
+              {borrowing.status === 'returned' ? 'Returned' : borrowing.status === 'overdue' ? 'Overdue' : 'Active'}
+            </span>
+          )}
+        </div>
+      )
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      sortable: true,
+      width: '120px',
+      render: (borrowing: any) => (
+        <div className="admin-borrowing-status-cell">
+          <span className={`admin-borrowing-status-badge admin-borrowing-status-badge-${borrowing.status}`}>
+            {borrowing.status.charAt(0).toUpperCase() + borrowing.status.slice(1)}
+          </span>
+        </div>
+      )
+    },
+    {
+      key: 'lateFeeAmount',
+      label: 'Late Fee',
+      sortable: true,
+      width: '100px',
+      render: (borrowing: any) => (
+        <div className={borrowing.lateFeeAmount > 0 ? 'admin-borrowing-late-fee' : 'admin-borrowing-no-fee'}>
+          ${borrowing.lateFeeAmount.toFixed(2)}
+        </div>
+      )
+    }
+  ], []);
+
   if (loading) {
     return (
       <div className="admin-borrowing-container">
@@ -321,6 +438,7 @@ export function AdminBorrowingManager() {
             onClick={() => {
               fetchPendingRequests();
               fetchOverdueBooks();
+              fetchAllHistory();
             }}
             className="admin-borrowing-refresh-button"
           >
@@ -390,6 +508,12 @@ export function AdminBorrowingManager() {
           >
             Overdue Books ({overdueBooks.length})
           </button>
+          <button
+            className={`admin-borrowing-tab ${activeTab === 'history' ? 'admin-borrowing-tab-active' : ''}`}
+            onClick={() => setActiveTab('history')}
+          >
+            Requests History ({allHistory.length})
+          </button>
         </div>
 
         {/* Pending Requests Table */}
@@ -437,6 +561,30 @@ export function AdminBorrowingManager() {
             onSort={handleOverdueSort}
             loading={loading}
             emptyMessage="No overdue books"
+          />
+        )}
+
+        {/* Requests History Table */}
+        {activeTab === 'history' && (
+          <PaginatedTable
+            data={allHistory}
+            columns={historyColumns}
+            pagination={{
+              currentPage: historyPagination.state.page,
+              totalPages: Math.ceil(allHistory.length / historyPagination.state.limit),
+              hasNextPage: historyPagination.state.page < Math.ceil(allHistory.length / historyPagination.state.limit),
+              hasPreviousPage: historyPagination.state.page > 1,
+              total: allHistory.length,
+              pageSize: historyPagination.state.limit
+            }}
+            sorting={{
+              sortBy: historyPagination.state.sortBy,
+              sortOrder: historyPagination.state.sortOrder
+            }}
+            onPageChange={historyPagination.goToPage}
+            onSort={handleHistorySort}
+            loading={loading}
+            emptyMessage="No borrowing history"
           />
         )}
 

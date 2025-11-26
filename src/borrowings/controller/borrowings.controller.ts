@@ -155,6 +155,17 @@ export class BorrowingsController {
     return this.borrowingsService.updateOverdueStatuses();
   }
 
+  /**
+   * GET /borrowings/admin/history
+   * Get all borrowing history for all users (Admin only)
+   */
+  @Get('admin/history')
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  async getAllBorrowingHistory() {
+    return this.borrowingsService.getAllBorrowingHistory();
+  }
+
   // ============= PUBLIC/SHARED ENDPOINTS =============
 
   /**

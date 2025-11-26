@@ -19,7 +19,6 @@ import { BorrowingHistory } from './components/borrowing/BorrowingHistory';
 import PaginatedBooksTable from './components/books/PaginatedBooksTable';
 import PaginatedUsersTable from './components/users/PaginatedUsersTable';
 import { AdminBorrowingManager } from './components/borrowing/AdminBorrowingManager';
-import BooksContextTest from './components/test/BooksContextTest';
 import './index.css';
 
 function ProtectedRoute({ children }: { children: React.ReactElement }) {
@@ -83,8 +82,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               
-              {/* TEST ROUTE - Phase 1, Step 1.5 - TO BE DELETED AFTER TESTING */}
-              <Route path="/test-books-context" element={<BooksContextTest />} />
+              {/* TEST ROUTE - Phase 1, Step 1.5 - TO BE DELETED AFTER TESTING
+              <Route path="/test-books-context" element={<BooksContextTest />} /> */}
               
               <Route
                 path="/profile"

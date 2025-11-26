@@ -289,6 +289,13 @@ export class BorrowingsService {
   }
 
   /**
+   * Get all borrowing history for all users (Admin only)
+   */
+  async getAllBorrowingHistory() {
+    return this.borrowingsRepo.findAllBorrowingHistory();
+  }
+
+  /**
    * Get specific borrowing details
    */
   async getBorrowingDetails(borrowingUuid: string) {

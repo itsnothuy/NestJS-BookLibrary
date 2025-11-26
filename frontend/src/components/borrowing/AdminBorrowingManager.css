@@ -197,6 +197,41 @@
   font-weight: 700;
 }
 
+.admin-borrowing-no-fee {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.admin-borrowing-status-cell {
+  display: flex;
+  align-items: center;
+}
+
+.admin-borrowing-status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.admin-borrowing-status-badge-active {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.admin-borrowing-status-badge-overdue {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.admin-borrowing-status-badge-returned {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
 /* Action Buttons */
 .admin-borrowing-actions {
   display: flex;
